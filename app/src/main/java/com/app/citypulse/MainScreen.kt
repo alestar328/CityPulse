@@ -1,5 +1,6 @@
 package com.app.citypulse
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -20,8 +21,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.NavItem
-import com.app.citypulse.presentation.screens.AddEventScreen
 import com.app.citypulse.presentation.screens.ContactsScreen
 import com.app.citypulse.presentation.screens.MapScreen
 import com.app.citypulse.presentation.screens.SettingsScreen
@@ -44,6 +46,8 @@ fun MainScreen(modifier: Modifier = Modifier) {
     //Este Scaffold ha sido traido desde el MainActivity
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        containerColor = Color.Transparent, // Evita que Scaffold agregue un fondo que ocupe espacio
+        contentWindowInsets = WindowInsets(0.dp), // Elimina cualquier margen superior
         bottomBar = {
             NavigationBar {
                 navitemList.forEachIndexed{ index, navItem ->

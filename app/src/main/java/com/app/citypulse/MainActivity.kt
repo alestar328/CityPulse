@@ -1,6 +1,7 @@
 package com.app.citypulse
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -26,7 +27,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         //Splash Screen
-        Thread.sleep(3000)
+        Thread.sleep(2000)
         installSplashScreen()
 
         setContent {
