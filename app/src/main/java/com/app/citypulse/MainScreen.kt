@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Badge
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import com.app.citypulse.data.NavItem
 import com.app.citypulse.presentation.screens.AddEventScreen
 import com.app.citypulse.presentation.screens.ContactsScreen
+import com.app.citypulse.presentation.screens.MapScreen
 import com.app.citypulse.presentation.screens.SettingsScreen
 
 @Composable
@@ -30,7 +32,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
     //Creamos una lista que representa los botones del Navbar
     val navitemList = listOf(
         NavItem("Contacts", Icons.Default.Person, 5),
-        NavItem("Add", Icons.Default.Add, 0),
+        NavItem("Map", Icons.Default.LocationOn, 0),
         NavItem("Settings", Icons.Default.Settings, 0)
 
     )
@@ -81,7 +83,7 @@ fun ContentScreen(modifier: Modifier = Modifier, selectedIndex: Int) {
     //Esta es la logica de seleccion y cambio de pantalla
     when(selectedIndex){
         0 -> ContactsScreen()
-        1 -> AddEventScreen()
+        1 -> MapScreen()
         2 -> SettingsScreen()
     }
 
