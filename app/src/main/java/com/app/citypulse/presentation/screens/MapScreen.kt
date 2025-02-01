@@ -42,13 +42,7 @@ fun MapScreen() {
                 title = "Marcador en Barcelona"
             )
         }
-        SearcherBar(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .align(Alignment.TopCenter) // La posicionamos arriba centrada
 
-        )
     }
 }
 

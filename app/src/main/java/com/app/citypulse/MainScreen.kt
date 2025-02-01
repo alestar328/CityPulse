@@ -1,10 +1,12 @@
 package com.app.citypulse
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
@@ -20,10 +22,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.NavItem
+import com.app.citypulse.presentation.components.SearchTopbar
 import com.app.citypulse.presentation.screens.ContactsScreen
 import com.app.citypulse.presentation.screens.MapScreen
 import com.app.citypulse.presentation.screens.SettingsScreen
@@ -40,7 +44,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
     )
 
     var selectedIndex by remember {
-        mutableIntStateOf(0)
+        mutableIntStateOf(1)
     }
 
     //Este Scaffold ha sido traido desde el MainActivity
@@ -48,6 +52,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.Transparent, // Evita que Scaffold agregue un fondo que ocupe espacio
         contentWindowInsets = WindowInsets(0.dp), // Elimina cualquier margen superior
+
         bottomBar = {
             NavigationBar {
                 navitemList.forEachIndexed{ index, navItem ->
@@ -77,10 +82,24 @@ fun MainScreen(modifier: Modifier = Modifier) {
 
         }
     ) { innerPadding ->
-        ContentScreen(modifier = Modifier.padding(innerPadding), selectedIndex)
+        // Contenido de las pantallas
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding) // Asegura que el contenido no se superponga con el topBar
+        ) {
+            ContentScreen(modifier = Modifier.fillMaxSize(), selectedIndex = selectedIndex)
+            // Agregamos el TopBar MANUALMENTE sobre el mapa
+            SearchTopbar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .align(Alignment.TopCenter)
+                    .background(Color.Transparent) // Hace que el topbar no tenga fondo blanco
+            )
+        }
     }
 }
-
 @Composable
 fun ContentScreen(modifier: Modifier = Modifier, selectedIndex: Int) {
 
