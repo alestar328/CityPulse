@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ProfileCard(
+fun EventCard(
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -98,6 +98,6 @@ fun ProfileCard(
 
 @Preview
 @Composable
-fun ProfileCardPreview() {
-    ProfileCard()
+fun EventCardPreview() {
+    EventCard()
 }
