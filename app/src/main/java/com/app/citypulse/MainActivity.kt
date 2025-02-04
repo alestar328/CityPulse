@@ -1,55 +1,41 @@
 package com.app.citypulse
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.app.citypulse.presentation.screens.LoginScreen
-import com.app.citypulse.presentation.screens.SettingsScreen
-import com.app.citypulse.ui.theme.CityPulseTheme
-import com.app.citypulse.ui.theme.viewmodel.AuthViewModel
+import com.app.citypulse.presentation.ui.theme.CityPulseTheme
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Splash Screen
-        Thread.sleep(3000)
+        //Splash Screen
+        Thread.sleep(2000)
         installSplashScreen()
 
         setContent {
             CityPulseTheme {
-                // Crea un NavController para gestionar la navegación
-                val navController = rememberNavController()
-
-                // Inicializa el ViewModel
-                val authViewModel: AuthViewModel = viewModel()
-
-                // Usamos NavHost para definir las pantallas y su navegación
-                NavHost(navController = navController, startDestination = "login_screen") {
-                    // Pantalla de Login
-                    composable("login_screen") {
-                        LoginScreen(navController = navController, viewModel = authViewModel)
-                    }
-                    // Pantalla de Settings
-                    composable("settings_screen") {
-                        SettingsScreen()
-                    }
-                }
+                //El Navbar esta en MainScreen
+                MainScreen()
             }
         }
     }
 }
+

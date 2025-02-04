@@ -1,4 +1,4 @@
-package com.app.citypulse.ui.theme
+package com.app.citypulse.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build
