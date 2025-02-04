@@ -19,19 +19,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.NavController
 import com.app.citypulse.R
+import com.app.citypulse.ui.theme.viewmodel.AuthViewModel
 
-@Preview
+
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
     val backgroundImage = if (isSystemInDarkTheme()) {
         R.drawable.hotelvelabarna // Imagen para modo oscuro
     } else {
         R.drawable.dubai // Imagen para modo claro
     }
-
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var loginResult by remember { mutableStateOf<Boolean?>(null) }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -129,16 +131,25 @@ fun LoginScreen() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-
-                // Botón de inicio de sesión
                 Button(
-                    onClick = { /* Lógica para iniciar sesión */ },
+                    onClick = {
+                        // Lógica de login, en este caso solo navegamos si el login es exitoso
+                        viewModel.login(email, password) { success ->
+                            loginResult = success
+                            if (success) {
+                                // Si el login es exitoso, navega a la pantalla de configuración
+                                navController.navigate("settings_screen")
+                            }
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                 ) {
                     Text("Iniciar sesión")
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Spacer(modifier = Modifier.height(8.dp))
 
