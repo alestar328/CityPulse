@@ -1,41 +1,53 @@
 package com.app.citypulse
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.app.citypulse.data.repository.EventRepository
+import com.app.citypulse.presentation.EventViewModel
+import com.app.citypulse.presentation.screens.CreateEventScreen
 import com.app.citypulse.presentation.ui.theme.CityPulseTheme
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Inicializar Firebase.
+        FirebaseApp.initializeApp(this)
+
+        // Inicializar Firestore.
+        val firestore = FirebaseFirestore.getInstance()
+
+
+        // Habilitar pantalla de borde a borde
         enableEdgeToEdge()
 
-        //Splash Screen
-        Thread.sleep(2000)
-        installSplashScreen()
+        // Configuración del SplashScreen
+        installSplashScreen().apply {
+            setKeepOnScreenCondition {
+                Thread.sleep(2000)
+                false
+            }
+        }
 
         setContent {
             CityPulseTheme {
-                //El Navbar esta en MainScreen
-                MainScreen()
+                val navController = rememberNavController()
+                val eventRepository = EventRepository() // Crear el repositorio manualmente
+                val viewModel = EventViewModel(eventRepository) // Pasar el repositorio al ViewModel
+
+                NavHost(navController = navController, startDestination = "main_screen") {
+                    composable("main_screen") { MainScreen(navController) }
+                    composable("create_event") { CreateEventScreen(viewModel, navController) }
+                }
             }
         }
     }
 }
-

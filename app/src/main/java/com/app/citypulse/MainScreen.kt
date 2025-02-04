@@ -31,71 +31,68 @@ import com.app.citypulse.presentation.components.SearchTopbar
 import com.app.citypulse.presentation.screens.ContactsScreen
 import com.app.citypulse.presentation.screens.MapScreen
 import com.app.citypulse.presentation.screens.SettingsScreen
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material.icons.filled.Add
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun MainScreen(navController: NavController = rememberNavController()) {
 
-    //Creamos una lista que representa los botones del Navbar
     val navitemList = listOf(
         NavItem("Contacts", Icons.Default.Person, 5),
         NavItem("Map", Icons.Default.LocationOn, 0),
         NavItem("Settings", Icons.Default.Settings, 0)
-
     )
 
-    var selectedIndex by remember {
-        mutableIntStateOf(1)
-    }
+    var selectedIndex by remember { mutableIntStateOf(1) }
 
-    //Este Scaffold ha sido traido desde el MainActivity
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = Color.Transparent, // Evita que Scaffold agregue un fondo que ocupe espacio
-        contentWindowInsets = WindowInsets(0.dp), // Elimina cualquier margen superior
-
+        containerColor = Color.Transparent,
+        contentWindowInsets = WindowInsets(0.dp),
         bottomBar = {
             NavigationBar {
-                navitemList.forEachIndexed{ index, navItem ->
+                navitemList.forEachIndexed { index, navItem ->
                     NavigationBarItem(
                         selected = selectedIndex == index,
-                        onClick = {
-                            selectedIndex = index
-                        },
+                        onClick = { selectedIndex = index },
                         icon = {
                             BadgedBox(badge = {
-                                //Condicional para que no muestre "0" en los demas iconos
-                                if(navItem.badgeCount>0)
-                                Badge(){
-                                    Text(text = navItem.badgeCount.toString())
-                                }
+                                if (navItem.badgeCount > 0)
+                                    Badge { Text(text = navItem.badgeCount.toString()) }
                             }) {
                                 Icon(imageVector = navItem.icon, contentDescription = "Icon")
                             }
                         },
-                        label = {
-                            Text(text = navItem.label)
-                        }
+                        label = { Text(text = navItem.label) }
                     )
                 }
-
             }
-
+        },
+        floatingActionButton = {
+            if (selectedIndex == 1) { // Solo mostrar el botón en la pantalla del mapa
+                FloatingActionButton(
+                    onClick = { navController.navigate("create_event") },
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Crear Evento")
+                }
+            }
         }
     ) { innerPadding ->
-        // Contenido de las pantallas
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding) // Asegura que el contenido no se superponga con el topBar
+                .padding(innerPadding)
         ) {
             ContentScreen(modifier = Modifier.fillMaxSize(), selectedIndex = selectedIndex)
-            // Agregamos el TopBar MANUALMENTE sobre el mapa
             SearchTopbar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
                     .align(Alignment.TopCenter)
-                    .background(Color.Transparent) // Hace que el topbar no tenga fondo blanco
+                    .background(Color.Transparent)
             )
         }
     }

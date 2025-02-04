@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -29,19 +30,24 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures {
         compose = true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -51,17 +57,18 @@ android {
 
 dependencies {
 
-    //Splash Screen:
+    // Splash Screen
     implementation("androidx.core:core-splashscreen:1.0.0")
-    //Google maps
-    implementation("com.google.android.gms:play-services-maps:19.0.0")
-    implementation ("com.google.maps.android:maps-compose:4.4.1")
 
-    //Navegacion
+    // Google Maps
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation("com.google.maps.android:maps-compose:4.4.1")
+
+    // Navegación
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
 
-
+    // Dependencias de UI y Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -70,6 +77,21 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // Firebase Firestore
+    implementation("com.google.firebase:firebase-firestore-ktx:24.0.0")
+
+    // Firebase Auth y Database
+    implementation("com.google.firebase:firebase-auth-ktx:21.0.1")
+    implementation("com.google.firebase:firebase-database-ktx:20.0.0")
+
+    // Firebase SDK
+    implementation("com.google.firebase:firebase-analytics:21.0.0")
+
+    // Firebase Cloud Messaging
+    implementation("com.google.firebase:firebase-messaging:23.0.0")
+
+    // Dependencias de prueba
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
