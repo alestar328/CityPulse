@@ -29,6 +29,7 @@ class MainActivity : ComponentActivity() {
         Thread.sleep(3000)
         installSplashScreen()
 
+
         setContent {
             CityPulseTheme {
                 //El Navbar esta en MainScreen
