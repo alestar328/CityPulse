@@ -9,5 +9,4 @@ plugins {
 
     //Crashlytics Gradle
     id("com.google.firebase.crashlytics") version "3.0.2" apply false
-    alias(libs.plugins.kotlin.compose) apply false
 }
