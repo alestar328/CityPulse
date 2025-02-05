@@ -1,6 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+
+    id("com.google.gms.google-services")
+
+    // Add the Crashlytics Gradle plugin
+    id("com.google.firebase.crashlytics")
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -61,6 +67,13 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
 
+    //FireBase:
+    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation("com.google.firebase:firebase-analytics")
+
+    //Crashlitics
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
