@@ -23,7 +23,7 @@ import com.app.citypulse.presentation.viewmodel.AuthViewModel
 fun MainScreen(authViewModel: AuthViewModel = viewModel()) {
     val navController = rememberNavController()
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
-
+// pongo un comentario para poder hacer un commit a
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.Transparent,
