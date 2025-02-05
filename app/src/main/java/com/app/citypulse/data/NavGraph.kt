@@ -19,8 +19,8 @@ fun NavigationGraph(navController: NavHostController, authViewModel: AuthViewMod
         composable("login") {
             LoginScreen(navController = navController, viewModel = authViewModel)
         }
-        composable("contacts") {
-            ContactsScreen()
+        composable("profile") {
+            ProfileScreen()
         }
         composable("map") {
             MapScreen()

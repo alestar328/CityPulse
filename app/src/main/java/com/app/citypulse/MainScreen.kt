@@ -23,7 +23,12 @@ import com.app.citypulse.presentation.viewmodel.AuthViewModel
 fun MainScreen(authViewModel: AuthViewModel = viewModel()) {
     val navController = rememberNavController()
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
-// pongo un comentario para poder hacer un commit a
+
+    // 1) Aqui empieza la logica para Topbar solo se vea en Map
+    val currentBackStackEntry by navController.currentBackStackEntryFlow.collectAsState(initial = null)
+    val currentRoute = currentBackStackEntry?.destination?.route
+
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.Transparent,
@@ -41,7 +46,7 @@ fun MainScreen(authViewModel: AuthViewModel = viewModel()) {
         ) {
             NavigationGraph(navController, authViewModel) // Usa el NavigationGraph
 
-            if (isAuthenticated) {
+            if (isAuthenticated && currentRoute == "map") {
                 SearchTopbar(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -57,7 +62,7 @@ fun MainScreen(authViewModel: AuthViewModel = viewModel()) {
 @Composable
 fun BottomNavigationBar(navController: androidx.navigation.NavController) {
     val navItemList = listOf(
-        NavItem("contacts", Icons.Default.Person, 5),
+        NavItem("profile", Icons.Default.Person, 5),
         NavItem("map", Icons.Default.LocationOn, 0),
         NavItem("settings", Icons.Default.Settings, 0)
     )
