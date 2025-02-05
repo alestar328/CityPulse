@@ -1,4 +1,4 @@
-package com.app.citypulse.ui.theme.viewmodel
+package com.app.citypulse.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

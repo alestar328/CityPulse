@@ -1,4 +1,5 @@
-package com.app.citypulse.data
+package com.app.citypulse.data.repository
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.AuthResult
 import kotlinx.coroutines.tasks.await
