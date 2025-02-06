@@ -35,9 +35,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material.icons.filled.Add
+import com.app.citypulse.presentation.EventViewModel
 
 @Composable
 fun MainScreen(navController: NavController = rememberNavController()) {
+
+    val viewModel = EventViewModel(com.app.citypulse.data.repository.EventRepository()) // Crear el ViewModel
 
     val navitemList = listOf(
         NavItem("Contacts", Icons.Default.Person, 5),
@@ -86,7 +89,12 @@ fun MainScreen(navController: NavController = rememberNavController()) {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            ContentScreen(modifier = Modifier.fillMaxSize(), selectedIndex = selectedIndex)
+            ContentScreen(
+                modifier = Modifier.fillMaxSize(),
+                selectedIndex = selectedIndex,
+                navController = navController,
+                viewModel = viewModel // 🔹 Pasar el ViewModel aquí
+            )
             SearchTopbar(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -97,14 +105,33 @@ fun MainScreen(navController: NavController = rememberNavController()) {
         }
     }
 }
-@Composable
-fun ContentScreen(modifier: Modifier = Modifier, selectedIndex: Int) {
 
-    //Esta es la logica de seleccion y cambio de pantalla
-    when(selectedIndex){
+
+@Composable
+fun ContentScreen(
+    modifier: Modifier = Modifier,
+    selectedIndex: Int,
+    navController: NavController,
+    viewModel: EventViewModel
+) {
+    when (selectedIndex) {
         0 -> ContactsScreen()
-        1 -> MapScreen()
+        1 -> {
+            // Agregar el parámetro onLocationSelected aquí también
+            MapScreen(
+                viewModel = viewModel,
+                onLocationSelected = { latLng ->
+                    // Acción a tomar cuando se selecciona una ubicación
+                    navController.previousBackStackEntry?.savedStateHandle?.apply {
+                        set("latitud", latLng.latitude)
+                        set("longitud", latLng.longitude)
+                    }
+                    navController.popBackStack() // Volver atrás después de seleccionar la ubicación
+                }
+            )
+        }
         2 -> SettingsScreen()
     }
-
 }
+
+

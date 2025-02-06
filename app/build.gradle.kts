@@ -90,6 +90,7 @@ dependencies {
 
     // Firebase Cloud Messaging
     implementation("com.google.firebase:firebase-messaging:23.0.0")
+    implementation(libs.androidx.appcompat)
 
     // Dependencias de prueba
     testImplementation(libs.junit)

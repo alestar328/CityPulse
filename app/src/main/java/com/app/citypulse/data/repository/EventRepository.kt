@@ -13,4 +13,20 @@ class EventRepository {
             .addOnSuccessListener { Log.d("Firebase", "Evento agregado con éxito") }
             .addOnFailureListener { Log.e("Firebase", "Error al agregar evento", it) }
     }
+
+    fun getEvents(callback: (List<EventEntity>) -> Unit) {
+        db.collection("Eventos")
+            .get()
+            .addOnSuccessListener { documents ->
+                val events = mutableListOf<EventEntity>()
+                for (document in documents) {
+                    val event = document.toObject(EventEntity::class.java)
+                    events.add(event)
+                }
+                callback(events)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Firebase", "Error al obtener eventos", exception)
+            }
+    }
 }
