@@ -26,17 +26,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.citypulse.presentation.components.ActionBox
 import com.app.citypulse.presentation.components.ButtonBar
+import com.app.citypulse.presentation.components.PersonalScoreBar
 import com.app.citypulse.presentation.components.ProfileHeader
 
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier){
     Column(
         modifier = modifier.fillMaxSize()
-            .background(Color(0xFF1976D2))
+            .background(Color(0xFFFFFFFF))
             .padding(horizontal = 16.dp), // Margen lateral
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
+        Spacer(modifier = Modifier.height(16.dp))
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -54,13 +55,15 @@ fun ProfileScreen(modifier: Modifier = Modifier){
                 }
             }
         }
+        PersonalScoreBar()
         Spacer(modifier = Modifier.height(16.dp))
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp) // Espaciado entre botones
         ) {
             ButtonBar("Mis Amigos", backgroundColor = Color.White)
-            Spacer(modifier = Modifier.height(8.dp))
+            ButtonBar("Mis Descuentos", backgroundColor = Color.White)
+
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween, // Espaciado entre ActionBoxes
                 modifier = Modifier.fillMaxWidth()
@@ -71,10 +74,6 @@ fun ProfileScreen(modifier: Modifier = Modifier){
 
             }
             Spacer(modifier = Modifier.height(8.dp))
-            ButtonBar("Mis Descuentos", backgroundColor = Color.White)
-            ButtonBar("Cambiar Contraseña", backgroundColor = Color.White)
-            ButtonBar("Cerrar Sesión", backgroundColor = Color.White)
-            ButtonBar("Borrar Cuenta", backgroundColor = Color.Red)
         }
 
     }

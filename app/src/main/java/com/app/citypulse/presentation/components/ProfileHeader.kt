@@ -52,7 +52,7 @@ fun ProfileHeader() {
         Column(
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Nombre Apellido", fontSize = 20.sp, color = Color.White)
+            Text(text = "Nombre Apellido", fontSize = 20.sp, color = Color.Black)
             Text(text = "Nombre Usuario", fontSize = 16.sp, color = Color.LightGray)
 
             Spacer(modifier = Modifier.height(4.dp))
