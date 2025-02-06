@@ -28,5 +28,8 @@ fun NavigationGraph(navController: NavHostController, authViewModel: AuthViewMod
         composable("settings") {
             SettingsScreen()
         }
+        composable("register"){
+            RegisterScreen(navController = navController, viewModel = authViewModel)
+        }
     }
 }
