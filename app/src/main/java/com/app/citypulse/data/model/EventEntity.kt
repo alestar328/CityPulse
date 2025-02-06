@@ -17,12 +17,4 @@ data class EventEntity (
     val precio: Double = 0.0,
     val valoracion: Int = 0,
     val idRealizador: Int = 0
-) {
-    fun obtenerUbicacion(): String {
-        return if (latitud != 0.0 && longitud != 0.0) {
-            "Lat: $latitud, Lng: $longitud"
-        } else {
-            "Ubicación no seleccionada"
-        }
-    }
-}
+)
