@@ -1,11 +1,10 @@
-package com.example.pruebas.data
+package com.app.citypulse.data.repository
 
 import com.app.citypulse.data.dataUsers.UserItem
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.tasks.await
 
-class FirebaseRepository {
+class UserRepository {
     private val db = FirebaseFirestore.getInstance()
     private  val collectionRef = db.collection("Usuarios")
 

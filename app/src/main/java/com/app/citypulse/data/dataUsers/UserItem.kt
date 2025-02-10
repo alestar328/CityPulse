@@ -1,37 +1,44 @@
 package com.app.citypulse.data.dataUsers
+
 import java.util.regex.Pattern
 
 
-
-
-// Data class Usuario
+// Data class para almacenar usuarios
 data class UserItem(
-    val id: Int,
-    val nombre: String,
-    val apellido: String,
-    val edad: Int,
+    val id: Int? = null,
+    val name: String,
+    val surname: String,
+    val age: Int,
     val email: String,
-    val dni: String,
-    val amigos: List<Int>,
-    val telefono: String,
-    val tipoCuenta: AccountType,
-    val valoracion: Int,  // Asumimos que el valor está entre 1 y 5
-    val contrasena: String
+    val documentId: String,  // Puede ser DNI o NIF
+    val amigos: List<Int> = emptyList(),
+    val telefono: String? = null,
+    val userType: AccountType,
+    val valoracion: Int? = null,  // Puede ser null si es un nuevo usuario
+    val password: String,
+    val gender: String,
+    val fiscalAddress: String? = null  // Solo se usa en cuentas de empresa
 ) {
     init {
-        // Validaciones
-
-        // Comprobación de email
+        // Validación del email
         require(email.endsWith("@gmail.com")) { "El correo electrónico debe terminar en '@gmail.com'" }
 
-        // Comprobación de DNI Español (formato básico: 8 dígitos + una letra)
-        require(Pattern.matches("\\d{8}[A-Z]", dni)) { "El DNI debe tener el formato correcto (8 dígitos y una letra)" }
+        // Validación del documento (DNI o NIF)
+        if (userType == AccountType.Persona) {
+            require(Pattern.matches("\\d{8}[A-Z]", documentId)) { "El DNI debe tener el formato correcto (8 dígitos y una letra)" }
+        } else {
+            require(Pattern.matches("[A-Z]\\d{8}", documentId)) { "El NIF debe tener el formato correcto (1 letra seguida de 8 números)" }
+            require(fiscalAddress != null) { "Las cuentas de empresa deben incluir una dirección fiscal" }
+        }
 
-        // Comprobación de teléfono (9 dígitos)
-        require(telefono.length == 9 && telefono.all { it.isDigit() }) { "El teléfono debe tener exactamente 9 dígitos" }
+        // Validación de teléfono (solo si se proporciona)
+        telefono?.let {
+            require(it.length == 9 && it.all { char -> char.isDigit() }) { "El teléfono debe tener exactamente 9 dígitos" }
+        }
 
-        // Comprobación de la valoración (del 1 al 5)
-        require(valoracion in 1..5) { "La valoración debe estar entre 1 y 5" }
+        // Validación de la valoración (solo si no es null)
+        valoracion?.let {
+            require(it in 1..5) { "La valoración debe estar entre 1 y 5" }
+        }
     }
 }
-

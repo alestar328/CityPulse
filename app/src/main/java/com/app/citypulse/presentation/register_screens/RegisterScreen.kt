@@ -1,4 +1,4 @@
-package com.app.citypulse.presentation.screens
+package com.app.citypulse.presentation.register_screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -20,12 +19,13 @@ import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
+fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
     val backgroundImage = if (isSystemInDarkTheme()) R.drawable.hotelvelabarna else R.drawable.dubai
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var loginError by remember { mutableStateOf(false) }
+    var confirmPassword by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -96,9 +96,20 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        if (loginError) {
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        TextField(
+                            value = confirmPassword,
+                            onValueChange = { confirmPassword = it },
+                            label = { Text("Repetir Contraseña") },
+                            singleLine = true,
+                            visualTransformation = PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        if (errorMessage.isNotEmpty()) {
                             Text(
-                                "Error al iniciar sesión. Verifique sus credenciales.",
+                                errorMessage,
                                 color = Color.Red,
                                 style = MaterialTheme.typography.bodyMedium,
                                 textAlign = TextAlign.Center,
@@ -114,55 +125,39 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
 
                 Button(
                     onClick = {
-                        viewModel.login(email, password) { success ->
-                            if (success) {
-                                navController.navigate("map") {
-                                    popUpTo("login") { inclusive = true }
-                                }
-                            } else {
-                                loginError = true
-                            }
+                        errorMessage = when {
+                            email.isBlank() -> "El correo electrónico no puede estar vacío."
+                            password.length < 6 -> "La contraseña debe tener al menos 6 caracteres."
+                            password != confirmPassword -> "Las contraseñas no coinciden."
+                            else -> ""
+                        }
+
+                        if (errorMessage.isEmpty()) {
+                            viewModel.setTempUserData(email, password)
+                            navController.navigate("register2")
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                 ) {
-                    Text("Iniciar sesión")
+                    Text("Siguiente")
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                Button(
-                    onClick = { /* Lógica para iniciar sesión con Google */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.googlelogo),
-                        contentDescription = "Logo de Google",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Iniciar sesión con Google", color = Color.Black)
-                }
-
-                Spacer(modifier = Modifier.height(56.dp))
-
-                Button(
-                    onClick = { navController.navigate("register") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 90.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333))
+                // Aquí agregamos el botón "¿Ya tienes cuenta? Inicia sesión"
+                TextButton(
+                    onClick = {
+                        // Aquí va la navegación al login
+                        navController.navigate("login")
+                    },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text(
-                        "¿No tienes cuenta? Regístrate aquí",
-                        color = Color.White,
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
+                        "¿Ya tienes cuenta? Inicia sesión",
+                        color = Color.White.copy(alpha = 0.8f), // Letras claras pero no mucho
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
