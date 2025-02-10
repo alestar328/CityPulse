@@ -4,13 +4,20 @@ import android.accounts.Account
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.AccountType
+import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.repository.AuthRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class AuthViewModel : ViewModel() {
     private val authRepository = AuthRepository()
+    // Obteniendo auth y firestore desde AuthRepository
+    private val auth: FirebaseAuth = authRepository.getFirebaseAuth()
+    private val firestore: FirebaseFirestore = authRepository.getFirestore()
 
     // Estado de autenticación
     private val _isAuthenticated = MutableStateFlow(false)  // Inicialmente no está autenticado
@@ -133,5 +140,18 @@ class AuthViewModel : ViewModel() {
         tempGender = null
         tempFiscalAddress = null
         tempUserType = null  // Limpiar el tipo de cuenta
+    }
+    fun getUserData(onResult: (UserItem?) -> Unit) {
+        val userId = auth.currentUser?.uid ?: return onResult(null)
+
+        viewModelScope.launch {
+            try {
+                val document = firestore.collection("users").document(userId).get().await()
+                val user = document.toObject(UserItem::class.java)
+                onResult(user)
+            } catch (e: Exception) {
+                onResult(null)
+            }
+        }
     }
 }

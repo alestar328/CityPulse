@@ -10,6 +10,16 @@ class AuthRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
+    // Método para obtener FirebaseAuth
+    fun getFirebaseAuth(): FirebaseAuth {
+        return auth
+    }
+
+    // Método para obtener FirebaseFirestore
+    fun getFirestore(): FirebaseFirestore {
+        return firestore
+    }
+
     // Función para hacer login con correo y contraseña
     suspend fun login(email: String, password: String): AuthResult? {
         return try {
@@ -77,4 +87,6 @@ class AuthRepository {
 
     // Obtener el usuario actual autenticado
     fun getCurrentUser() = auth.currentUser
+
+
 }

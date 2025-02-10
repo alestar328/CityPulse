@@ -24,9 +24,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.citypulse.data.dataUsers.UserItem
 
 @Composable
-fun ProfileHeader() {
+fun ProfileHeader(user: UserItem?){
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -62,9 +63,9 @@ fun ProfileHeader() {
         }
     }
 }
-
+/*
 @Preview
 @Composable
 fun ProfileHeaderPreview() {
     ProfileHeader()
-}
+}*/

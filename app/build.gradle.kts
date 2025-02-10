@@ -8,11 +8,21 @@ plugins {
     id("com.google.firebase.crashlytics")
     alias(libs.plugins.compose.compiler)
 
+    //KSP para Room, esto va segundo
+    id("com.google.devtools.ksp")
+
+    //Esto es para que almacenar en local (2)
+    id("androidx.room")
+
 }
 
 android {
     namespace = "com.app.citypulse"
     compileSdk = 35
+    //Esto es para almacenar en local (3)
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 
     defaultConfig {
         applicationId = "com.app.citypulse"
@@ -76,6 +86,21 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
 
+    //Room, esto va tercero
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-ktx:$room_version")
+    // optional - Test helpers
+    testImplementation("androidx.room:room-testing:$room_version")
+
+    // optional - Paging 3 Integration
+    implementation("androidx.room:room-paging:$room_version")
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -94,3 +119,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
+
+
