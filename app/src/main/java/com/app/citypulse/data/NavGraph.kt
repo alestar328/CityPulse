@@ -20,13 +20,19 @@ fun NavigationGraph(navController: NavHostController, authViewModel: AuthViewMod
             LoginScreen(navController = navController, viewModel = authViewModel)
         }
         composable("profile") {
-            ProfileScreen()
+            ProfileScreen(navController = navController)
         }
         composable("map") {
             MapScreen()
         }
         composable("settings") {
             SettingsScreen()
+        }
+        composable("assisted_events") {
+            AssistedEventScreen(navController = navController)
+        }
+        composable("saved_events") {
+            SavedEventScreen(navController = navController)
         }
     }
 }

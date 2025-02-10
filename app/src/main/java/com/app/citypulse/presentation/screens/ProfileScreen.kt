@@ -20,19 +20,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.app.citypulse.presentation.components.ActionBox
 import com.app.citypulse.presentation.components.ButtonBar
 import com.app.citypulse.presentation.components.PersonalScoreBar
+import com.app.citypulse.presentation.components.PhotoContainer
 import com.app.citypulse.presentation.components.ProfileHeader
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier){
+fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController
+) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
             .background(Color(0xFFFFFFFF))
             .padding(horizontal = 16.dp), // Margen lateral
         horizontalAlignment = Alignment.CenterHorizontally
@@ -41,7 +48,9 @@ fun ProfileScreen(modifier: Modifier = Modifier){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProfileHeader()
+            ProfileHeader(
+
+            )
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -68,12 +77,24 @@ fun ProfileScreen(modifier: Modifier = Modifier){
                 horizontalArrangement = Arrangement.SpaceBetween, // Espaciado entre ActionBoxes
                 modifier = Modifier.fillMaxWidth()
             ) {
-                ActionBox(icon = Icons.Default.Check,"Eventos asistidos")
+                ActionBox(icon = Icons.Default.Check, "Eventos asistidos", modifier = Modifier){
+                    navController.navigate("assisted_events")
+                }
 
-                ActionBox(icon = Icons.Default.Favorite,"Eventos guardados")
+                ActionBox(icon = Icons.Default.Favorite, "Eventos guardados",modifier = Modifier){
+                    navController.navigate("assisted_events")
+                }
 
             }
             Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceAround, // Espaciado entre ActionBoxes
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                PhotoContainer { }
+                PhotoContainer { }
+                PhotoContainer { }
+            }
         }
 
     }
@@ -81,6 +102,6 @@ fun ProfileScreen(modifier: Modifier = Modifier){
 
 @Preview
 @Composable
-fun ProfileScreenPreview(){
-    ProfileScreen()
+fun ProfileScreenPreview() {
+    ProfileScreen(navController = NavController(LocalContext.current))
 }

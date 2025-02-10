@@ -26,11 +26,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,8 +45,9 @@ fun SearcherBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(50.dp)
-            .background(color = Color.Gray, shape = RoundedCornerShape(24.dp))
+            .height(55.dp)
+            .shadow(4.dp, RoundedCornerShape(12.dp))
+            .background(color = TurkBlue, shape = RoundedCornerShape(24.dp))
             .padding(horizontal = 16.dp)
     ){
         Row(
@@ -54,7 +57,7 @@ fun SearcherBar(
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = "Menu",
-                tint = Color.Black,
+                tint = Color.White,
                 modifier = Modifier.size(40.dp)
             )
             Spacer(modifier = Modifier.width(12.dp)) // Espaciado entre el icono y el campo de texto
@@ -62,7 +65,7 @@ fun SearcherBar(
             TextField(
                 value = searchText,
                 onValueChange = {searchText = it},
-                placeholder = { Text("Buscar evento", color = Color.Black, fontSize = 18.sp)},
+                placeholder = { Text("Buscar evento", color = Color.White, fontSize = 18.sp)},
                 singleLine = true,
                 modifier = Modifier.weight(1f),
                 colors = TextFieldDefaults.textFieldColors(
@@ -76,7 +79,7 @@ fun SearcherBar(
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Buscar",
-                tint = Color.Black,
+                tint = Color.White ,
                 modifier = Modifier.size(40.dp)
 
             )

@@ -9,11 +9,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.R
+import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
 
 @Composable
 fun CulturalIcon(
@@ -21,16 +23,16 @@ fun CulturalIcon(
 ) {
     Box(
         modifier = modifier
-            .background(color = Color.Gray, shape = RoundedCornerShape(24.dp))
+            .shadow(4.dp, RoundedCornerShape(12.dp))            .background(color = TurkBlue, shape = RoundedCornerShape(24.dp))
             .padding(horizontal = 12.dp)
-            .size(60.dp),
+            .size(45.dp),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             painter = painterResource(id = R.drawable.culturaicon),
             contentDescription = "Fiesta",
-            tint = Color.Black,
-            modifier = Modifier.size(40.dp)
+            tint = Color.White,
+            modifier = Modifier.size(35.dp)
         )
 
     }

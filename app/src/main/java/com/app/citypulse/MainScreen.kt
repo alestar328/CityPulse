@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.data.NavItem
 import com.app.citypulse.data.NavigationGraph
 import com.app.citypulse.presentation.components.SearchTopbar
+import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 @Composable
@@ -50,6 +51,7 @@ fun MainScreen(authViewModel: AuthViewModel = viewModel()) {
                 SearchTopbar(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .statusBarsPadding()
                         .padding(16.dp)
                         .align(Alignment.TopCenter)
                         .background(Color.Transparent)
@@ -67,7 +69,9 @@ fun BottomNavigationBar(navController: androidx.navigation.NavController) {
         NavItem("settings", Icons.Default.Settings, 0)
     )
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = TurkBlue
+    ) {
         navItemList.forEach { navItem ->
             NavigationBarItem(
                 selected = navController.currentDestination?.route == navItem.label,
@@ -77,7 +81,7 @@ fun BottomNavigationBar(navController: androidx.navigation.NavController) {
                         if (navItem.badgeCount > 0)
                             Badge { Text(text = navItem.badgeCount.toString()) }
                     }) {
-                        Icon(imageVector = navItem.icon, contentDescription = "Icon")
+                        Icon(imageVector = navItem.icon, contentDescription = "Icon", tint = Color.White)
                     }
                 },
                 label = { Text(text = navItem.label) }
