@@ -93,7 +93,7 @@ fun MainScreen(navController: NavController = rememberNavController()) {
                 modifier = Modifier.fillMaxSize(),
                 selectedIndex = selectedIndex,
                 navController = navController,
-                viewModel = viewModel // 🔹 Pasar el ViewModel aquí
+                viewModel = viewModel
             )
             SearchTopbar(
                 modifier = Modifier

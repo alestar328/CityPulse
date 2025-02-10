@@ -28,6 +28,7 @@ fun LocationPickerScreen(navController: NavController) {
     val markerState = rememberMarkerState(position = LatLng(41.387054, 2.170210))
 
     fun getAddressFromLatLng(context: Context, latLng: LatLng): String {
+        // Usar geocoder para obtener la dirección en texto a partir de las coordenadas
         val geocoder = Geocoder(context, Locale.getDefault())
         return try {
             val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)

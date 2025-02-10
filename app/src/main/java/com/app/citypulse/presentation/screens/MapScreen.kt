@@ -14,14 +14,15 @@ fun MapScreen(viewModel: EventViewModel, onLocationSelected: (LatLng) -> Unit) {
         position = CameraPosition.fromLatLngZoom(LatLng(41.387054, 2.170210), 12f)
     }
 
-    val eventLocations = viewModel.eventList // Lista de eventos en tiempo real
+    // Lista de eventos en tiempo real.
+    val eventLocations = viewModel.eventList
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
         ) {
-            // Dibujar los eventos como marcadores
+            // Dibujar los eventos como marcadores.
             eventLocations.forEach { event ->
                 Marker(
                     state = rememberMarkerState(position = LatLng(event.latitud, event.longitud)),
