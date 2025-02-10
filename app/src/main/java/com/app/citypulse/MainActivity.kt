@@ -32,7 +32,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CityPulseTheme {
-                //El Navbar esta en MainScreen
                 MainScreen()
             }
         }

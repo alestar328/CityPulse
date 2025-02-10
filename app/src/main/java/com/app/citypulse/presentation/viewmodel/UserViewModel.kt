@@ -3,12 +3,12 @@ package com.app.citypulse.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.UserItem
-import com.example.pruebas.data.FirebaseRepository
+import com.app.citypulse.data.repository.UserRepository
 import kotlinx.coroutines.launch
 
 class PersonViewModel : ViewModel() {
 
-    private val repository = FirebaseRepository()
+    private val repository = UserRepository()
 
     // 🔹 Agregar una persona a Firestore
     fun addPerson(user: UserItem) {
@@ -28,7 +28,7 @@ class PersonViewModel : ViewModel() {
             try {
                 val persons = repository.getUsers()
                 persons.forEach {
-                    println("Persona: ${it.nombre} ${it.apellido}, Edad: ${it.edad}")
+                    println("Persona: ${it.name} ${it.surname}, Edad: ${it.age}")
                 }
             } catch (e: Exception) {
                 println(" Error al obtener personas: ${e.message}")
