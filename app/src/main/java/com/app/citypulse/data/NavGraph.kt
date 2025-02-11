@@ -13,14 +13,14 @@ import com.app.citypulse.presentation.screens.*
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 @Composable
-fun NavigationGraph(navController: NavHostController, authViewModel: AuthViewModel, eventViewModel: EventViewModel) {
+fun NavigationGraph(
+    navController: NavHostController,
+    authViewModel: AuthViewModel,
+    eventViewModel: EventViewModel) {
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
     val context = LocalContext.current
 
-    NavHost(
-        navController = navController,
-        startDestination = if (isAuthenticated) "map_screen" else "login"
-    ) {
+    NavHost(navController, startDestination = "login") {
         composable("login") {
             LoginScreen(navController = navController, viewModel = authViewModel)
         }

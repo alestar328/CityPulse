@@ -6,6 +6,8 @@ plugins {
     id("androidx.room")
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
+    // Add the Crashlytics Gradle plugin
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -71,12 +73,19 @@ dependencies {
     //FireBase:
     implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
     implementation("com.google.firebase:firebase-analytics")
+    // Add the dependency for the Firebase Authentication library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-auth")
+    // Also add the dependency for the Google Play services library and specify its version
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
+
+
+
 
     //Crashlitics
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
-    implementation(libs.firebase.firestore.ktx)
-    implementation(libs.firebase.auth.ktx)
+
 
     //Room, esto va tercero
     val room_version = "2.6.1"
@@ -103,17 +112,17 @@ dependencies {
     implementation(libs.androidx.material3)
 
     // Firebase Firestore
-    implementation("com.google.firebase:firebase-firestore-ktx:24.0.0")
+    implementation(libs.firebase.firestore.ktx.v2400)
 
     // Firebase Auth y Database
     implementation("com.google.firebase:firebase-auth-ktx:21.0.1")
-    implementation("com.google.firebase:firebase-database-ktx:20.0.0")
+    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
 
     // Firebase SDK
-    implementation("com.google.firebase:firebase-analytics:21.0.0")
+    implementation("com.google.firebase:firebase-analytics:22.2.0")
 
     // Firebase Cloud Messaging
-    implementation("com.google.firebase:firebase-messaging:23.0.0")
+    implementation("com.google.firebase:firebase-messaging:24.1.0")
 
 
     // Dependencias de prueba

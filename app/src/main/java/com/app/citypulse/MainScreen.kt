@@ -51,7 +51,7 @@ fun MainScreen(
         ) {
             NavigationGraph(navController, authViewModel, eventViewModel) // Usa el NavigationGraph
 
-            if (isAuthenticated && currentRoute == "map") {
+            if (isAuthenticated && currentRoute == "map_screen") {
                 SearchTopbar(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -69,7 +69,7 @@ fun MainScreen(
 fun BottomNavigationBar(navController: androidx.navigation.NavController) {
     val navItemList = listOf(
         NavItem("profile", Icons.Default.Person, 5),
-        NavItem("map", Icons.Default.LocationOn, 0),
+        NavItem("map_screen", Icons.Default.LocationOn, 0),
         NavItem("settings", Icons.Default.Settings, 0)
     )
 

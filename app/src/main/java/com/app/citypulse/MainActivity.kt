@@ -36,11 +36,11 @@ class MainActivity : ComponentActivity() {
                 val eventViewModel = EventViewModel(eventRepository)
                 val authViewModel = AuthViewModel()
 
-                NavigationGraph(
+             /*   NavigationGraph(
                     navController = navController,
                     authViewModel = authViewModel,
                     eventViewModel = eventViewModel
-                )
+                )*/
                 MainScreen(
                     authViewModel = authViewModel,
                     eventViewModel = eventViewModel

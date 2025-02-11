@@ -116,7 +116,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     onClick = {
                         viewModel.login(email, password) { success ->
                             if (success) {
-                                navController.navigate("map") {
+                                navController.navigate("map_screen") {
                                     popUpTo("login") { inclusive = true }
                                 }
                             } else {
