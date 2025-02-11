@@ -30,41 +30,48 @@ fun NavigationGraph(navController: NavHostController, authViewModel: AuthViewMod
         }
         composable("profile") {
             ProfileScreen(navController = navController, viewModel = authViewModel)
-fun NavGraph(navController: NavHostController, viewModel: EventViewModel) {
-    NavHost(navController = navController, startDestination = "main_screen") {
-        composable("main_screen") {
-            MainScreen(navController)
-        }
-        composable("map") {
-            MapScreen()
-        composable("create_event") {
-            CreateEventScreen(viewModel, navController)
-        }
-        composable("settings") {
-            SettingsScreen()
-        composable("location_picker_screen") {
-            LocationPickerScreen(navController)
-        }
-        composable("register"){
-            RegisterScreen(navController = navController, viewModel = authViewModel)
-        }
-        composable("register2"){
-            RegisterScreen2(navController = navController, viewModel = authViewModel)
-        composable("map_screen") {
-            MapScreen(viewModel = viewModel, onLocationSelected = { latLng ->
-                navController.previousBackStackEntry?.savedStateHandle?.apply {
-                    set("latitud", latLng.latitude)
-                    set("longitud", latLng.longitude)
+            fun NavGraph(navController: NavHostController, viewModel: EventViewModel) {
+                composable("main_screen") {
+                    MainScreen(navController)
                 }
-                navController.popBackStack()
-            })
+                composable("map") {
+                    MapScreen()
+                    composable("create_event") {
+                        CreateEventScreen(viewModel, navController)
+                    }
+                    composable("settings") {
+                        SettingsScreen()
+                        composable("location_picker_screen") {
+                            LocationPickerScreen(navController)
+                        }
+                        composable("register") {
+                            RegisterScreen(navController = navController, viewModel = authViewModel)
+                        }
+                        composable("register2") {
+                            RegisterScreen2(
+                                navController = navController,
+                                viewModel = authViewModel
+                            )
+                            composable("map_screen") {
+                                MapScreen(viewModel = viewModel, onLocationSelected = { latLng ->
+                                    navController.previousBackStackEntry?.savedStateHandle?.apply {
+                                        set("latitud", latLng.latitude)
+                                        set("longitud", latLng.longitude)
+                                    }
+                                    navController.popBackStack()
+                                })
+                            }
+                            composable("assisted_events") {
+                                AssistedEventScreen(navController = navController)
+                            }
+                            composable("saved_events") {
+                                SavedEventScreen(navController = navController)
+                            }
+                        }
+                    }
+                }
+            }
         }
-        composable("assisted_events") {
-            AssistedEventScreen(navController = navController)
-        }
-        composable("saved_events") {
-            SavedEventScreen(navController = navController)
-        }
-
     }
 }
+

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
@@ -28,14 +29,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.NavItem
 import com.app.citypulse.presentation.components.SearchTopbar
-import com.app.citypulse.presentation.screens.ContactsScreen
-import com.app.citypulse.presentation.screens.MapScreen
-import com.app.citypulse.presentation.screens.SettingsScreen
-import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.app.citypulse.data.NavigationGraph
 import com.app.citypulse.presentation.EventViewModel
+import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
+import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 @Composable
 fun MainScreen(authViewModel: AuthViewModel = viewModel()) {
