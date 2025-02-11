@@ -2,7 +2,6 @@ package com.app.citypulse.presentation.screens
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -87,8 +86,8 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
             CustomTextField(value = precio, label = "Precio", onValueChange = { precio = it })
             CustomTextField(value = aforo, label = "Aforo", onValueChange = { aforo = it })
 
-            DateTimePickerField(label = "Fecha inicio y hora", dateTime = fechaInicio) { fechaInicio = it }
-            DateTimePickerField(label = "Fecha final y hora", dateTime = fechaFin) { fechaFin = it }
+            DateTimePickerField(label = "Fecha y hora inicial", dateTime = fechaInicio) { fechaInicio = it }
+            DateTimePickerField(label = "Fecha y hora final", dateTime = fechaFin) { fechaFin = it }
 
             CustomTextField(value = lugar, label = "Ubicación", onValueChange = {}, enabled = false)
 
@@ -134,9 +133,8 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                                 longitud = longitud
                             )
                             viewModel.createEvent(event)
-                            navController.popBackStack() // Vuelve a la pantalla anterior
+                            navController.popBackStack()
                         } else {
-                            // Muestra un mensaje de error si algún campo obligatorio está vacío
                             Toast.makeText(context, "Por favor, complete todos los campos obligatorios", Toast.LENGTH_SHORT).show()
                         }
                     },
@@ -154,14 +152,15 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
 // Función para convertir String a Date
 fun parseDate(dateStr: String): Date? {
     return try {
-        val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        val formatter = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
+        formatter.timeZone = TimeZone.getTimeZone("UTC")
         formatter.parse(dateStr)
     } catch (e: Exception) {
-        null // Retorna null si la conversión falla
+        null
     }
 }
 
-// Composable para selector de fecha y hora
+
 @Composable
 fun DateTimePickerField(label: String, dateTime: String, onDateTimeSelected: (String) -> Unit) {
     val context = LocalContext.current
@@ -195,7 +194,10 @@ fun DateTimePickerField(label: String, dateTime: String, onDateTimeSelected: (St
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.LightGray.copy(alpha = 0.2f))
     ) {
-        Text(dateTime.ifEmpty { "Seleccionar fecha y hora" }, color = Color.Blue)
+        Text(
+            text = if (dateTime.isEmpty()) label else dateTime,
+            color = Color.Blue
+        )
     }
 }
 

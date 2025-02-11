@@ -25,9 +25,9 @@ class MainActivity : ComponentActivity() {
             CityPulseTheme {
                 val navController = rememberNavController()
                 val eventRepository = EventRepository()
+                // Maneja logica de eventos.
                 val viewModel = EventViewModel(eventRepository)
 
-                // Usamos NavGraph en lugar de definir el NavHost directamente aquí
                 NavGraph(navController = navController, viewModel = viewModel)
             }
         }

@@ -23,6 +23,7 @@ class EventRepository {
                     val event = document.toObject(EventEntity::class.java)
                     events.add(event)
                 }
+                // Devuelve eventos obtenidos.
                 callback(events)
             }
             .addOnFailureListener { exception ->

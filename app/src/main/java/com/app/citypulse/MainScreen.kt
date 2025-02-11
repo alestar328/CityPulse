@@ -35,11 +35,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExtendedFloatingActionButton
 import com.app.citypulse.presentation.EventViewModel
 
 @Composable
 fun MainScreen(navController: NavController = rememberNavController()) {
 
+    // Creamos instancia para manejar logica eventos en el mapa.
     val viewModel = EventViewModel(com.app.citypulse.data.repository.EventRepository()) // Crear el ViewModel
 
     val navitemList = listOf(
@@ -74,15 +76,25 @@ fun MainScreen(navController: NavController = rememberNavController()) {
             }
         },
         floatingActionButton = {
-            if (selectedIndex == 1) { // Solo mostrar el botón en la pantalla del mapa
-                FloatingActionButton(
-                    onClick = { navController.navigate("create_event") },
-                    modifier = Modifier.padding(16.dp)
+            if (selectedIndex == 1) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 24.dp, bottom = 18.dp), // Separación de la izquierda y abajo
+                    contentAlignment = Alignment.BottomStart
                 ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Crear Evento")
+                    FloatingActionButton(
+                        onClick = { navController.navigate("create_event") },
+                        modifier = Modifier.padding(4.dp),
+                        containerColor = Color.LightGray
+
+                    ) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "Crear Evento")
+                    }
                 }
             }
         }
+
     ) { innerPadding ->
         Box(
             modifier = Modifier
