@@ -147,9 +147,35 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val document = firestore.collection("users").document(userId).get().await()
-                val user = document.toObject(UserItem::class.java)
-                onResult(user)
+                if (document.exists()) {
+                    val userMap = document.data
+
+                    val user = UserItem(
+                        uid = userId.hashCode().toString(), // Asignar un hash del UID
+                        name = userMap?.get("name") as? String ?: "",
+                        surname = userMap?.get("surname") as? String ?: "",
+                        age = (userMap?.get("age") as? Long)?.toInt() ?: 0,
+                        documentId = userMap?.get("documentId") as? String ?: "",
+                        gender = userMap?.get("gender") as? String ?: "",
+                        fiscalAddress = userMap?.get("fiscalAddress") as? String,
+                        userType = when (userMap?.get("UserType") as? String) {
+                            "Persona" -> AccountType.Persona
+                            "Organizador" -> AccountType.Organizador
+                            "Asociacion" -> AccountType.Asociacion
+                            else -> AccountType.Persona
+                        },
+                        email = auth.currentUser?.email ?: "",
+                        password = "" // No se guarda en Firestore
+                    )
+
+                    println("🔥 Usuario cargado correctamente: $user")
+                    onResult(user)
+                } else {
+                    println("❌ Documento de usuario no encontrado en Firestore.")
+                    onResult(null)
+                }
             } catch (e: Exception) {
+                println("❌ Error obteniendo usuario: ${e.message}")
                 onResult(null)
             }
         }

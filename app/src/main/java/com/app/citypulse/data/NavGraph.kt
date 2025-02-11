@@ -23,7 +23,7 @@ fun NavigationGraph(navController: NavHostController, authViewModel: AuthViewMod
             LoginScreen(navController = navController, viewModel = authViewModel)
         }
         composable("profile") {
-            ProfileScreen(navController = navController)
+            ProfileScreen(navController = navController, viewModel = authViewModel)
         }
         composable("map") {
             MapScreen()

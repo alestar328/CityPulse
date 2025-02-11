@@ -53,11 +53,21 @@ fun ProfileHeader(user: UserItem?){
         Column(
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Nombre Apellido", fontSize = 20.sp, color = Color.Black)
-            Text(text = "Nombre Usuario", fontSize = 16.sp, color = Color.LightGray)
+            Text(
+                text = user?.name?.plus(" ")?.plus(user.surname) ?: "Nombre Apellido",
+                fontSize = 20.sp,
+                color = Color.Black)
+            Text(
+                text = user?.email ?: "Correo no disponible",
+                fontSize = 16.sp,
+                color = Color.LightGray)
 
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Tipo Usuario", fontSize = 14.sp, color = Color(0xFFBBDEFB))
+            Text(
+                text = user?.userType?.name ?: "Tipo Usuario",
+                fontSize = 14.sp,
+                color = Color(0xFFBBDEFB)
+            )
 
 
         }

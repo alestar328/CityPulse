@@ -55,6 +55,8 @@ fun ProfileScreen(
         viewModel.getUserData { fetchedUser ->
             user = fetchedUser
             isLoading = false
+            println("🔥 Datos del usuario obtenidos: $fetchedUser") // Agrega este log
+
         }
     }
     if (isLoading) {

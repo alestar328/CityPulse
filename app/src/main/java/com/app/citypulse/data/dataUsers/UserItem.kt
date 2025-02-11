@@ -5,7 +5,7 @@ import java.util.regex.Pattern
 
 // Data class para almacenar usuarios
 data class UserItem(
-    val id: Int? = null,
+    val uid: String = "",
     val name: String,
     val surname: String,
     val age: Int,
