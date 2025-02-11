@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,34 +14,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.app.citypulse.presentation.components.SearchTopbar
 import com.app.citypulse.presentation.components.SearcherBar
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.*
 
 @Composable
-fun MapScreen() {
-    val barna = LatLng(41.3870540940097, 2.1702107801979693)
-    val barnaState = MarkerState(position = barna)
+fun MapScreen(viewModel: EventViewModel, onLocationSelected: (LatLng) -> Unit) {
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(barna, 15f)
+        position = CameraPosition.fromLatLngZoom(LatLng(41.387054, 2.170210), 12f)
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    // Lista de eventos en tiempo real.
+    val eventLocations = viewModel.eventList
+
+    Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState
+            cameraPositionState = cameraPositionState,
         ) {
-            Marker(
-                state = barnaState,
-                title = "Marcador en Barcelona"
-            )
+            // Dibujar los eventos como marcadores.
+            eventLocations.forEach { event ->
+                Marker(
+                    state = rememberMarkerState(position = LatLng(event.latitud, event.longitud)),
+                    title = event.nombre,
+                    snippet = event.descripcion
+                )
+            }
         }
 
     }

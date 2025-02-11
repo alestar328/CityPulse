@@ -72,12 +72,13 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.0")
     //Google maps
     implementation("com.google.android.gms:play-services-maps:19.0.0")
-    implementation ("com.google.maps.android:maps-compose:4.4.1")
+    implementation("com.google.maps.android:maps-compose:4.4.1")
 
-    //Navegacion
+    // Navegación
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
 
+    // Dependencias de UI y Lifecycle
     //FireBase:
     implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
     implementation("com.google.firebase:firebase-analytics")
@@ -109,6 +110,22 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // Firebase Firestore
+    implementation("com.google.firebase:firebase-firestore-ktx:24.0.0")
+
+    // Firebase Auth y Database
+    implementation("com.google.firebase:firebase-auth-ktx:21.0.1")
+    implementation("com.google.firebase:firebase-database-ktx:20.0.0")
+
+    // Firebase SDK
+    implementation("com.google.firebase:firebase-analytics:21.0.0")
+
+    // Firebase Cloud Messaging
+    implementation("com.google.firebase:firebase-messaging:23.0.0")
+    implementation(libs.androidx.appcompat)
+
+    // Dependencias de prueba
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.auth.ktx)
     testImplementation(libs.junit)
@@ -119,5 +136,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
+
 
 

@@ -5,6 +5,13 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.navigation.compose.rememberNavController
+import com.app.citypulse.data.repository.EventRepository
+import com.app.citypulse.presentation.EventViewModel
+import com.app.citypulse.presentation.ui.theme.CityPulseTheme
+import com.app.citypulse.data.NavGraph
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -24,6 +31,10 @@ import com.google.maps.android.compose.rememberCameraPositionState
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        FirebaseApp.initializeApp(this)
+        FirebaseFirestore.getInstance()
+
         enableEdgeToEdge()
 
         //Splash Screen
@@ -32,7 +43,12 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CityPulseTheme {
-                MainScreen()
+                val navController = rememberNavController()
+                val eventRepository = EventRepository()
+                val viewModel = EventViewModel(eventRepository)
+
+                // Usamos NavGraph en lugar de definir el NavHost directamente aquí
+                NavGraph(navController = navController, viewModel = viewModel)
             }
         }
     }
