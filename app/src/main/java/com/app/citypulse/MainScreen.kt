@@ -42,7 +42,7 @@ import com.app.citypulse.presentation.EventViewModel
 fun MainScreen(navController: NavController = rememberNavController()) {
 
     // Creamos instancia para manejar logica eventos en el mapa.
-    val viewModel = EventViewModel(com.app.citypulse.data.repository.EventRepository()) // Crear el ViewModel
+    val viewModel = EventViewModel(com.app.citypulse.data.repository.EventRepository())
 
     val navitemList = listOf(
         NavItem("Contacts", Icons.Default.Person, 5),

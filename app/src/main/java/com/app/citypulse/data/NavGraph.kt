@@ -12,7 +12,7 @@ import com.app.citypulse.presentation.screens.LocationPickerScreen
 import com.app.citypulse.presentation.screens.MapScreen
 
 @Composable
-fun NavGraph(navController: NavHostController, viewModel: EventViewModel) {
+fun NavigationGraph(navController: NavHostController, viewModel: EventViewModel) {
     NavHost(navController = navController, startDestination = "main_screen") {
         composable("main_screen") {
             MainScreen(navController)

@@ -8,7 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.presentation.EventViewModel
 import com.app.citypulse.presentation.ui.theme.CityPulseTheme
-import com.app.citypulse.data.NavGraph
+import com.app.citypulse.data.NavigationGraph
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -23,12 +23,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CityPulseTheme {
+                // Maneja navegación entre pantallas.
                 val navController = rememberNavController()
                 val eventRepository = EventRepository()
                 // Maneja logica de eventos.
                 val viewModel = EventViewModel(eventRepository)
 
-                NavGraph(navController = navController, viewModel = viewModel)
+                NavigationGraph(navController = navController, viewModel = viewModel)
             }
         }
     }
