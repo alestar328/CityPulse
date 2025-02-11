@@ -1,12 +1,19 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
+
+    id("androidx.room")
+    id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.app.citypulse"
     compileSdk = 35
-
+   room {
+        schemaDirectory("$projectDir/schemas")
+    }
     defaultConfig {
         applicationId = "com.app.citypulse"
         minSdk = 27
@@ -68,6 +75,8 @@ dependencies {
     //Crashlitics
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.auth.ktx)
 
     //Room, esto va tercero
     val room_version = "2.6.1"
@@ -93,6 +102,21 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    // Firebase Firestore
+    implementation("com.google.firebase:firebase-firestore-ktx:24.0.0")
+
+    // Firebase Auth y Database
+    implementation("com.google.firebase:firebase-auth-ktx:21.0.1")
+    implementation("com.google.firebase:firebase-database-ktx:20.0.0")
+
+    // Firebase SDK
+    implementation("com.google.firebase:firebase-analytics:21.0.0")
+
+    // Firebase Cloud Messaging
+    implementation("com.google.firebase:firebase-messaging:23.0.0")
+
+
+    // Dependencias de prueba
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

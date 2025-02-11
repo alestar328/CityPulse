@@ -6,18 +6,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.app.citypulse.presentation.EventViewModel
 import com.app.citypulse.presentation.register_screens.RegisterScreen
 import com.app.citypulse.presentation.register_screens.RegisterScreen2
 import com.app.citypulse.presentation.screens.*
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 @Composable
-fun NavigationGraph(navController: NavHostController, authViewModel: AuthViewModel) {
+fun NavigationGraph(navController: NavHostController, authViewModel: AuthViewModel, eventViewModel: EventViewModel) {
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
     val context = LocalContext.current
+
     NavHost(
         navController = navController,
-        startDestination = if (isAuthenticated) "map" else "login"
+        startDestination = if (isAuthenticated) "map_screen" else "login"
     ) {
         composable("login") {
             LoginScreen(navController = navController, viewModel = authViewModel)
@@ -25,8 +27,14 @@ fun NavigationGraph(navController: NavHostController, authViewModel: AuthViewMod
         composable("profile") {
             ProfileScreen(navController = navController, viewModel = authViewModel)
         }
-        composable("map") {
-            MapScreen()
+        composable("map_screen") {
+            MapScreen(viewModel = eventViewModel, onLocationSelected = { latLng ->
+                navController.previousBackStackEntry?.savedStateHandle?.apply {
+                    set("latitud", latLng.latitude)
+                    set("longitud", latLng.longitude)
+                }
+                navController.popBackStack()
+            })
         }
         composable("settings") {
             SettingsScreen()
@@ -43,6 +51,5 @@ fun NavigationGraph(navController: NavHostController, authViewModel: AuthViewMod
         composable("saved_events") {
             SavedEventScreen(navController = navController)
         }
-
     }
 }

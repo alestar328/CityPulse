@@ -16,12 +16,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.data.NavItem
 import com.app.citypulse.data.NavigationGraph
+import com.app.citypulse.presentation.EventViewModel
 import com.app.citypulse.presentation.components.SearchTopbar
 import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 @Composable
-fun MainScreen(authViewModel: AuthViewModel = viewModel()) {
+fun MainScreen(
+    authViewModel: AuthViewModel = viewModel(),
+    eventViewModel: EventViewModel = viewModel()
+) {
     val navController = rememberNavController()
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
 
@@ -45,7 +49,7 @@ fun MainScreen(authViewModel: AuthViewModel = viewModel()) {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            NavigationGraph(navController, authViewModel) // Usa el NavigationGraph
+            NavigationGraph(navController, authViewModel, eventViewModel) // Usa el NavigationGraph
 
             if (isAuthenticated && currentRoute == "map") {
                 SearchTopbar(

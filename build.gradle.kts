@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.compose.compiler) apply false
 
+
     //Firebase
     id("com.google.gms.google-services") version "4.4.2" apply false
 
@@ -16,5 +17,6 @@ plugins {
     //Esto es para almacenar en local (1)
     val room_version = "2.6.1"
     id("androidx.room") version "$room_version" apply false
+
 
 }
