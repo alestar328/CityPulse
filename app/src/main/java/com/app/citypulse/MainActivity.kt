@@ -13,9 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.rememberNavController
+import com.app.citypulse.data.NavigationGraph
 import com.app.citypulse.presentation.screens.ui.theme.CityPulseTheme
+import com.app.citypulse.presentation.ui.theme.CityPulseTheme
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
@@ -24,6 +29,10 @@ import com.google.maps.android.compose.rememberCameraPositionState
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        FirebaseApp.initializeApp(this)
+        FirebaseFirestore.getInstance()
+
         enableEdgeToEdge()
 
         //Splash Screen
@@ -32,6 +41,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CityPulseTheme {
+                // Maneja navegación entre pantallas.
+                val navController = rememberNavController()
+                val eventRepository = EventRepository()
+                // Maneja logica de eventos.
+                val viewModel = EventViewModel(eventRepository)
+
+                NavigationGraph(navController = navController, viewModel = viewModel)
                 MainScreen()
             }
         }

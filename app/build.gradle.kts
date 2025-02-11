@@ -1,28 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-
-    id("com.google.gms.google-services")
-
-    // Add the Crashlytics Gradle plugin
-    id("com.google.firebase.crashlytics")
-    alias(libs.plugins.compose.compiler)
-
-    //KSP para Room, esto va segundo
-    id("com.google.devtools.ksp")
-
-    //Esto es para que almacenar en local (2)
-    id("androidx.room")
-
 }
 
 android {
     namespace = "com.app.citypulse"
     compileSdk = 35
-    //Esto es para almacenar en local (3)
-    room {
-        schemaDirectory("$projectDir/schemas")
-    }
 
     defaultConfig {
         applicationId = "com.app.citypulse"
@@ -109,8 +92,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.firebase.firestore.ktx)
-    implementation(libs.firebase.auth.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -119,5 +101,3 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
-
-
