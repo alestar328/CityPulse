@@ -15,6 +15,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.data.NavigationGraph
+import com.app.citypulse.data.repository.EventRepository
+import com.app.citypulse.presentation.EventViewModel
 import com.app.citypulse.presentation.screens.ui.theme.CityPulseTheme
 import com.app.citypulse.presentation.ui.theme.CityPulseTheme
 import com.google.android.gms.maps.model.CameraPosition
