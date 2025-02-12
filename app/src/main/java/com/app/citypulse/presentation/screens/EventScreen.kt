@@ -131,6 +131,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                                 lugar = lugar,
                                 latitud = latitud,
                                 longitud = longitud
+
                             )
                             viewModel.createEvent(event)
                             navController.popBackStack()

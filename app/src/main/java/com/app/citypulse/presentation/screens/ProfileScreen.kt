@@ -126,6 +126,7 @@ fun ProfileScreen(
                     PhotoContainer { }
                     PhotoContainer { }
                 }
+                ButtonBar("Cerrar Sesión", backgroundColor = Color.Red)
             }
         }
 

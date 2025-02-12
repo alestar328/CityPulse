@@ -27,6 +27,12 @@ fun NavigationGraph(
         composable("profile") {
             ProfileScreen(navController = navController, viewModel = authViewModel)
         }
+        composable("create_event") {
+            CreateEventScreen(eventViewModel, navController)
+        }
+        composable("location_picker_screen") {
+            LocationPickerScreen(navController)
+        }
         composable("map_screen") {
             MapScreen(viewModel = eventViewModel, onLocationSelected = { latLng ->
                 navController.previousBackStackEntry?.savedStateHandle?.apply {

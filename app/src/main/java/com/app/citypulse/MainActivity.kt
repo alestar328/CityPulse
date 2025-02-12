@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         if (FirebaseApp.getApps(this).isEmpty()) {
             throw IllegalStateException("FirebaseApp no se ha inicializado correctamente.")
         }
-       // FirebaseFirestore.getInstance()
+        FirebaseFirestore.getInstance()
 
         enableEdgeToEdge()
         installSplashScreen()
@@ -34,13 +34,14 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val eventRepository = EventRepository()
                 val eventViewModel = EventViewModel(eventRepository)
+
                 val authViewModel = AuthViewModel()
 
-             /*   NavigationGraph(
+                NavigationGraph(
                     navController = navController,
                     authViewModel = authViewModel,
                     eventViewModel = eventViewModel
-                )*/
+                )
                 MainScreen(
                     authViewModel = authViewModel,
                     eventViewModel = eventViewModel
