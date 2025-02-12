@@ -164,7 +164,7 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                                     userType ?: AccountType.Persona// Asegura que nunca sea null
                                 ) { isRegistered ->
                                     if (isRegistered) {
-                                        navController.navigate("map")
+                                        navController.navigate("map_screen")
                                     } else {
                                         errorMessage = "Ocurrió un error al registrar el usuario."
                                     }
