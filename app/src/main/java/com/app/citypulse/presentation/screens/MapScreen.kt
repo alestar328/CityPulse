@@ -3,7 +3,7 @@ package com.app.citypulse.presentation.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.app.citypulse.presentation.EventViewModel
+import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*

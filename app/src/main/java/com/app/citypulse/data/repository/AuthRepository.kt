@@ -87,6 +87,4 @@ class AuthRepository {
 
     // Obtener el usuario actual autenticado
     fun getCurrentUser() = auth.currentUser
-
-
 }

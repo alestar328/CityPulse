@@ -38,19 +38,24 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures {
         compose = true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -60,48 +65,18 @@ android {
 
 dependencies {
 
-    //Splash Screen:
+    // Splash Screen
     implementation("androidx.core:core-splashscreen:1.0.0")
-    //Google maps
-    implementation("com.google.android.gms:play-services-maps:19.0.0")
-    implementation ("com.google.maps.android:maps-compose:4.4.1")
 
-    //Navegacion
+    // Google Maps
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation("com.google.maps.android:maps-compose:4.4.1")
+
+    // Navegación
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
 
-    //FireBase:
-    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
-    implementation("com.google.firebase:firebase-analytics")
-    // Add the dependency for the Firebase Authentication library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-auth")
-    // Also add the dependency for the Google Play services library and specify its version
-    implementation("com.google.android.gms:play-services-auth:21.3.0")
-
-
-
-
-    //Crashlitics
-    implementation("com.google.firebase:firebase-crashlytics")
-    implementation("com.google.firebase:firebase-analytics")
-
-
-    //Room, esto va tercero
-    val room_version = "2.6.1"
-    implementation("androidx.room:room-runtime:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
-
-    annotationProcessor("androidx.room:room-compiler:$room_version")
-    // optional - Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:$room_version")
-    // optional - Test helpers
-    testImplementation("androidx.room:room-testing:$room_version")
-
-    // optional - Paging 3 Integration
-    implementation("androidx.room:room-paging:$room_version")
-
-
+    // Dependencias de UI y Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -112,18 +87,18 @@ dependencies {
     implementation(libs.androidx.material3)
 
     // Firebase Firestore
-    implementation(libs.firebase.firestore.ktx.v2400)
+    implementation("com.google.firebase:firebase-firestore-ktx:24.0.0")
 
     // Firebase Auth y Database
     implementation("com.google.firebase:firebase-auth-ktx:21.0.1")
-    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
+    implementation("com.google.firebase:firebase-database-ktx:20.0.0")
 
     // Firebase SDK
-    implementation("com.google.firebase:firebase-analytics:22.2.0")
+    implementation("com.google.firebase:firebase-analytics:21.0.0")
 
     // Firebase Cloud Messaging
-    implementation("com.google.firebase:firebase-messaging:24.1.0")
-
+    implementation("com.google.firebase:firebase-messaging:23.0.0")
+    implementation(libs.androidx.appcompat)
 
     // Dependencias de prueba
     testImplementation(libs.junit)

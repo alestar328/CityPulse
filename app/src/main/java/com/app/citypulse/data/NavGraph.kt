@@ -6,27 +6,43 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.app.citypulse.presentation.EventViewModel
+import com.app.citypulse.MainScreen
+import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.app.citypulse.presentation.screens.*
 import com.app.citypulse.presentation.register_screens.RegisterScreen
 import com.app.citypulse.presentation.register_screens.RegisterScreen2
-import com.app.citypulse.presentation.screens.*
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
-    authViewModel: AuthViewModel,
-    eventViewModel: EventViewModel) {
+    eventViewModel: EventViewModel,
+    authViewModel: AuthViewModel
+) {
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
     val context = LocalContext.current
 
-    NavHost(navController, startDestination = "login") {
+    NavHost(
+        navController = navController,
+        startDestination = if (isAuthenticated) "main_screen" else "login"
+    ) {
+        // Autenticación
         composable("login") {
             LoginScreen(navController = navController, viewModel = authViewModel)
         }
-        composable("profile") {
-            ProfileScreen(navController = navController, viewModel = authViewModel)
+        composable("register") {
+            RegisterScreen(navController = navController, viewModel = authViewModel)
         }
+        composable("register2") {
+            RegisterScreen2(navController = navController, viewModel = authViewModel)
+        }
+
+        // Pantalla Principal
+        composable("main_screen") {
+            MainScreen(navController)
+        }
+
+        // Eventos
         composable("create_event") {
             CreateEventScreen(eventViewModel, navController)
         }
@@ -42,20 +58,13 @@ fun NavigationGraph(
                 navController.popBackStack()
             })
         }
+
+        // Otras pantallas
+        composable("contacts") {
+            ContactsScreen()
+        }
         composable("settings") {
             SettingsScreen()
-        }
-        composable("register"){
-            RegisterScreen(navController = navController, viewModel = authViewModel)
-        }
-        composable("register2"){
-            RegisterScreen2(navController = navController, viewModel = authViewModel)
-        }
-        composable("assisted_events") {
-            AssistedEventScreen(navController = navController)
-        }
-        composable("saved_events") {
-            SavedEventScreen(navController = navController)
         }
     }
 }
