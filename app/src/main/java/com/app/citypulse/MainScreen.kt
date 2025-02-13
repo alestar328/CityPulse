@@ -35,14 +35,14 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExtendedFloatingActionButton
-import com.app.citypulse.presentation.EventViewModel
+import com.app.citypulse.data.repository.EventRepository
+import com.app.citypulse.presentation.viewmodel.EventViewModel
 
 @Composable
 fun MainScreen(navController: NavController = rememberNavController()) {
 
     // Creamos instancia para manejar logica eventos en el mapa.
-    val viewModel = EventViewModel(com.app.citypulse.data.repository.EventRepository())
+    val viewModel = EventViewModel(EventRepository())
 
     val navitemList = listOf(
         NavItem("Contacts", Icons.Default.Person, 5),

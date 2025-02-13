@@ -1,7 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+
     id("com.google.gms.google-services")
+
+    // Add the Crashlytics Gradle plugin
+    id("com.google.firebase.crashlytics")
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -68,6 +73,21 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
 
+    //FireBase:
+    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation("com.google.firebase:firebase-analytics")
+
+    //Crashlitics
+    implementation("com.google.firebase:firebase-crashlytics")
+
+    // Firebase Auth y Database
+    implementation("com.google.firebase:firebase-auth-ktx:21.0.1")
+    implementation("com.google.firebase:firebase-database-ktx:20.0.0")
+
+    // Firebase Cloud Messaging
+    implementation("com.google.firebase:firebase-messaging:23.0.0")
+    implementation(libs.androidx.appcompat)
+
     // Dependencias de UI y Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -77,20 +97,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
-    // Firebase Firestore
-    implementation("com.google.firebase:firebase-firestore-ktx:24.0.0")
-
-    // Firebase Auth y Database
-    implementation("com.google.firebase:firebase-auth-ktx:21.0.1")
-    implementation("com.google.firebase:firebase-database-ktx:20.0.0")
-
-    // Firebase SDK
-    implementation("com.google.firebase:firebase-analytics:21.0.0")
-
-    // Firebase Cloud Messaging
-    implementation("com.google.firebase:firebase-messaging:23.0.0")
-    implementation(libs.androidx.appcompat)
+    implementation(libs.google.firebase.firestore.ktx)
 
     // Dependencias de prueba
     testImplementation(libs.junit)

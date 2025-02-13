@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.app.citypulse.presentation.EventViewModel
+import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.data.model.EventEntity
 import java.text.SimpleDateFormat
 import java.util.*
