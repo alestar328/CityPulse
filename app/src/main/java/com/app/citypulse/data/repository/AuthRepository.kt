@@ -1,5 +1,6 @@
 package com.app.citypulse.data.repository
 
+import com.app.citypulse.data.model.UserEntity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.firestore.FirebaseFirestore
@@ -28,55 +29,29 @@ class AuthRepository {
         }
     }
 
-    // Función para registrar un usuario con correo y contraseña
-    suspend fun register(email: String, password: String): AuthResult? {
-        return try {
-            auth.createUserWithEmailAndPassword(email, password).await()
-        } catch (e: Exception) {
-            null
-        }
-    }
 
     // Función para registrar un usuario con datos completos en Firestore
-    suspend fun registerCompleteUser(
-        email: String,
-        password: String,
-        name: String,
-        surname: String,
-        age: Int,
-        documentId: String,
-        gender: String,
-        fiscalAddress: String?,
-        userType: String
-    ): Boolean {
-        return try {
-            // Primero, creamos al usuario con email y contraseña
-            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-
-            // Después de que el usuario sea creado exitosamente, guardamos los datos adicionales en Firestore
+    suspend fun register(user: UserEntity): Boolean = try {
+        val authResult = auth.createUserWithEmailAndPassword(user.email, user.password).await()
+        authResult.user?.let { firebaseUser ->
             val userData = hashMapOf(
-                "name" to name,
-                "surname" to surname,
-                "age" to age,
-                "documentId" to documentId,
-                "gender" to gender,
-                "fiscalAddress" to fiscalAddress.orEmpty(),
+                "id" to user.id,
+                "email" to user.email,
+                "name" to user.name,
+                "surname" to user.surname,
+                "age" to user.age,
+                "documentId" to user.documentId,
+                "gender" to user.gender,
+                "fiscalAddress" to user.fiscalAddress,
                 "createdAt" to FieldValue.serverTimestamp(),
-                "UserType" to userType
+                "userType" to user.userType.name
             )
+            firestore.collection("users").document(firebaseUser.uid).set(userData).await()
 
-            // Guardamos la información en la colección de "users" usando el UID del usuario
-            authResult.user?.let {
-                firestore.collection("users")
-                    .document(it.uid)
-                    .set(userData)
-                    .await()
-            }
-
-            true // El registro fue exitoso
-        } catch (e: Exception) {
-            false // Ocurrió un error en el registro
         }
+        true
+    } catch (e: Exception) {
+        false
     }
 
     // Función para cerrar sesión

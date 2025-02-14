@@ -38,9 +38,8 @@ fun NavigationGraph(
         }
 
         // Pantalla Principal
-        composable("main_screen") {
-            MainScreen(navController)
-        }
+        composable("main_screen") { MainScreen(navController, authViewModel) }
+
 
         // Eventos
         composable("create_event") {
@@ -60,8 +59,8 @@ fun NavigationGraph(
         }
 
         // Otras pantallas
-        composable("contacts") {
-            ContactsScreen()
+        composable("profile") {
+            ProfileScreen(navController = navController, viewModel = authViewModel)
         }
         composable("settings") {
             SettingsScreen()

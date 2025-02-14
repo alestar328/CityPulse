@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import com.app.citypulse.R
 import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
+import java.util.Locale
 
 @Composable
 fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
@@ -26,7 +27,6 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
     var surname by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var documentId by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf(viewModel.getTempUserData()["email"] as? String ?: "") }
     var gender by remember { mutableStateOf<String>("") }
     var fiscalAddress by remember { mutableStateOf("") }
 
@@ -54,159 +54,126 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                     color = Color.White,
                     style = MaterialTheme.typography.displayLarge,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 32.dp)
-                )
+                    modifier = Modifier.padding(bottom = 32.dp))
 
-                // Botón para volver atrás
-                if (userType != null) {
-                    Button(
-                        onClick = {
-                            userType = null
-                        },
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(bottom = 16.dp)
-                    ) {
-                        Text("Volver")
-                    }
-                }
-
-                // Botones para seleccionar tipo de usuario
                 if (userType == null) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Button(
-                            onClick = {
-                                userType = AccountType.Persona
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Soy una persona")
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(
-                            onClick = {
-                                userType = AccountType.Organizador
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Soy un organizador")
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(
-                            onClick = {
-                                userType = AccountType.Asociacion
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Soy una asociación")
+                        AccountType.values().forEach { type ->
+                            Button(onClick = { userType = type }, modifier = Modifier.fillMaxWidth()) {
+                                Text("Soy ${type.name.lowercase(Locale.getDefault())}")
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 } else {
-                    // Formulario para "persona"
-                    if (userType == AccountType.Persona) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            TextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") })
-                            Spacer(modifier = Modifier.height(8.dp))
-                            TextField(value = surname, onValueChange = { surname = it }, label = { Text("Apellidos") })
-                            Spacer(modifier = Modifier.height(8.dp))
-                            TextField(value = age, onValueChange = { age = it }, label = { Text("Edad") })
-                            Spacer(modifier = Modifier.height(8.dp))
-                            TextField(value = documentId, onValueChange = { documentId = it }, label = { Text("DNI") })
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Button(onClick = { gender = "Masculino" }, modifier = Modifier.weight(1f)) {
-                                    Text("Masculino")
-                                }
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Button(onClick = { gender = "Femenino" }, modifier = Modifier.weight(1f)) {
-                                    Text("Femenino")
-                                }
+                    RegisterForm(userType!!, name, surname, age, documentId, gender, fiscalAddress, onFormChange = { n, s, a, d, g, f ->
+                        name = n; surname = s; age = a; documentId = d; gender = g; fiscalAddress = f
+                    })
+
+                    val isFormValid = validateForm(userType!!, name, surname, age, documentId, gender, fiscalAddress)
+
+                    Button(onClick = {
+                        val ageInt = age.toIntOrNull() ?: 0
+                        val user = viewModel.getTempUserData()?.copy(
+                            name = name, surname = surname, age = ageInt, documentId = documentId,
+                            gender = gender, fiscalAddress = fiscalAddress, userType = userType!!
+                        )
+                        if (user != null) {
+                            viewModel.registerUser(user) { isRegistered ->
+                                if (isRegistered) navController.navigate("map_screen")
+                                else errorMessage = "Error al registrar usuario."
                             }
                         }
-                    } else if (userType == AccountType.Organizador || userType == AccountType.Asociacion) {
-                        // Formulario para "organizador" o "asociación"
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            TextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") })
-                            Spacer(modifier = Modifier.height(8.dp))
-                            TextField(value = documentId, onValueChange = { documentId = it }, label = { Text("ID o NIF") })
-                            Spacer(modifier = Modifier.height(8.dp))
-                            TextField(value = fiscalAddress, onValueChange = { fiscalAddress = it }, label = { Text("Dirección fiscal") })
-                        }
-                    }
+                    }, enabled = isFormValid, modifier = Modifier.fillMaxWidth()) { Text("Siguiente") }
                 }
 
-                // Validación de campos
-                val isAgeValid = age.toIntOrNull() != null
-                val isFormValid = when (userType) {
-                    AccountType.Persona -> name.isNotBlank() && surname.isNotBlank() && isAgeValid && documentId.isNotBlank() && gender.isNotBlank()
-                    AccountType.Organizador, AccountType.Asociacion -> name.isNotBlank() && documentId.isNotBlank() && fiscalAddress.isNotBlank()
-                    else -> false
-                }
-
-                // Botón de navegación
-                if (userType != null) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    // Llamada corregida con userType incluido
-                    Button(
-                        onClick = {
-                            if (isFormValid) {
-                                val ageInt = age.toIntOrNull() ?: 0
-                                viewModel.registerCompleteUser(
-                                    name,
-                                    surname,
-                                    ageInt,
-                                    documentId,
-                                    gender,
-                                    fiscalAddress,
-                                    userType ?: AccountType.Persona// Asegura que nunca sea null
-                                ) { isRegistered ->
-                                    if (isRegistered) {
-                                        navController.navigate("map_screen")
-                                    } else {
-                                        errorMessage = "Ocurrió un error al registrar el usuario."
-                                    }
-                                }
-                            } else {
-                                errorMessage = "Por favor, completa todos los campos correctamente."
-                            }
-                        },
-                        enabled = isFormValid,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Siguiente")
-                    }
-
-                }
-
-                // Mostrar mensaje de error si existe
                 if (errorMessage.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                TextButton(
-                    onClick = {
-                        // Aquí va la navegación al login
-                        navController.navigate("login")
-                    },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                ) {
-                    Text(
-                        "¿Ya tienes cuenta? Inicia sesión",
-                        color = Color.White.copy(alpha = 0.8f), // Letras claras pero no mucho
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Text(errorMessage, color = Color.Red, textAlign = TextAlign.Center, modifier = Modifier.padding(16.dp))
                 }
             }
         }
     }
 }
+
+
+@Composable
+fun RegisterForm(
+    userType: AccountType,
+    name: String,
+    surname: String,
+    age: String,
+    documentId: String,
+    gender: String,
+    fiscalAddress: String,
+    onFormChange: (String, String, String, String, String, String) -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        TextField(
+            value = name,
+            onValueChange = { onFormChange(it, surname, age, documentId, gender, fiscalAddress) },
+            label = { Text("Nombre") })
+        if (userType == AccountType.Persona) {
+            TextField(
+                value = surname,
+                onValueChange = { onFormChange(name, it, age, documentId, gender, fiscalAddress) },
+                label = { Text("Apellidos") })
+            TextField(
+                value = age,
+                onValueChange = {
+                    onFormChange(
+                        name,
+                        surname,
+                        it,
+                        documentId,
+                        gender,
+                        fiscalAddress
+                    )
+                },
+                label = { Text("Edad") })
+            GenderSelection(gender) { g ->
+                onFormChange(
+                    name,
+                    surname,
+                    age,
+                    documentId,
+                    g,
+                    fiscalAddress
+                )
+            }
+        }
+        TextField(
+            value = documentId,
+            onValueChange = { onFormChange(name, surname, age, it, gender, fiscalAddress) },
+            label = { Text("Documento") })
+        if (userType != AccountType.Persona) {
+            TextField(
+                value = fiscalAddress,
+                onValueChange = { onFormChange(name, surname, age, documentId, gender, it) },
+                label = { Text("Dirección fiscal") })
+        }
+    }
+}
+
+@Composable
+fun GenderSelection(selectedGender: String, onSelect: (String) -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        Button(onClick = { onSelect("Masculino") }) { Text("Masculino") }
+        Button(onClick = { onSelect("Femenino") }) { Text("Femenino") }
+    }
+}
+
+fun validateForm(
+    userType: AccountType,
+    name: String,
+    surname: String,
+    age: String,
+    documentId: String,
+    gender: String,
+    fiscalAddress: String
+): Boolean {
+    return when (userType) {
+        AccountType.Persona -> name.isNotBlank() && surname.isNotBlank() && age.toIntOrNull() != null && documentId.isNotBlank() && gender.isNotBlank()
+        else -> name.isNotBlank() && documentId.isNotBlank() && fiscalAddress.isNotBlank()
+    }
+}
+

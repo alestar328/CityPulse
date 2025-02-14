@@ -133,7 +133,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                         }
 
                         if (errorMessage.isEmpty()) {
-                            viewModel.setTempUserData(email, password)
+                            viewModel.saveTempUserData(email, password)
                             navController.navigate("register2")
                         }
                     },

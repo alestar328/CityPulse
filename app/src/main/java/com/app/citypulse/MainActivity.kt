@@ -10,6 +10,7 @@ import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.screens.ui.theme.CityPulseTheme
 import com.app.citypulse.data.NavigationGraph
+import com.app.citypulse.data.repository.AuthRepository
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -27,12 +28,13 @@ class MainActivity : ComponentActivity() {
                 // Maneja navegación entre pantallas.
                 val navController = rememberNavController()
                 val eventRepository = EventRepository()
+                val authRepository = AuthRepository()
 
                 // Maneja lógica de eventos.
                 val eventViewModel = EventViewModel(eventRepository)
 
                 // Maneja autenticación
-                val authViewModel = AuthViewModel()
+                val authViewModel = AuthViewModel(authRepository)
 
                 NavigationGraph(
                     navController = navController,

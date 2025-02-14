@@ -10,8 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -28,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.NavItem
 import com.app.citypulse.presentation.components.SearchTopbar
-import com.app.citypulse.presentation.screens.ContactsScreen
 import com.app.citypulse.presentation.screens.MapScreen
 import com.app.citypulse.presentation.screens.SettingsScreen
 import androidx.navigation.NavController
@@ -36,20 +33,22 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material.icons.filled.Add
 import com.app.citypulse.data.repository.EventRepository
+import com.app.citypulse.presentation.screens.ProfileScreen
+import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import java.util.Locale
 
 @Composable
-fun MainScreen(navController: NavController = rememberNavController()) {
+fun MainScreen(navController: NavController = rememberNavController(), authViewModel: AuthViewModel) {
 
     // Creamos instancia para manejar logica eventos en el mapa.
-    val viewModel = EventViewModel(EventRepository())
+    val eventViewModel = EventViewModel(EventRepository())
 
     val navitemList = listOf(
-        NavItem("Contacts", Icons.Default.Person, 5),
+        NavItem("Profile", Icons.Default.Person, 5),
         NavItem("Map", Icons.Default.LocationOn, 0),
         NavItem("Settings", Icons.Default.Settings, 0)
     )
-
     var selectedIndex by remember { mutableIntStateOf(1) }
 
     Scaffold(
@@ -61,15 +60,11 @@ fun MainScreen(navController: NavController = rememberNavController()) {
                 navitemList.forEachIndexed { index, navItem ->
                     NavigationBarItem(
                         selected = selectedIndex == index,
-                        onClick = { selectedIndex = index },
-                        icon = {
-                            BadgedBox(badge = {
-                                if (navItem.badgeCount > 0)
-                                    Badge { Text(text = navItem.badgeCount.toString()) }
-                            }) {
-                                Icon(imageVector = navItem.icon, contentDescription = "Icon")
-                            }
+                        onClick = {
+                            selectedIndex = index
+                            navController.navigate(navitemList[index].label.lowercase(Locale.getDefault()))
                         },
+                        icon = { Icon(imageVector = navItem.icon, contentDescription = navItem.label) },
                         label = { Text(text = navItem.label) }
                     )
                 }
@@ -77,75 +72,35 @@ fun MainScreen(navController: NavController = rememberNavController()) {
         },
         floatingActionButton = {
             if (selectedIndex == 1) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 24.dp, bottom = 18.dp), // Separación de la izquierda y abajo
-                    contentAlignment = Alignment.BottomStart
-                ) {
-                    FloatingActionButton(
-                        onClick = { navController.navigate("create_event") },
-                        modifier = Modifier.padding(4.dp),
-                        containerColor = Color.LightGray
-
-                    ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "Crear Evento")
-                    }
+                FloatingActionButton(onClick = { navController.navigate("create_event") }, containerColor = Color.LightGray) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Crear Evento")
                 }
             }
         }
-
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            ContentScreen(
-                modifier = Modifier.fillMaxSize(),
-                selectedIndex = selectedIndex,
-                navController = navController,
-                viewModel = viewModel
-            )
-            SearchTopbar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .align(Alignment.TopCenter)
-                    .background(Color.Transparent)
-            )
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            ContentScreen(selectedIndex, navController, eventViewModel, authViewModel)
+            if (selectedIndex == 1) {
+                SearchTopbar(modifier = Modifier.fillMaxWidth().padding(16.dp).align(Alignment.TopCenter).background(Color.Transparent))
+            }
         }
     }
 }
+
 
 
 @Composable
-fun ContentScreen(
-    modifier: Modifier = Modifier,
-    selectedIndex: Int,
-    navController: NavController,
-    viewModel: EventViewModel
-) {
+fun ContentScreen(selectedIndex: Int, navController: NavController, eventViewModel: EventViewModel, authViewModel: AuthViewModel) {
     when (selectedIndex) {
-        0 -> ContactsScreen()
-        1 -> {
-            // Agregar el parámetro onLocationSelected aquí también
-            MapScreen(
-                viewModel = viewModel,
-                onLocationSelected = { latLng ->
-                    // Acción a tomar cuando se selecciona una ubicación
-                    navController.previousBackStackEntry?.savedStateHandle?.apply {
-                        set("latitud", latLng.latitude)
-                        set("longitud", latLng.longitude)
-                    }
-                    navController.popBackStack() // Volver atrás después de seleccionar la ubicación
-                }
-            )
-        }
+        0 -> ProfileScreen(navController = navController, viewModel = authViewModel)
+        1 -> MapScreen(viewModel = eventViewModel, onLocationSelected = { latLng ->
+            navController.previousBackStackEntry?.savedStateHandle?.apply {
+                set("latitud", latLng.latitude)
+                set("longitud", latLng.longitude)
+            }
+            navController.popBackStack()
+        })
         2 -> SettingsScreen()
     }
 }
-
-
-
 
