@@ -46,7 +46,7 @@ fun MainScreen(navController: NavController = rememberNavController()) {
 
     val navitemList = listOf(
         NavItem("Contacts", Icons.Default.Person, 5),
-        NavItem("Map", Icons.Default.LocationOn, 0),
+        NavItem("map_screen", Icons.Default.LocationOn, 0),
         NavItem("Settings", Icons.Default.Settings, 0)
     )
 

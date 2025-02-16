@@ -2,7 +2,6 @@ package com.app.citypulse.data.dataUsers
 
 import java.util.regex.Pattern
 
-
 // Data class para almacenar usuarios
 data class UserItem(
     val id: Int? = null,

@@ -2,6 +2,7 @@ package com.app.citypulse.presentation.screens
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -38,23 +39,24 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
     var aforo by rememberSaveable { mutableStateOf("") }
 
     val context = LocalContext.current
-    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
 
-    // Recuperar valores de ubicación al volver de la selección de ubicación
     LaunchedEffect(navController.currentBackStackEntry) {
-        savedStateHandle?.get<String>("direccion")?.let {
-            lugar = it
-            savedStateHandle.remove<String>("direccion")
+        val savedState = navController.currentBackStackEntry?.savedStateHandle
+
+        savedState?.get<Double>("latitud")?.let {
+            if (it != 0.0) latitud = it
         }
-        savedStateHandle?.get<Double>("latitud")?.let {
-            latitud = it
-            savedStateHandle.remove<Double>("latitud")
+        savedState?.get<Double>("longitud")?.let {
+            if (it != 0.0) longitud = it
         }
-        savedStateHandle?.get<Double>("longitud")?.let {
-            longitud = it
-            savedStateHandle.remove<Double>("longitud")
+        savedState?.get<String>("direccion")?.let {
+            if (it.isNotEmpty()) lugar = it
         }
     }
+
+
+
+
 
     // Fondo con degradado
     Box(
@@ -120,6 +122,11 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                         if (nombre.isNotEmpty() && categoria.isNotEmpty() && descripcion.isNotEmpty() &&
                             fechaInicio.isNotEmpty() && fechaFin.isNotEmpty() && precio.isNotEmpty() && aforo.isNotEmpty()) {
 
+                            if (latitud == 0.0 || longitud == 0.0) {
+                                Toast.makeText(context, "Ubicación aún no cargada, intenta de nuevo", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+
                             val event = EventEntity(
                                 nombre = nombre,
                                 categoria = categoria,
@@ -132,7 +139,9 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                                 latitud = latitud,
                                 longitud = longitud
                             )
+
                             viewModel.createEvent(event)
+                            viewModel.loadEvents()
                             navController.popBackStack()
                         } else {
                             Toast.makeText(context, "Por favor, complete todos los campos obligatorios", Toast.LENGTH_SHORT).show()
@@ -143,22 +152,22 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                 ) {
                     Text("Crear", color = Color.White)
                 }
-
             }
         }
     }
 }
 
 // Función para convertir String a Date
-fun parseDate(dateStr: String): Date? {
+fun parseDate(dateStr: String): Date {
     return try {
         val formatter = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
         formatter.timeZone = TimeZone.getTimeZone("UTC")
-        formatter.parse(dateStr)
+        formatter.parse(dateStr) ?: Date()
     } catch (e: Exception) {
-        null
+        Date()
     }
 }
+
 
 
 @Composable

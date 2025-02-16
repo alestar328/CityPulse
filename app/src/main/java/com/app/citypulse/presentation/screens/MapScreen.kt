@@ -14,18 +14,27 @@ fun MapScreen(viewModel: EventViewModel, onLocationSelected: (LatLng) -> Unit) {
         position = CameraPosition.fromLatLngZoom(LatLng(41.387054, 2.170210), 12f)
     }
 
-    // Lista de eventos en tiempo real.
-    val eventLocations = viewModel.eventList
+    val eventLocations by viewModel.eventList.collectAsState()
+
+    val markerStates = remember { mutableStateMapOf<String, MarkerState>() } // 🔹 Map para manejar estados de los marcadores
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
+            cameraPositionState = cameraPositionState
         ) {
-            // Dibujar los eventos como marcadores.
+            // 🔹 Limpiar el mapa antes de añadir nuevos marcadores
+            markerStates.clear()
+
             eventLocations.forEach { event ->
+                val position = LatLng(event.latitud, event.longitud)
+
+                // 🔹 Crear o actualizar el estado del marcador
+                val markerState = markerStates.getOrPut(event.id) { rememberMarkerState(position = position) }
+                markerState.position = position
+
                 Marker(
-                    state = rememberMarkerState(position = LatLng(event.latitud, event.longitud)),
+                    state = markerState,
                     title = event.nombre,
                     snippet = event.descripcion
                 )
@@ -33,7 +42,3 @@ fun MapScreen(viewModel: EventViewModel, onLocationSelected: (LatLng) -> Unit) {
         }
     }
 }
-
-
-
-

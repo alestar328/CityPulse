@@ -51,6 +51,8 @@ fun LocationPickerScreen(navController: NavController) {
                 selectedLocation = latLng
                 selectedAddress = getAddressFromLatLng(context, latLng)
                 markerState.position = latLng
+
+                Log.d("LocationPickerScreen", "Ubicación seleccionada: Lat: ${latLng.latitude}, Lng: ${latLng.longitude}")
             }
         ) {
             selectedLocation?.let {
@@ -68,14 +70,15 @@ fun LocationPickerScreen(navController: NavController) {
 
             selectedLocation?.let { location ->
                 Button(
-                    modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        navController.previousBackStackEntry?.savedStateHandle?.apply {
-                            set("latitud", location.latitude)
-                            set("longitud", location.longitude)
-                            set("direccion", selectedAddress)
+                        selectedLocation?.let { location ->
+                            navController.previousBackStackEntry?.savedStateHandle?.apply {
+                                set("latitud", location.latitude)
+                                set("longitud", location.longitude)
+                                set("direccion", selectedAddress)
+                            }
+                            navController.popBackStack()
                         }
-                        navController.popBackStack()
                     }
                 ) {
                     Text("Confirmar Ubicación")

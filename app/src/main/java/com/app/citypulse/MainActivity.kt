@@ -24,21 +24,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CityPulseTheme {
-                // Maneja navegación entre pantallas.
+
                 val navController = rememberNavController()
                 val eventRepository = EventRepository()
-
-                // Maneja lógica de eventos.
                 val eventViewModel = EventViewModel(eventRepository)
-
-                // Maneja autenticación
                 val authViewModel = AuthViewModel()
 
-                NavigationGraph(
-                    navController = navController,
-                    eventViewModel = eventViewModel,
-                    authViewModel = authViewModel
-                )
+                NavigationGraph(navController = navController, eventViewModel = eventViewModel, authViewModel = authViewModel)
             }
         }
     }

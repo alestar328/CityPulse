@@ -14,11 +14,7 @@ import com.app.citypulse.presentation.register_screens.RegisterScreen2
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 @Composable
-fun NavigationGraph(
-    navController: NavHostController,
-    eventViewModel: EventViewModel,
-    authViewModel: AuthViewModel
-) {
+fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewModel, authViewModel: AuthViewModel) {
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
     val context = LocalContext.current
 

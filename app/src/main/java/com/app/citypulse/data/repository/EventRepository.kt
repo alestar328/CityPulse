@@ -1,33 +1,33 @@
 package com.app.citypulse.data.repository
 
-import android.util.Log
 import com.app.citypulse.data.model.EventEntity
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 class EventRepository {
-
     private val db = FirebaseFirestore.getInstance()
 
-    fun addEvent(event: EventEntity) {
-        db.collection("Eventos").add(event)
-            .addOnSuccessListener { Log.d("Firebase", "Evento agregado con éxito") }
-            .addOnFailureListener { Log.e("Firebase", "Error al agregar evento", it) }
+    suspend fun addEvent(event: EventEntity) {
+        try {
+            val documentRef = db.collection("Eventos").add(event).await()
+            documentRef.update("id", documentRef.id)
+        } catch (e: Exception) {
+            throw e
+        }
     }
 
     fun getEvents(callback: (List<EventEntity>) -> Unit) {
         db.collection("Eventos")
-            .get()
-            .addOnSuccessListener { documents ->
-                val events = mutableListOf<EventEntity>()
-                for (document in documents) {
-                    val event = document.toObject(EventEntity::class.java)
-                    events.add(event)
+            .addSnapshotListener { snapshots, e ->
+                if (e != null) {
+                    return@addSnapshotListener
                 }
-                // Devuelve eventos obtenidos.
+                val events = snapshots?.documents?.mapNotNull { doc ->
+                    val event = doc.toObject(EventEntity::class.java)
+                    event?.copy(id = doc.id) // 🔹 Asigna manualmente el ID de Firestore
+                } ?: emptyList()
+
                 callback(events)
-            }
-            .addOnFailureListener { exception ->
-                Log.e("Firebase", "Error al obtener eventos", exception)
             }
     }
 }
