@@ -11,7 +11,7 @@ import com.google.maps.android.compose.*
 @Composable
 fun MapScreen(viewModel: EventViewModel, onLocationSelected: (LatLng) -> Unit) {
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(41.387054, 2.170210), 12f)
+        position = CameraPosition.fromLatLngZoom(LatLng(41.57008436408339, 1.9954403499999671), 15f)
     }
 
     val eventLocations by viewModel.eventList.collectAsState()
