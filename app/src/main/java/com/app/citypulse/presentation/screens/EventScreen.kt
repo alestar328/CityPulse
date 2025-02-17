@@ -2,12 +2,11 @@ package com.app.citypulse.presentation.screens
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,18 +17,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.data.model.EventEntity
+import com.app.citypulse.data.model.TipoCategoria
+import com.app.citypulse.presentation.viewmodel.EventViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
     var nombre by rememberSaveable { mutableStateOf("") }
-    var categoria by rememberSaveable { mutableStateOf("") }
+    var categoriaSeleccionada by rememberSaveable { mutableStateOf(TipoCategoria.CULTURAL) }
     var descripcion by rememberSaveable { mutableStateOf("") }
     var lugar by rememberSaveable { mutableStateOf("Ubicación no seleccionada") }
     var latitud by rememberSaveable { mutableStateOf(0.0) }
@@ -55,7 +56,6 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
         }
     }
 
-    // Fondo con degradado
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -79,10 +79,16 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            CustomTextField(value = nombre, label = "Nombre evento", onValueChange = { nombre = it })
-            CustomTextField(value = categoria, label = "Categoría Principal", onValueChange = { categoria = it })
+            CustomTextField(value = nombre, label = "Nombre del evento", onValueChange = { nombre = it })
+
+            CategoriaDropdown(selectedCategoria = categoriaSeleccionada) {
+                categoriaSeleccionada = it
+            }
+
             CustomTextField(value = descripcion, label = "Descripción", onValueChange = { descripcion = it })
-            NumericTextField(value = precio, label = "Precio", onValueChange = { precio = it })
+
+            NumericTextField(value = precio, label = "Precio", onValueChange = { precio = it }, isDecimal = true)
+
             NumericTextField(value = aforo, label = "Aforo", onValueChange = { aforo = it })
 
             var fechaInicioCalendar by rememberSaveable { mutableStateOf<Calendar?>(null) }
@@ -110,9 +116,6 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                 )
             }
 
-
-
-
             CustomTextField(value = lugar, label = "Ubicación", onValueChange = {}, enabled = false)
 
             Button(
@@ -125,10 +128,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 Button(
                     onClick = { navController.popBackStack() },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
@@ -141,38 +141,71 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
 
                 Button(
                     onClick = {
-                        if (nombre.isNotEmpty() && categoria.isNotEmpty() && descripcion.isNotEmpty() &&
-                            fechaInicio.isNotEmpty() && fechaFin.isNotEmpty() && precio.isNotEmpty() && aforo.isNotEmpty()) {
-
+                        if (nombre.isNotEmpty() && fechaInicio.isNotEmpty() && fechaFin.isNotEmpty() &&
+                            precio.isNotEmpty() && aforo.isNotEmpty()
+                        ) {
                             if (latitud == 0.0 || longitud == 0.0) {
-                                Toast.makeText(context, "Ubicación aún no cargada, intenta de nuevo", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Ubicación no seleccionada", Toast.LENGTH_SHORT).show()
                                 return@Button
                             }
 
                             val event = EventEntity(
                                 nombre = nombre,
-                                categoria = categoria,
+                                categoria = categoriaSeleccionada,
                                 descripcion = descripcion,
-                                fechaInicio = parseDate(fechaInicio),
-                                fechaFin = parseDate(fechaFin),
-                                precio = precio.toDoubleOrNull() ?: 0.0,
-                                aforo = aforo.toIntOrNull() ?: 0,
                                 lugar = lugar,
                                 latitud = latitud,
-                                longitud = longitud
+                                longitud = longitud,
+                                fechaInicio = parseDate(fechaInicio),
+                                fechaFin = parseDate(fechaFin),
+                                precio = precio.toDouble(),
+                                aforo = aforo.toInt()
                             )
 
                             viewModel.createEvent(event)
-                            viewModel.loadEvents()
                             navController.popBackStack()
                         } else {
-                            Toast.makeText(context, "Por favor, complete todos los campos obligatorios", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Crear", color = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CategoriaDropdown(selectedCategoria: TipoCategoria, onCategoriaSelected: (TipoCategoria) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+
+    // Usa Row para permitir el uso de weight()
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Box(modifier = Modifier.weight(1f)) {
+            OutlinedButton(
+                onClick = { expanded = true },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray.copy(alpha = 0.2f))
+            ) {
+                Text(selectedCategoria.displayName, color = Color.White)
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Color.Black)
+            ) {
+                TipoCategoria.values().forEach { categoria ->
+                    DropdownMenuItem(
+                        text = { Text(categoria.displayName, color = Color.White) },
+                        onClick = {
+                            onCategoriaSelected(categoria)
+                            expanded = false
+                        }
+                    )
                 }
             }
         }
@@ -189,8 +222,6 @@ fun parseDate(dateStr: String): Date {
         Date()
     }
 }
-
-
 
 @Composable
 fun DateTimePickerField(
@@ -250,8 +281,6 @@ fun DateTimePickerField(
     }
 }
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTextField(value: String, label: String, onValueChange: (String) -> Unit, enabled: Boolean = true) {
@@ -295,7 +324,7 @@ fun NumericTextField(value: String, label: String, onValueChange: (String) -> Un
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = if (isDecimal) KeyboardType.Number else KeyboardType.NumberPassword
+            keyboardType = if (isDecimal) KeyboardType.Number else KeyboardType.Number
         ),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = Color.Gray.copy(alpha = 0.2f),

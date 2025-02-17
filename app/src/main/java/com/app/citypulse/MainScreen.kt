@@ -145,5 +145,3 @@ fun ContentScreen(
         2 -> SettingsScreen()
     }
 }
-
-
