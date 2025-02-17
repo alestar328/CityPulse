@@ -22,15 +22,15 @@ fun CulturalIcon(
     Box(
         modifier = modifier
             .background(color = Color.Gray, shape = RoundedCornerShape(24.dp))
-            .padding(horizontal = 12.dp)
-            .size(60.dp),
+            .padding(horizontal = 10.dp)
+            .size(40.dp),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             painter = painterResource(id = R.drawable.culturaicon),
             contentDescription = "Fiesta",
             tint = Color.Black,
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(25.dp)
         )
 
     }

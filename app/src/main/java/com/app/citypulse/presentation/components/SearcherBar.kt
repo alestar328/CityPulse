@@ -27,10 +27,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.citypulse.R
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,11 +54,12 @@ fun SearcherBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu",
-                tint = Color.Black,
-                modifier = Modifier.size(40.dp)
+                painter = painterResource(id = R.drawable.filtericon),
+                contentDescription = "Filtro",
+                tint = Color.White,
+                modifier = Modifier.size(25.dp)
             )
+
             Spacer(modifier = Modifier.width(12.dp)) // Espaciado entre el icono y el campo de texto
 
             TextField(
@@ -77,7 +80,7 @@ fun SearcherBar(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Buscar",
                 tint = Color.Black,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(25.dp)
 
             )
         }

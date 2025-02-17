@@ -23,6 +23,7 @@ import androidx.navigation.NavController
 import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
@@ -117,45 +118,32 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             )
 
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.splash_screen),
                     contentDescription = "Logo de la app",
                     modifier = Modifier
-                        .width(230.dp)
-                        .height(230.dp)
-                        .padding(top = 20.dp)
+                        .size(140.dp)
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Text("CityPulse", color = Color.White, fontSize = 40.sp, textAlign = TextAlign.Center)
 
-                Text(
-                    "CityPulse",
-                    color = Color.White,
-                    style = MaterialTheme.typography.displayLarge
-                )
 
-                Text(
-                    "¡Una aplicación que te ayudará a encontrar eventos cerca de ti!",
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp)
-                )
+                Text("¡Encuentra eventos cerca de ti!", color = Color.White, fontSize = 22.sp, textAlign = TextAlign.Center)
 
-                Spacer(modifier = Modifier.height(40.dp))
+
 
                 // Formulario para iniciar sesión con correo y contraseña
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .background(Color.White.copy(alpha = 0.8f)),
-                    shape = MaterialTheme.shapes.medium,
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                        .padding(horizontal = 20.dp),
+                    elevation = CardDefaults.cardElevation(8.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         TextField(
@@ -166,7 +154,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
 
                         TextField(
                             value = password,
@@ -191,7 +178,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
 
                 // Botón de inicio de sesión con correo y contraseña
                 Button(
@@ -252,7 +238,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     Text("Iniciar sesión con Google", color = Color.Black)
                 }
 
-                Spacer(modifier = Modifier.height(56.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
                 // Botón para ir a la pantalla de registro
                 Button(

@@ -36,18 +36,19 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material.icons.filled.Add
 import com.app.citypulse.data.repository.EventRepository
+import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 
 @Composable
-fun MainScreen(navController: NavController = rememberNavController()) {
+fun MainScreen(navController: NavController = rememberNavController(), authViewModel: AuthViewModel) {
 
     // Creamos instancia para manejar logica eventos en el mapa.
     val viewModel = EventViewModel(EventRepository())
 
     val navitemList = listOf(
-        NavItem("Contacts", Icons.Default.Person, 5),
-        NavItem("map_screen", Icons.Default.LocationOn, 0),
-        NavItem("Settings", Icons.Default.Settings, 0)
+        NavItem("Perfil", Icons.Default.Person, 5),
+        NavItem("Mapa", Icons.Default.LocationOn, 0),
+        NavItem("Config", Icons.Default.Settings, 0)
     )
 
     var selectedIndex by remember { mutableIntStateOf(1) }
@@ -107,13 +108,17 @@ fun MainScreen(navController: NavController = rememberNavController()) {
                 navController = navController,
                 viewModel = viewModel
             )
-            SearchTopbar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .align(Alignment.TopCenter)
-                    .background(Color.Transparent)
-            )
+            if (selectedIndex == 1) {
+
+
+                SearchTopbar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.TopCenter)
+                        .background(Color.Transparent)
+                )
+            }
         }
     }
 }

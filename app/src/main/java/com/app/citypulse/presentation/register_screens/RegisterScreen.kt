@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
@@ -38,41 +39,28 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
             )
 
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.splash_screen),
                     contentDescription = "Logo de la app",
-                    modifier = Modifier
-                        .width(230.dp)
-                        .height(230.dp)
-                        .padding(top = 20.dp)
+                    modifier = Modifier.size(140.dp)
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Text("CityPulse", color = Color.White, fontSize = 38.sp)
 
-                Text(
-                    "CityPulse",
-                    color = Color.White,
-                    style = MaterialTheme.typography.displayLarge
-                )
 
-                Text(
-                    "¡Una aplicación que te ayudará a encontrar eventos cerca de ti!",
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp)
-                )
+                Text("¡Encuentra eventos cerca de ti!", color = Color.White, fontSize = 22.sp, textAlign = TextAlign.Center)
 
-                Spacer(modifier = Modifier.height(40.dp))
 
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 12.dp)
                         .background(Color.White.copy(alpha = 0.8f)),
                     shape = MaterialTheme.shapes.medium,
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -86,7 +74,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         TextField(
                             value = password,
@@ -97,7 +85,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         TextField(
                             value = confirmPassword,
@@ -122,7 +110,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Button(
                     onClick = {
@@ -154,13 +142,13 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 12.dp)
                 ) {
                     Text("Siguiente")
                 }
 
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // Aquí agregamos el botón "¿Ya tienes cuenta? Inicia sesión"
                 TextButton(

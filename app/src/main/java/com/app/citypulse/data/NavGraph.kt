@@ -35,7 +35,7 @@ fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewM
 
         // Pantalla Principal
         composable("main_screen") {
-            MainScreen(navController)
+            MainScreen(navController, authViewModel)
         }
 
         // Eventos
