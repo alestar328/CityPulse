@@ -2,7 +2,8 @@ package com.app.citypulse.presentation.screens
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.util.Log
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -54,10 +55,6 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
         }
     }
 
-
-
-
-
     // Fondo con degradado
     Box(
         modifier = Modifier
@@ -85,11 +82,36 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
             CustomTextField(value = nombre, label = "Nombre evento", onValueChange = { nombre = it })
             CustomTextField(value = categoria, label = "Categoría Principal", onValueChange = { categoria = it })
             CustomTextField(value = descripcion, label = "Descripción", onValueChange = { descripcion = it })
-            CustomTextField(value = precio, label = "Precio", onValueChange = { precio = it })
-            CustomTextField(value = aforo, label = "Aforo", onValueChange = { aforo = it })
+            NumericTextField(value = precio, label = "Precio", onValueChange = { precio = it })
+            NumericTextField(value = aforo, label = "Aforo", onValueChange = { aforo = it })
 
-            DateTimePickerField(label = "Fecha y hora inicial", dateTime = fechaInicio) { fechaInicio = it }
-            DateTimePickerField(label = "Fecha y hora final", dateTime = fechaFin) { fechaFin = it }
+            var fechaInicioCalendar by rememberSaveable { mutableStateOf<Calendar?>(null) }
+
+            DateTimePickerField(
+                label = "Fecha y hora inicial",
+                dateTime = fechaInicio,
+                onDateTimeSelected = { selectedDate ->
+                    fechaInicio = selectedDate
+                    fechaInicioCalendar = Calendar.getInstance().apply {
+                        time = parseDate(selectedDate)
+                    }
+                }
+            )
+
+            // Solo mostrar el selector de fecha final cuando la fecha de inicio ya ha sido seleccionada
+            if (fechaInicioCalendar != null) {
+                DateTimePickerField(
+                    label = "Fecha y hora final",
+                    dateTime = fechaFin,
+                    minDate = fechaInicioCalendar ?: Calendar.getInstance(), // <- Evita el error de tipo
+                    onDateTimeSelected = { selectedDate ->
+                        fechaFin = selectedDate
+                    }
+                )
+            }
+
+
+
 
             CustomTextField(value = lugar, label = "Ubicación", onValueChange = {}, enabled = false)
 
@@ -171,7 +193,12 @@ fun parseDate(dateStr: String): Date {
 
 
 @Composable
-fun DateTimePickerField(label: String, dateTime: String, onDateTimeSelected: (String) -> Unit) {
+fun DateTimePickerField(
+    label: String,
+    dateTime: String,
+    onDateTimeSelected: (String) -> Unit,
+    minDate: Calendar? = null // Parámetro opcional para establecer una restricción mínima.
+) {
     val context = LocalContext.current
 
     OutlinedButton(
@@ -186,6 +213,17 @@ fun DateTimePickerField(label: String, dateTime: String, onDateTimeSelected: (St
                             val selectedDate = Calendar.getInstance().apply {
                                 set(year, month, dayOfMonth, hourOfDay, minute)
                             }
+
+                            // Verificar si la fecha seleccionada es anterior a la mínima permitida
+                            if (minDate != null && selectedDate.before(minDate)) {
+                                Toast.makeText(
+                                    context,
+                                    "La fecha final no puede ser anterior a la fecha inicial.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@TimePickerDialog
+                            }
+
                             val formattedDate = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
                                 .format(selectedDate.time)
                             onDateTimeSelected(formattedDate)
@@ -198,7 +236,9 @@ fun DateTimePickerField(label: String, dateTime: String, onDateTimeSelected: (St
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
-            ).show()
+            ).apply {
+                minDate?.let { datePicker.minDate = it.timeInMillis } // Establecer la restricción mínima en el selector de fecha
+            }.show()
         },
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.LightGray.copy(alpha = 0.2f))
@@ -209,6 +249,7 @@ fun DateTimePickerField(label: String, dateTime: String, onDateTimeSelected: (St
         )
     }
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -232,6 +273,40 @@ fun CustomTextField(value: String, label: String, onValueChange: (String) -> Uni
             unfocusedBorderColor = Color.LightGray
         ),
         enabled = enabled,
+        shape = RoundedCornerShape(12.dp)
+    )
+}
+
+@Composable
+fun NumericTextField(value: String, label: String, onValueChange: (String) -> Unit, isDecimal: Boolean = false) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = { input ->
+            // Permitir solo números y un punto decimal si es necesario
+            val filteredInput = if (isDecimal) {
+                input.filterIndexed { index, c -> c.isDigit() || (c == '.' && index != 0 && !value.contains('.')) }
+            } else {
+                input.filter { it.isDigit() }
+            }
+            onValueChange(filteredInput)
+        },
+        label = { Text(label, color = Color.White) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = if (isDecimal) KeyboardType.Number else KeyboardType.NumberPassword
+        ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = Color.Gray.copy(alpha = 0.2f),
+            unfocusedContainerColor = Color.Gray.copy(alpha = 0.2f),
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            disabledTextColor = Color.LightGray,
+            disabledContainerColor = Color.Gray.copy(alpha = 0.1f),
+            focusedBorderColor = Color.White,
+            unfocusedBorderColor = Color.LightGray
+        ),
         shape = RoundedCornerShape(12.dp)
     )
 }

@@ -23,7 +23,7 @@ fun LocationPickerScreen(navController: NavController) {
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) }
     var selectedAddress by remember { mutableStateOf("Selecciona una ubicación") }
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(41.387054, 2.170210), 12f)
+        position = CameraPosition.fromLatLngZoom(LatLng(41.57008436408339, 1.9954403499999671), 12f)
     }
     val markerState = rememberMarkerState(position = LatLng(41.387054, 2.170210))
 
