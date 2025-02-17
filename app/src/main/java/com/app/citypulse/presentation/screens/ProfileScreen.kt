@@ -71,7 +71,7 @@ fun ProfileScreen(navController: NavController, viewModel: AuthViewModel) {
                 Column(verticalArrangement = Arrangement.Center) {
                     Text(text = user?.name?.plus(" ")?.plus(user?.surname) ?: "Nombre Apellido", fontSize = 20.sp, color = Color.Black)
                     Text(text = user?.email ?: "Correo no disponible", fontSize = 16.sp, color = Color.LightGray)
-                    Text(text = user?.userType?.name ?: "Tipo Usuario", fontSize = 14.sp, color = Color(0xFFBBDEFB))
+                    Text(text = user?.userType?: "Tipo Usuario", fontSize = 14.sp, color = Color(0xFFBBDEFB))
                 }
             }
 

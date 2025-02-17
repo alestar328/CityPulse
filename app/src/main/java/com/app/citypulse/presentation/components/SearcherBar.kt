@@ -69,9 +69,10 @@ fun SearcherBar(
                 placeholder = { Text("Buscar evento", color = Color.White, fontSize = 18.sp)},
                 singleLine = true,
                 modifier = Modifier.weight(1f),
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent, // Sin línea inferior
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 )
             )

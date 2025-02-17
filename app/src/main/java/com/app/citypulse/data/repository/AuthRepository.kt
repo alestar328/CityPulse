@@ -5,6 +5,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class AuthRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -24,6 +27,7 @@ class AuthRepository {
     suspend fun login(email: String, password: String): AuthResult? {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
+
         } catch (e: Exception) {
             null
         }

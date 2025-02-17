@@ -66,7 +66,7 @@ android {
 dependencies {
 
     // Splash Screen
-    implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Google Maps
     implementation("com.google.android.gms:play-services-maps:19.0.0")
@@ -87,23 +87,30 @@ dependencies {
     implementation(libs.androidx.material3)
 
     // Firebase Firestore
-    implementation("com.google.firebase:firebase-firestore-ktx:24.0.0")
+    implementation(libs.google.firebase.firestore.ktx.v2400)
 
     // Firebase Auth y Database
-    implementation("com.google.firebase:firebase-auth-ktx:21.0.1")
-    implementation("com.google.firebase:firebase-database-ktx:20.0.0")
+    implementation("com.google.firebase:firebase-auth-ktx:23.2.0")
+    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
 
     // Firebase SDK
-    implementation("com.google.firebase:firebase-analytics:21.0.0")
+    implementation("com.google.firebase:firebase-analytics:22.2.0")
 
     // Firebase Cloud Messaging
-    implementation("com.google.firebase:firebase-messaging:23.0.0")
+    implementation("com.google.firebase:firebase-messaging:24.1.0")
     implementation(libs.androidx.appcompat)
 
     // Dependencias de prueba
     testImplementation(libs.junit)
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.collection:collection-ktx:1.4.5")
+
+
+    //Necesario para usuario firebase
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation ("com.google.firebase:firebase-auth-ktx:23.2.0")
+    implementation ("com.google.firebase:firebase-firestore-ktx:25.1.2")
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

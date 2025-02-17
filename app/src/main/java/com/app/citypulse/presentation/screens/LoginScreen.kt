@@ -37,17 +37,23 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             )
 
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize()
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                //     Testear esto 1      verticalArrangement = Arrangement.Top
+                       verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.splash_screen),
                     contentDescription = "Logo de la app",
                     modifier = Modifier
-                        .width(230.dp)
+                        /*.width(230.dp)
                         .height(230.dp)
-                        .padding(top = 20.dp)
+                        .padding(top = 20.dp)*/
+                        .width(200.dp)
+                        .aspectRatio(1f)
+                        .padding(top = 16.dp)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -55,26 +61,21 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 Text(
                     "CityPulse",
                     color = Color.White,
-                    style = MaterialTheme.typography.displayLarge
+                    style = MaterialTheme.typography.displayMedium
                 )
 
                 Text(
-                    "¡Una aplicación que te ayudará a encontrar eventos cerca de ti!",
+                    "¡Encuentra eventos cerca de ti!",
                     color = Color.White,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(8.dp)
                 )
 
-                Spacer(modifier = Modifier.height(40.dp))
-
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .background(Color.White.copy(alpha = 0.8f)),
+                    modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    elevation = CardDefaults.cardElevation(6.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         TextField(
@@ -85,7 +86,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         TextField(
                             value = password,
@@ -104,13 +105,12 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
+                                    .padding(vertical = 4.dp)
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
                     onClick = {
@@ -126,7 +126,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 12.dp)
                 ) {
                     Text("Iniciar sesión")
                 }
@@ -138,14 +138,13 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.googlelogo),
                         contentDescription = "Logo de Google",
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(20.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text("Iniciar sesión con Google", color = Color.Black)
                 }
 
