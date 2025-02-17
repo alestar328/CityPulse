@@ -2,10 +2,10 @@ package com.app.citypulse.data.model
 
 import java.util.Date
 
-data class EventEntity (
+data class EventEntity(
     val id: String = "",
     val nombre: String = "",
-    val categoria: String = "",
+    val categoria: TipoCategoria = TipoCategoria.CULTURAL,
     val subcategoria: String = "",
     val descripcion: String = "",
     val lugar: String = "",

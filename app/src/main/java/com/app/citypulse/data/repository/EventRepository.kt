@@ -16,6 +16,15 @@ class EventRepository {
         }
     }
 
+    suspend fun getEventById(eventId: String): EventEntity? {
+        return try {
+            val document = db.collection("Eventos").document(eventId).get().await()
+            document.toObject(EventEntity::class.java)?.copy(id = document.id)
+        } catch (e: Exception) {
+            null // En caso de error, retornamos null
+        }
+    }
+
     fun getEvents(callback: (List<EventEntity>) -> Unit) {
         db.collection("Eventos")
             .addSnapshotListener { snapshots, e ->
@@ -24,7 +33,7 @@ class EventRepository {
                 }
                 val events = snapshots?.documents?.mapNotNull { doc ->
                     val event = doc.toObject(EventEntity::class.java)
-                    event?.copy(id = doc.id) // 🔹 Asigna manualmente el ID de Firestore
+                    event?.copy(id = doc.id)
                 } ?: emptyList()
 
                 callback(events)

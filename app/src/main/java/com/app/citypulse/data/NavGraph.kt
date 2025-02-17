@@ -46,14 +46,30 @@ fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewM
             LocationPickerScreen(navController)
         }
         composable("map_screen") {
-            MapScreen(viewModel = eventViewModel, onLocationSelected = { latLng ->
-                navController.previousBackStackEntry?.savedStateHandle?.apply {
-                    set("latitud", latLng.latitude)
-                    set("longitud", latLng.longitude)
+            MapScreen(
+                viewModel = eventViewModel,
+                onLocationSelected = { latLng ->
+                    navController.previousBackStackEntry?.savedStateHandle?.apply {
+                        set("latitud", latLng.latitude)
+                        set("longitud", latLng.longitude)
+                    }
+                    navController.popBackStack()
+                },
+                onMarkerClicked = { eventEntity ->
+                    // Aquí puedes agregar cualquier acción que quieras realizar cuando se haga clic en el marcador
+                    // Por ejemplo, podrías navegar a los detalles del evento:
+                    navController.navigate("event_details/${eventEntity.id}")
                 }
-                navController.popBackStack()
-            })
+            )
         }
+
+
+        // Detalles del evento
+        composable("event_details/{eventId}") { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+            EventDetailsScreen(eventId = eventId, viewModel = eventViewModel, navController = navController)
+        }
+
 
         // Otras pantallas
         composable("contacts") {

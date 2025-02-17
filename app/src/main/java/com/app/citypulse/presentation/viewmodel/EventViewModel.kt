@@ -1,5 +1,7 @@
 package com.app.citypulse.presentation.viewmodel
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.model.EventEntity
@@ -12,6 +14,8 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
 
     private val _eventList = MutableStateFlow<List<EventEntity>>(emptyList())
     val eventList: StateFlow<List<EventEntity>> = _eventList
+    private val _eventDetails = mutableStateOf<EventEntity?>(null)
+    val eventDetails: MutableState<EventEntity?> = _eventDetails
 
     init {
         loadEvents()
@@ -32,6 +36,12 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
         repository.getEvents { events ->
             _eventList.value = emptyList()
             _eventList.value = events
+        }
+    }
+
+    fun getEventById(eventId: String) {
+        viewModelScope.launch {
+            _eventDetails.value = repository.getEventById(eventId)
         }
     }
 }
