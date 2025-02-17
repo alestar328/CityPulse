@@ -4,6 +4,8 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.tasks.await
@@ -32,17 +34,17 @@ class AuthRepository {
 
     suspend fun checkIfUserExists(email: String): Boolean {
         return try {
-            // Intentamos obtener los métodos de inicio de sesión asociados al correo
-            val result = FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email).await()
-
-            // Si result.signInMethods no es nulo y tiene elementos, significa que el correo ya está registrado
-            result.signInMethods?.isNotEmpty() == true
+            val auth = FirebaseAuth.getInstance()
+            val signInResult = auth.signInWithEmailAndPassword(email, "dummyPassword").await()
+            true // Si llega aquí, el correo ya está registrado.
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+            false // Si el error es de credenciales inválidas, significa que el correo no está registrado.
         } catch (e: Exception) {
-            // Si ocurre un error (por ejemplo, si el correo no existe en Firebase), lo manejamos aquí
             Log.e("AuthCheck", "Error al verificar el correo: ${e.message}")
-            false // Devolvemos false si hubo un error
+            false // Otros errores (por ejemplo, red o problemas de red).
         }
     }
+
 
 
     // Función para registrar un usuario con datos completos en Firestore
