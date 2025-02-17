@@ -1,17 +1,20 @@
 package com.app.citypulse.presentation.screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 
 @Composable
-fun EventDetailsScreen(eventId: String, viewModel: EventViewModel) {
-    val event by viewModel.getEventById(eventId).collectAsState(initial = null)
+fun EventDetailsScreen(eventId: String, viewModel: EventViewModel, navController: NavController) {
+    LaunchedEffect(eventId) {
+        viewModel.getEventById(eventId)
+    }
+
+    val event = viewModel.eventDetails.value
 
     event?.let {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -23,6 +26,12 @@ fun EventDetailsScreen(eventId: String, viewModel: EventViewModel) {
             Text("Fecha y hora de fin: ${it.fechaFin}")
             Text("Precio: ${it.precio}")
             Text("Aforo: ${it.aforo}")
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(onClick = { navController.popBackStack() }) {
+                Text("Volver")
+            }
         }
     } ?: Text("Cargando detalles del evento...")
 }

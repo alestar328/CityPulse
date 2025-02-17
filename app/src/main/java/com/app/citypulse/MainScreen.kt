@@ -35,22 +35,23 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.runtime.mutableStateOf
+import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun MainScreen(navController: NavController = rememberNavController()) {
-
-    // Creamos instancia para manejar logica eventos en el mapa.
     val viewModel = EventViewModel(EventRepository())
-
     val navitemList = listOf(
         NavItem("Contacts", Icons.Default.Person, 5),
-        NavItem("map_screen", Icons.Default.LocationOn, 0),
+        NavItem("Map", Icons.Default.LocationOn, 0),
         NavItem("Settings", Icons.Default.Settings, 0)
     )
 
     var selectedIndex by remember { mutableIntStateOf(1) }
+    var selectedEvent by remember { mutableStateOf<EventEntity?>(null) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -74,27 +75,7 @@ fun MainScreen(navController: NavController = rememberNavController()) {
                     )
                 }
             }
-        },
-        floatingActionButton = {
-            if (selectedIndex == 1) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 24.dp, bottom = 18.dp), // Separación de la izquierda y abajo
-                    contentAlignment = Alignment.BottomStart
-                ) {
-                    FloatingActionButton(
-                        onClick = { navController.navigate("create_event") },
-                        modifier = Modifier.padding(4.dp),
-                        containerColor = Color.LightGray
-
-                    ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "Crear Evento")
-                    }
-                }
-            }
         }
-
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -105,7 +86,10 @@ fun MainScreen(navController: NavController = rememberNavController()) {
                 modifier = Modifier.fillMaxSize(),
                 selectedIndex = selectedIndex,
                 navController = navController,
-                viewModel = viewModel
+                viewModel = viewModel,
+                onMarkerClicked = { eventEntity ->
+                    navController.navigate("event_details/${eventEntity.id}")
+                }
             )
             SearchTopbar(
                 modifier = Modifier
@@ -118,30 +102,25 @@ fun MainScreen(navController: NavController = rememberNavController()) {
     }
 }
 
-
 @Composable
 fun ContentScreen(
     modifier: Modifier = Modifier,
     selectedIndex: Int,
     navController: NavController,
-    viewModel: EventViewModel
+    viewModel: EventViewModel,
+    onMarkerClicked: (EventEntity) -> Unit
 ) {
     when (selectedIndex) {
         0 -> ContactsScreen()
         1 -> {
-            // Agregar el parámetro onLocationSelected aquí también
             MapScreen(
                 viewModel = viewModel,
-                onLocationSelected = { latLng ->
-                    // Acción a tomar cuando se selecciona una ubicación
-                    navController.previousBackStackEntry?.savedStateHandle?.apply {
-                        set("latitud", latLng.latitude)
-                        set("longitud", latLng.longitude)
-                    }
-                    navController.popBackStack() // Volver atrás después de seleccionar la ubicación
-                }
+                onLocationSelected = { navController.navigate("create_event") },
+                onMarkerClicked = onMarkerClicked
             )
         }
         2 -> SettingsScreen()
     }
 }
+
+
