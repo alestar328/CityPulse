@@ -32,21 +32,18 @@ class AuthRepository {
 
     suspend fun checkIfUserExists(email: String): Boolean {
         return try {
-            // Intentamos registrar al usuario con el correo y una contraseña ficticia
-            FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, "dummyPassword123").await()
+            // Intentamos obtener los métodos de inicio de sesión asociados al correo
+            val result = FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email).await()
 
-            // Si no ocurre ninguna excepción, significa que el correo no está registrado
-            FirebaseAuth.getInstance().signOut()  // Desconectamos al usuario creado
-            false // El correo no está registrado
-        } catch (e: FirebaseAuthException) {
-            // Si ocurre una excepción, significa que el correo ya está registrado
-            true // El correo ya está registrado
+            // Si result.signInMethods no es nulo y tiene elementos, significa que el correo ya está registrado
+            result.signInMethods?.isNotEmpty() == true
         } catch (e: Exception) {
-            // Manejar cualquier otro tipo de error
+            // Si ocurre un error (por ejemplo, si el correo no existe en Firebase), lo manejamos aquí
             Log.e("AuthCheck", "Error al verificar el correo: ${e.message}")
-            false // Devolvemos false si hay un error
+            false // Devolvemos false si hubo un error
         }
     }
+
 
     // Función para registrar un usuario con datos completos en Firestore
     suspend fun registerCompleteUser(
