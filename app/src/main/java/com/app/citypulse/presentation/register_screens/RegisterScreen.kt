@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.register_screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -125,16 +126,30 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
 
                 Button(
                     onClick = {
-                        errorMessage = when {
-                            email.isBlank() -> "El correo electrónico no puede estar vacío."
-                            password.length < 6 -> "La contraseña debe tener al menos 6 caracteres."
-                            password != confirmPassword -> "Las contraseñas no coinciden."
-                            else -> ""
-                        }
 
-                        if (errorMessage.isEmpty()) {
-                            viewModel.setTempUserData(email, password)
-                            navController.navigate("register2")
+                        Log.d("RegisterScreen", "Verificando correo: $email")
+
+                        viewModel.checkIfUserExists(email) { exists ->
+                            Log.d("RegisterScreen", "Correo $email ya registrado: $exists")
+
+                            if (exists) {
+                                errorMessage = "El correo electrónico ya está registrado."
+                            } else {
+                                // Validaciones adicionales
+                                errorMessage = when {
+                                    email.isBlank() -> "El correo electrónico no puede estar vacío."
+                                    !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> "Por favor, ingresa un correo electrónico válido."
+                                    password.length < 6 -> "La contraseña debe tener al menos 6 caracteres."
+                                    password != confirmPassword -> "Las contraseñas no coinciden."
+                                    else -> ""
+                                }
+
+                                if (errorMessage.isEmpty()) {
+                                    viewModel.setTempUserData(email, password)
+                                    navController.navigate("register2")
+                                }
+                            }
+
                         }
                     },
                     modifier = Modifier
@@ -144,20 +159,24 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                     Text("Siguiente")
                 }
 
+
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Aquí agregamos el botón "¿Ya tienes cuenta? Inicia sesión"
                 TextButton(
                     onClick = {
-                        // Aquí va la navegación al login
                         navController.navigate("login")
                     },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 90.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333))
                 ) {
                     Text(
                         "¿Ya tienes cuenta? Inicia sesión",
-                        color = Color.White.copy(alpha = 0.8f), // Letras claras pero no mucho
-                        style = MaterialTheme.typography.bodyLarge
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
                     )
                 }
             }

@@ -17,6 +17,18 @@ import com.app.citypulse.R
 import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
+// Función para validar el DNI
+fun isValidDNI(dni: String): Boolean {
+    val dniPattern = Regex("^[0-9]{8}[A-Za-z]$")
+    return dni.matches(dniPattern)
+}
+
+// Función para validar el NIF
+fun isValidNIF(nif: String): Boolean {
+    val nifPattern = Regex("^[A-Za-z]{1}[0-9]{8}$")
+    return nif.matches(nifPattern)
+}
+
 @Composable
 fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
     val backgroundImage = if (isSystemInDarkTheme()) R.drawable.hotelvelabarna else R.drawable.dubai
@@ -48,7 +60,6 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Título centrado
                 Text(
                     "Completa tu perfil",
                     color = Color.White,
@@ -111,18 +122,33 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                             Spacer(modifier = Modifier.height(8.dp))
                             TextField(value = age, onValueChange = { age = it }, label = { Text("Edad") })
                             Spacer(modifier = Modifier.height(8.dp))
-                            TextField(value = documentId, onValueChange = { documentId = it }, label = { Text("DNI") })
+                            TextField(value = documentId, onValueChange = { documentId = it }, label = { Text("DNI (00000000X)") })
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                Button(onClick = { gender = "Masculino" }, modifier = Modifier.weight(1f)) {
-                                    Text("Masculino")
+                                Button(
+                                    onClick = { gender = "Masculino" },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (gender == "Masculino") Color.Blue else Color.Gray
+                                    )
+                                ) {
+                                    Text("Masculino", color = Color.White)
                                 }
+
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Button(onClick = { gender = "Femenino" }, modifier = Modifier.weight(1f)) {
-                                    Text("Femenino")
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Button(
+                                    onClick = { gender = "Femenino" },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (gender == "Femenino") Color.Magenta else Color.Gray
+                                    )
+                                ) {
+                                    Text("Femenino", color = Color.White)
                                 }
                             }
                         }
@@ -131,7 +157,7 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             TextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") })
                             Spacer(modifier = Modifier.height(8.dp))
-                            TextField(value = documentId, onValueChange = { documentId = it }, label = { Text("ID o NIF") })
+                            TextField(value = documentId, onValueChange = { documentId = it }, label = { Text("NIF (X00000000)") })
                             Spacer(modifier = Modifier.height(8.dp))
                             TextField(value = fiscalAddress, onValueChange = { fiscalAddress = it }, label = { Text("Dirección fiscal") })
                         }
@@ -140,9 +166,14 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
 
                 // Validación de campos
                 val isAgeValid = age.toIntOrNull() != null
+                val isDocumentIdValid = when (userType) {
+                    AccountType.Persona -> isValidDNI(documentId)
+                    AccountType.Organizador, AccountType.Asociacion -> isValidNIF(documentId)
+                    else -> false
+                }
                 val isFormValid = when (userType) {
-                    AccountType.Persona -> name.isNotBlank() && surname.isNotBlank() && isAgeValid && documentId.isNotBlank() && gender.isNotBlank()
-                    AccountType.Organizador, AccountType.Asociacion -> name.isNotBlank() && documentId.isNotBlank() && fiscalAddress.isNotBlank()
+                    AccountType.Persona -> name.isNotBlank() && surname.isNotBlank() && isAgeValid && documentId.isNotBlank() && gender.isNotBlank() && isDocumentIdValid
+                    AccountType.Organizador, AccountType.Asociacion -> name.isNotBlank() && documentId.isNotBlank() && fiscalAddress.isNotBlank() && isDocumentIdValid
                     else -> false
                 }
 
@@ -154,19 +185,27 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                         onClick = {
                             if (isFormValid) {
                                 val ageInt = age.toIntOrNull() ?: 0
-                                viewModel.registerCompleteUser(
-                                    name,
-                                    surname,
-                                    ageInt,
-                                    documentId,
-                                    gender,
-                                    fiscalAddress,
-                                    userType ?: AccountType.Persona// Asegura que nunca sea null
-                                ) { isRegistered ->
-                                    if (isRegistered) {
-                                        navController.navigate("map_screen")
+
+                                // Verificar si el usuario ya existe antes de registrar
+                                viewModel.checkIfUserExists(email) { exists ->
+                                    if (exists) {
+                                        errorMessage = "El usuario ya existe."
                                     } else {
-                                        errorMessage = "Ocurrió un error al registrar el usuario."
+                                        viewModel.registerCompleteUser(
+                                            name,
+                                            surname,
+                                            ageInt,
+                                            documentId,
+                                            gender,
+                                            fiscalAddress,
+                                            userType ?: AccountType.Persona
+                                        ) { isRegistered ->
+                                            if (isRegistered) {
+                                                navController.navigate("map_screen")
+                                            } else {
+                                                errorMessage = "Ocurrió un error al registrar el usuario."
+                                            }
+                                        }
                                     }
                                 }
                             } else {
@@ -178,7 +217,6 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                     ) {
                         Text("Siguiente")
                     }
-
                 }
 
                 // Mostrar mensaje de error si existe
@@ -202,7 +240,7 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                 ) {
                     Text(
                         "¿Ya tienes cuenta? Inicia sesión",
-                        color = Color.White.copy(alpha = 0.8f), // Letras claras pero no mucho
+                        color = Color.White.copy(alpha = 0.8f),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }

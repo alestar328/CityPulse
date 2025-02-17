@@ -81,12 +81,16 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
 
     // Firebase Auth y Database
-    implementation("com.google.firebase:firebase-auth-ktx:21.0.1")
+    // implementation("com.google.firebase:firebase-auth-ktx:21.0.1") comentada la version 21.0.1
     implementation("com.google.firebase:firebase-database-ktx:20.0.0")
 
     // Firebase Cloud Messaging
     implementation("com.google.firebase:firebase-messaging:23.0.0")
     implementation(libs.androidx.appcompat)
+
+    implementation ("com.google.android.gms:play-services-auth:20.7.0") // Google Sign-In
+    implementation ("com.google.firebase:firebase-auth-ktx:22.1.2") // Firebase Auth
+
 
     // Dependencias de UI y Lifecycle
     implementation(libs.androidx.core.ktx)

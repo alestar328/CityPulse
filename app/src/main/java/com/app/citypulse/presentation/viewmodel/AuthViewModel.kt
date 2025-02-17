@@ -1,10 +1,20 @@
 package com.app.citypulse.presentation.viewmodel
 
 import android.accounts.Account
+import android.app.Activity
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.AccountType
+import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.repository.AuthRepository
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -40,7 +50,8 @@ class AuthViewModel : ViewModel() {
 
     fun logout() {
         authRepository.logout()
-        _isAuthenticated.value = false  // Actualizamos el estado cuando el usuario cierra sesión
+        _isAuthenticated.value =
+            false  // Actualizamos el estado cuando el usuario cierra sesión
     }
 
     // Variables temporales para almacenar datos antes del registro final
@@ -60,23 +71,37 @@ class AuthViewModel : ViewModel() {
         tempPassword = password
     }
 
-    // Guardar los datos adicionales del usuario para completar el perfil
-    fun completeTempUserData(
-        name: String,
-        surname: String,
-        age: Int,
-        documentId: String,
-        gender: String,
-        fiscalAddress: String?,
-        userType: AccountType  // Agregar el parámetro para el tipo de cuenta
-    ) {
-        tempName = name
-        tempSurname = surname
-        tempAge = age
-        tempDocumentId = documentId
-        tempGender = gender
-        tempFiscalAddress = fiscalAddress ?: ""  // Valor por defecto si es null
-        tempUserType = userType  // Guardamos el tipo de cuenta
+    private val firestore = FirebaseFirestore.getInstance()
+
+    fun saveUser(user: UserItem, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            // Creamos un mapa con los datos del usuario
+            val userData = hashMapOf(
+                "name" to user.name,
+                "surname" to user.surname,
+                "email" to user.email,
+                "age" to user.age,
+                "documentId" to user.documentId,
+                "gender" to user.gender,
+                "userType" to (user.userType?.name ?: "Persona")  // Si userType es null, usamos "PERSON" como valor por defecto
+            )
+
+            // Referencia a la colección "users" en Firestore
+            val userRef = firestore.collection("users").document(user.email) // Usamos el correo como ID del documento
+
+            try {
+                // Guardamos el usuario en Firestore
+                userRef.set(userData).addOnSuccessListener {
+                    onResult(true)  // Si se guardó correctamente
+                }.addOnFailureListener { exception ->
+                    onResult(false)  // Si hubo un error al guardar
+                    println("Error saving user: $exception")
+                }
+            } catch (e: Exception) {
+                onResult(false)
+                println("Error saving user: $e")
+            }
+        }
     }
 
     // Función para registrar el usuario con los datos completos
@@ -91,19 +116,35 @@ class AuthViewModel : ViewModel() {
         onResult: (Boolean) -> Unit
     ) {
         viewModelScope.launch {
+            // Verificar si los datos temporales están completos antes de continuar
+            if (tempEmail.isNullOrEmpty() || tempPassword.isNullOrEmpty()) {
+                onResult(false)  // Si no hay email o contraseña, no continuamos
+                return@launch
+            }
+
             // Realiza el registro del usuario completo, incluyendo el tipo de cuenta
             val result = authRepository.registerCompleteUser(
                 tempEmail ?: "",  // Usamos el email temporal guardado
                 tempPassword ?: "",  // Usamos la contraseña temporal guardada
-                name, surname, age, documentId, gender, fiscalAddress,
+                name,
+                surname,
+                age,
+                documentId,
+                gender,
+                fiscalAddress,
                 userType.name  // Pasamos el tipo de cuenta
             )
 
+            // Verificar si el registro fue exitoso
             val isSuccessful = result != null
             onResult(isSuccessful)
 
-            // Si el registro es exitoso, actualizamos el estado
-            _isAuthenticated.value = isSuccessful
+            // Si el registro es exitoso, actualizamos el estado de autenticación
+            if (isSuccessful) {
+                _isAuthenticated.value = true
+            } else {
+                _isAuthenticated.value = false
+            }
         }
     }
 
@@ -122,16 +163,34 @@ class AuthViewModel : ViewModel() {
         )
     }
 
-    // Limpiar los datos temporales después de un intento de registro o inicio de sesión
-    fun clearTempUserData() {
-        tempEmail = null
-        tempPassword = null
-        tempName = null
-        tempSurname = null
-        tempAge = null
-        tempDocumentId = null
-        tempGender = null
-        tempFiscalAddress = null
-        tempUserType = null  // Limpiar el tipo de cuenta
+    private val auth = FirebaseAuth.getInstance()
+
+    // Obtener el cliente de inicio de sesión de Google
+    fun getGoogleSignInClient(activity: Activity): GoogleSignInClient {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("79725582630-2mn226j2pnrpcn7ljg07j6o7hish6p3s.apps.googleusercontent.com") // Usa el ID de cliente de Firebase
+            .requestEmail()
+            .build()
+
+        return GoogleSignIn.getClient(activity, gso)
     }
+
+
+
+    fun checkIfUserExists(email: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val exists = authRepository.checkIfUserExists(email)
+                Log.d("AuthCheck", "Correo $email existe: $exists")
+                onResult(exists)
+            } catch (e: Exception) {
+                Log.e("AuthCheck", "Error al verificar el correo: ${e.message}")
+                onResult(false)  // En caso de error, devolvemos false
+            }
+        }
+    }
+
+
+
 }
+
