@@ -36,7 +36,6 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
     var userType by remember { mutableStateOf<AccountType?>(null) }
     var name by remember { mutableStateOf("") }
     var surname by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
     var documentId by remember { mutableStateOf("") }
     var email by remember { mutableStateOf(viewModel.getTempUserData()["email"] as? String ?: "") }
     var gender by remember { mutableStateOf<String>("") }
@@ -120,8 +119,6 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                             Spacer(modifier = Modifier.height(8.dp))
                             TextField(value = surname, onValueChange = { surname = it }, label = { Text("Apellidos") })
                             Spacer(modifier = Modifier.height(8.dp))
-                            TextField(value = age, onValueChange = { age = it }, label = { Text("Edad") })
-                            Spacer(modifier = Modifier.height(8.dp))
                             TextField(value = documentId, onValueChange = { documentId = it }, label = { Text("DNI (00000000X)") })
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(
@@ -165,54 +162,60 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                 }
 
                 // Validación de campos
-                val isAgeValid = age.toIntOrNull() != null
                 val isDocumentIdValid = when (userType) {
                     AccountType.Persona -> isValidDNI(documentId)
                     AccountType.Organizador, AccountType.Asociacion -> isValidNIF(documentId)
                     else -> false
                 }
+
+                val missingFields = mutableListOf<String>()
+
                 val isFormValid = when (userType) {
-                    AccountType.Persona -> name.isNotBlank() && surname.isNotBlank() && isAgeValid && documentId.isNotBlank() && gender.isNotBlank() && isDocumentIdValid
-                    AccountType.Organizador, AccountType.Asociacion -> name.isNotBlank() && documentId.isNotBlank() && fiscalAddress.isNotBlank() && isDocumentIdValid
+                    AccountType.Persona -> {
+                        missingFields.clear()
+                        if (name.isBlank()) missingFields.add("Nombre")
+                        if (surname.isBlank()) missingFields.add("Apellido")
+                        if (documentId.isBlank()) missingFields.add("Documento de identidad")
+                        if (gender.isBlank()) missingFields.add("Género")
+                        if (!isDocumentIdValid) missingFields.add("Documento de identidad inválido")
+                        missingFields.isEmpty()
+                    }
+                    AccountType.Organizador, AccountType.Asociacion -> {
+                        missingFields.clear()
+                        if (name.isBlank()) missingFields.add("Nombre")
+                        if (documentId.isBlank()) missingFields.add("Documento de identidad")
+                        if (fiscalAddress.isBlank()) missingFields.add("Dirección fiscal")
+                        if (!isDocumentIdValid) missingFields.add("Documento de identidad inválido")
+                        missingFields.isEmpty()
+                    }
                     else -> false
                 }
 
                 // Botón de navegación
                 if (userType != null) {
                     Spacer(modifier = Modifier.height(16.dp))
-                    // Llamada corregida con userType incluido
                     Button(
                         onClick = {
                             if (isFormValid) {
-                                val ageInt = age.toIntOrNull() ?: 0
-
-                                // Verificar si el usuario ya existe antes de registrar
-                                viewModel.checkIfUserExists(email) { exists ->
-                                    if (exists) {
-                                        errorMessage = "El usuario ya existe."
+                                viewModel.registerCompleteUser(
+                                    name,
+                                    surname,
+                                    documentId,
+                                    gender,
+                                    fiscalAddress,
+                                    userType ?: AccountType.Persona
+                                ) { isRegistered ->
+                                    if (isRegistered) {
+                                        navController.navigate("map_screen")
                                     } else {
-                                        viewModel.registerCompleteUser(
-                                            name,
-                                            surname,
-                                            ageInt,
-                                            documentId,
-                                            gender,
-                                            fiscalAddress,
-                                            userType ?: AccountType.Persona
-                                        ) { isRegistered ->
-                                            if (isRegistered) {
-                                                navController.navigate("map_screen")
-                                            } else {
-                                                errorMessage = "Ocurrió un error al registrar el usuario."
-                                            }
-                                        }
+                                        errorMessage = "Ocurrió un error al registrar el usuario."
                                     }
                                 }
                             } else {
-                                errorMessage = "Por favor, completa todos los campos correctamente."
+                                errorMessage = "Faltan los siguientes campos: ${missingFields.joinToString(", ")}"
                             }
                         },
-                        enabled = isFormValid,
+                        enabled = true, // El botón siempre está habilitado
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Siguiente")
@@ -233,7 +236,6 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
 
                 TextButton(
                     onClick = {
-                        // Aquí va la navegación al login
                         navController.navigate("login")
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)

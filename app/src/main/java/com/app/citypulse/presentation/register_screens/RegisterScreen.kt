@@ -126,8 +126,18 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
 
                 Button(
                     onClick = {
-
                         Log.d("RegisterScreen", "Verificando correo: $email")
+
+                        val missingFields = mutableListOf<String>()
+                        if (email.isBlank()) missingFields.add("Correo electrónico")
+                        if (!email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) missingFields.add("Correo electrónico inválido")
+                        if (password.length < 6) missingFields.add("Contraseña (mínimo 6 caracteres)")
+                        if (password != confirmPassword) missingFields.add("Las contraseñas no coinciden")
+
+                        if (missingFields.isNotEmpty()) {
+                            errorMessage = "Faltan los siguientes campos: ${missingFields.joinToString(", ")}"
+                            return@Button
+                        }
 
                         viewModel.checkIfUserExists(email) { exists ->
                             Log.d("RegisterScreen", "Correo $email ya registrado: $exists")
@@ -135,21 +145,9 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                             if (exists) {
                                 errorMessage = "El correo electrónico ya está registrado."
                             } else {
-                                // Validaciones adicionales
-                                errorMessage = when {
-                                    email.isBlank() -> "El correo electrónico no puede estar vacío."
-                                    !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> "Por favor, ingresa un correo electrónico válido."
-                                    password.length < 6 -> "La contraseña debe tener al menos 6 caracteres."
-                                    password != confirmPassword -> "Las contraseñas no coinciden."
-                                    else -> ""
-                                }
-
-                                if (errorMessage.isEmpty()) {
-                                    viewModel.setTempUserData(email, password)
-                                    navController.navigate("register2")
-                                }
+                                viewModel.setTempUserData(email, password)
+                                navController.navigate("register2")
                             }
-
                         }
                     },
                     modifier = Modifier
@@ -158,7 +156,6 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                 ) {
                     Text("Siguiente")
                 }
-
 
                 Spacer(modifier = Modifier.height(20.dp))
 
