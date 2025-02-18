@@ -14,7 +14,11 @@ import com.app.citypulse.presentation.register_screens.RegisterScreen2
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 @Composable
-fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewModel, authViewModel: AuthViewModel) {
+fun NavigationGraph(
+    navController: NavHostController,
+    eventViewModel: EventViewModel,
+    authViewModel: AuthViewModel
+) {
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
     val context = LocalContext.current
 
@@ -55,10 +59,10 @@ fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewM
                     }
                     navController.popBackStack()
                 },
-                onMarkerClicked = { eventEntity ->
+                onMarkerClicked = { eventUi  ->
                     // Aquí puedes agregar cualquier acción que quieras realizar cuando se haga clic en el marcador
                     // Por ejemplo, podrías navegar a los detalles del evento:
-                    navController.navigate("event_details/${eventEntity.id}")
+                    navController.navigate("event_details/${eventUi.id}")
                 }
             )
         }

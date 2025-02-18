@@ -37,6 +37,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.mutableStateOf
 import com.app.citypulse.data.model.EventEntity
+import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
@@ -117,7 +118,7 @@ fun ContentScreen(
     selectedIndex: Int,
     navController: NavController,
     viewModel: EventViewModel,
-    onMarkerClicked: (EventEntity) -> Unit
+    onMarkerClicked: (EventUiModel) -> Unit
 ) {
     when (selectedIndex) {
         0 -> ContactsScreen()

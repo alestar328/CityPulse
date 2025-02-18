@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.screens
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -11,37 +12,50 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.model.EventEntity
+import com.app.citypulse.data.model.EventUiModel
+import com.app.citypulse.presentation.components.EventOrganizerMapCard
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 
 @Composable
-fun MapScreen(viewModel: EventViewModel, onLocationSelected: (LatLng) -> Unit, onMarkerClicked: (EventEntity) -> Unit) {
+fun MapScreen(viewModel: EventViewModel,
+              onLocationSelected: (LatLng) -> Unit,
+              onMarkerClicked: (EventUiModel) -> Unit
+) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(41.57008436408339, 1.9954403499999671), 15f)
     }
 
-    val eventLocations by viewModel.eventList.collectAsState()
+    val eventLocations by viewModel.eventUiList.collectAsState()
     val markerStates = remember { mutableStateMapOf<String, MarkerState>() }
-    var selectedEvent by remember { mutableStateOf<EventEntity?>(null) }
+    var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState
+            cameraPositionState = cameraPositionState,
+            onMapClick = {
+                // Cada vez que el usuario toque el mapa (y no un marcador):
+                selectedEvent = null
+            }
         ) {
             eventLocations.forEach { event ->
                 val position = LatLng(event.latitud, event.longitud)
-                val markerState = markerStates.getOrPut(event.id) { rememberMarkerState(position = position) }
-
+                val markerState = markerStates.getOrPut(event.id) {
+                    // Recuerda usar rememberMarkerState para cada marcador
+                    rememberMarkerState(position = position)
+                }
                 Marker(
                     state = markerState,
                     title = event.nombre,
                     snippet = event.descripcion,
                     onClick = {
+                        // Alterna la selección del evento
                         selectedEvent = if (selectedEvent == event) null else event
-                        true
+                        true // Indicamos que el evento se ha manejado
                     }
                 )
             }
@@ -72,6 +86,32 @@ fun MapScreen(viewModel: EventViewModel, onLocationSelected: (LatLng) -> Unit, o
                 } else {
                     Text(text = "INFO", color = Color.White)
                 }
+            }
+        }
+
+        // --- Tarjeta con la información del evento seleccionado ---
+        selectedEvent?.let { event ->
+            // Un contenedor para la tarjeta, alineado en la parte inferior
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .align(Alignment.BottomCenter)
+                    // Opcional: puedes darle un fondo o un padding extra
+                    .background(Color.White.copy(alpha = 0.9f))
+                    .padding(8.dp)
+            ) {
+                // Aquí reutilizas tu EventOrganizerMapCard
+                EventOrganizerMapCard(
+                    nombre = event.nombre,
+                    categoria = event.categoria,
+                    subcategoria = event.subcategoria,
+                    lugar = event.lugar,
+                    fechaInicio = event.fechaInicio,
+                    fechaFin = event.fechaFin,
+                    precio = event.precio,
+                    aforo = event.aforo
+                )
             }
         }
     }
