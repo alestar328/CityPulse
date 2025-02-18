@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.presentation.components.EventOrganizerMapCard
 import com.app.citypulse.presentation.viewmodel.EventViewModel
@@ -20,7 +21,8 @@ import com.google.maps.android.compose.*
 @Composable
 fun MapScreen(viewModel: EventViewModel,
               onLocationSelected: (LatLng) -> Unit,
-              onMarkerClicked: (EventUiModel) -> Unit
+              onMarkerClicked: (EventUiModel) -> Unit,
+              navController: NavController
 ) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(41.57008436408339, 1.9954403499999671), 15f)
@@ -91,11 +93,10 @@ fun MapScreen(viewModel: EventViewModel,
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .align(Alignment.BottomCenter)
-                    // Opcional: puedes darle un fondo o un padding extra
                     .background(Color.White.copy(alpha = 0.9f))
                     .padding(8.dp)
             ) {
-                // Aquí reutilizas tu EventOrganizerMapCard
+                // Reutilizamos EventOrganizerMapCard
                 EventOrganizerMapCard(
                     nombre = event.nombre,
                     categoria = event.categoria,
@@ -104,7 +105,9 @@ fun MapScreen(viewModel: EventViewModel,
                     fechaInicio = event.fechaInicio,
                     fechaFin = event.fechaFin,
                     precio = event.precio,
-                    aforo = event.aforo
+                    aforo = event.aforo,
+                    eventId = event.id,
+                    navController = navController
                 )
             }
         }

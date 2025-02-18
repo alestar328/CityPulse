@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
@@ -24,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.R
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -32,24 +35,21 @@ import java.util.Locale
 @Composable
 fun EventOrganizerMapCard(
     nombre: String,
-    categoria: String,      // Ahora es un String ya formateado
+    categoria: String,
     subcategoria: String?,
     lugar: String,
-    fechaInicio: String,    // Fecha ya formateada
-    fechaFin: String,       // Fecha ya formateada
+    fechaInicio: String,
+    fechaFin: String,
     precio: Double,
     aforo: Int,
-
-
+    eventId: String,  // 🔹 Agregado eventId
+    navController: NavController, // 🔹 Agregado navController
     images: List<Int> = listOf(
         R.drawable.sample_party,
         R.drawable.sample_cena,
         R.drawable.sample_cultura
     )
-){
-
-    val dateFormat = SimpleDateFormat("HH:mm (EEE)", Locale.getDefault())
-
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -59,13 +59,10 @@ fun EventOrganizerMapCard(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // INFORMACION DEL EVENTO
-
         Column {
             Text(text = nombre, fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
             Spacer(modifier = Modifier.height(4.dp))
-
 
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -84,26 +81,22 @@ fun EventOrganizerMapCard(
                     color = Color.Gray
                 )
             }
+
             Spacer(modifier = Modifier.height(4.dp))
-            // CATEGORIA
+
             Row {
                 Text(text = categoria, fontSize = 14.sp, color = Color.Gray)
-
                 Spacer(modifier = Modifier.width(4.dp))
-
                 subcategoria?.let {
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = it, fontSize = 14.sp, color = Color.Gray)
                 }
                 Spacer(modifier = Modifier.width(10.dp))
                 Text("Aforo: $aforo", fontSize = 14.sp, color = Color.Gray)
-
-
             }
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            //Estado y apertura
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -114,11 +107,8 @@ fun EventOrganizerMapCard(
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.width(5.dp))
-
                 Text(text = fechaInicio, fontSize = 14.sp, color = Color.Gray)
-
                 Spacer(modifier = Modifier.width(10.dp))
-
                 Text(
                     text = "Termina",
                     fontSize = 14.sp,
@@ -126,17 +116,17 @@ fun EventOrganizerMapCard(
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.width(5.dp))
-
                 Text(text = fechaFin, fontSize = 14.sp, color = Color.Gray)
-
             }
+
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Ubicación: $lugar", fontSize = 14.sp, color = Color.Gray)
             }
         }
-        Spacer(modifier = Modifier.height(7.dp)) // 🔹 Espacio antes de los botones
+
+        Spacer(modifier = Modifier.height(7.dp))
 
         Row(
             modifier = Modifier
@@ -145,22 +135,11 @@ fun EventOrganizerMapCard(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             ActionButton(
-                text = "Asistiré",
+                text = "Inscribirse",
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = "Asistencia"
-                    )
-                },
-                onClick = {},
-                modifier = Modifier.weight(1f)
-            )
-            ActionButton(
-                text = "Entradas",
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = "Entradas"
                     )
                 },
                 onClick = {},
@@ -177,23 +156,39 @@ fun EventOrganizerMapCard(
                 onClick = {},
                 modifier = Modifier.weight(1f)
             )
+            // 🔹 Nuevo botón de "Información"
+            ActionButton(
+                text = "Info",
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "Información"
+                    )
+                },
+                onClick = { navController.navigate("event_details/$eventId") },  // 🚀 Navega a los detalles del evento
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun EventOrganizerMapCardPreview() {
-    val sampleDate = Date()
+    val fakeNavController = rememberNavController()
 
     EventOrganizerMapCard(
         nombre = "Full day with your friends",
         categoria = "Fiesta",
         subcategoria = "Techno",
         aforo = 666,
-        fechaInicio = "18:00 (Wed)",    // Fecha preformateada
+        fechaInicio = "18:00 (Wed)",
         fechaFin = "23:00 (Wed)",
         precio = 50.5,
-        lugar = "Calle Paris 123, Barcelona"
+        lugar = "Calle Paris 123, Barcelona",
+        eventId = "123", // 🔹 Agregamos un ID de prueba
+        navController = fakeNavController // 🔹 Pasamos un NavController de prueba
     )
 }
+

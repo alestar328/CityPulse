@@ -121,11 +121,13 @@ fun ContentScreen(
             MapScreen(
                 viewModel = viewModel,
                 onLocationSelected = { navController.navigate("create_event") },
-                onMarkerClicked = onMarkerClicked
+                onMarkerClicked = onMarkerClicked,
+                navController = navController
             )
         }
         2 -> SettingsScreen()
     }
 }
+
 
 

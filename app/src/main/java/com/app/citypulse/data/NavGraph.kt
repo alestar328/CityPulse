@@ -57,7 +57,8 @@ fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewM
                 },
                 onMarkerClicked = { eventEntity ->
                     navController.navigate("event_details/${eventEntity.id}")
-                }
+                },
+                navController = navController
             )
         }
 
