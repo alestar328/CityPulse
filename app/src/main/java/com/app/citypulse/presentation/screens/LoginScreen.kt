@@ -1,10 +1,8 @@
 package com.app.citypulse.presentation.screens
 
 import android.app.Activity
-import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -13,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -23,15 +20,16 @@ import androidx.navigation.NavController
 import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.launch
+import androidx.navigation.compose.rememberNavController
+import com.app.citypulse.presentation.screens.ui.theme.YellowLight
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
@@ -108,8 +106,12 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         }
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxSize()) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()) {
             Image(
                 painter = painterResource(id = backgroundImage),
                 contentDescription = null,
@@ -120,7 +122,8 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 16.dp),
+                    .statusBarsPadding()
+                    .padding(top = 32.dp, bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -129,6 +132,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     contentDescription = "Logo de la app",
                     modifier = Modifier
                         .size(140.dp)
+                        .statusBarsPadding()
                 )
 
                 Text("CityPulse", color = Color.White, fontSize = 40.sp, textAlign = TextAlign.Center)
@@ -194,12 +198,13 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = YellowLight) // Fondo amarillo
+
                 ) {
-                    Text("Iniciar sesión")
+                    Text("Iniciar sesión", color = Color.Black)
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
 
                 // Botón para iniciar sesión con Google
                 Button(
@@ -238,7 +243,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     Text("Iniciar sesión con Google", color = Color.Black)
                 }
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 // Botón para ir a la pantalla de registro
                 Button(

@@ -9,7 +9,7 @@ plugins {
 
     // Add the Crashlytics Gradle plugin
     id("com.google.firebase.crashlytics")
-    alias(libs.plugins.compose.compiler)
+
 }
 
 android {
@@ -66,7 +66,11 @@ android {
 }
 
 dependencies {
-
+    val room_version = "2.6.1"
+    ksp("androidx.room:room-compiler:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    testImplementation("androidx.room:room-testing:$room_version")
     // Splash Screen
     implementation("androidx.core:core-splashscreen:1.0.1")
 

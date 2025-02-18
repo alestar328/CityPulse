@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -39,7 +40,7 @@ import com.app.citypulse.presentation.components.ActionBox
 import com.app.citypulse.presentation.components.ButtonBar
 import com.app.citypulse.presentation.components.PersonalScoreBar
 import com.app.citypulse.presentation.components.PhotoContainer
-import com.app.citypulse.presentation.components.ProfileHeader
+
 
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
@@ -68,15 +69,16 @@ fun ProfileScreen(
             modifier = modifier
                 .fillMaxSize()
                 .background(Color.White)
+                .statusBarsPadding()
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             // Encabezado integrado (antes era ProfileHeader separado)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
@@ -93,7 +95,7 @@ fun ProfileScreen(
                         modifier = Modifier.size(50.dp)
                     )
                 }
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(12.dp))
                 Column(
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -130,20 +132,18 @@ fun ProfileScreen(
             }
             // Componente para mostrar puntaje personal (ya existente)
             PersonalScoreBar()
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             // Botones y cajas de acción
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                ButtonBar(
-                    text = "Mis Amigos",
-                    backgroundColor = Color.White
-                )
-                ButtonBar(
-                    text = "Mis Descuentos",
-                    backgroundColor = Color.White
-                )
+                ButtonBar("Mis Amigos", backgroundColor = Color.White, onClick = {  } )
+
+
+                ButtonBar("Mis Descuentos", backgroundColor = Color.White, onClick = {  })
+
+
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
@@ -161,7 +161,7 @@ fun ProfileScreen(
                         onClick = { navController.navigate("assisted_events") }
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Row(
                     horizontalArrangement = Arrangement.SpaceAround,
                     modifier = Modifier.fillMaxWidth()
@@ -170,6 +170,9 @@ fun ProfileScreen(
                     PhotoContainer { }
                     PhotoContainer { }
                 }
+                ButtonBar("Cerrar Sesión", backgroundColor = Color.Red, onClick = { viewModel.logout() })
+
+
             }
         }
     }

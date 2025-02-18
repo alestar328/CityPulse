@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.app.citypulse.MainScreen
+import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.screens.*
 import com.app.citypulse.presentation.register_screens.RegisterScreen
@@ -69,10 +70,10 @@ fun NavigationGraph(
 
 
         // Detalles del evento
-        composable("event_details/{eventId}") { backStackEntry ->
+        /*composable("event_details/{eventId}") { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
-            EventDetailsScreen(eventId = eventId, viewModel = eventViewModel, navController = navController)
-        }
+            EventDetailsScreen(event = EventUiModel)
+        }*/
 
 
         // Otras pantallas

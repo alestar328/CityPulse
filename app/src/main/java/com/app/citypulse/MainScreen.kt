@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -37,6 +38,8 @@ import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.presentation.screens.ProfileScreen
+import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
+import com.app.citypulse.presentation.screens.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 
@@ -48,7 +51,7 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
     val viewModel = EventViewModel(EventRepository())
 
     val navitemList = listOf(
-        NavItem("Perfil", Icons.Default.Person, 5),
+        NavItem("Perfil", Icons.Default.Person, 0),
         NavItem("Mapa", Icons.Default.LocationOn, 0),
         NavItem("Config", Icons.Default.Settings, 0)
     )
@@ -60,7 +63,11 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
         containerColor = Color.Transparent,
         contentWindowInsets = WindowInsets(0.dp),
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                modifier = Modifier.height(60.dp), // Ajusta a la altura que prefieras
+                containerColor = TurkBlue,   // Fondo turquesa
+                contentColor = YellowLight
+            ) {
                 navitemList.forEachIndexed { index, navItem ->
                     NavigationBarItem(
                         selected = selectedIndex == index,
@@ -73,7 +80,14 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
                                 Icon(imageVector = navItem.icon, contentDescription = "Icon")
                             }
                         },
-                        label = { Text(text = navItem.label) }
+                        label = { Text(text = navItem.label) },
+                        colors = androidx.compose.material3.NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Black,
+                            selectedIconColor = YellowLight,
+                            unselectedIconColor = YellowLight,
+                            selectedTextColor = YellowLight,
+                            unselectedTextColor = YellowLight
+                    )
                     )
                 }
             }
