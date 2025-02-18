@@ -76,8 +76,8 @@ fun NavigationGraph(
 
 
         // Otras pantallas
-        composable("contacts") {
-            ContactsScreen()
+        composable("profile") {
+            ProfileScreen(navController = navController, viewModel = authViewModel)
         }
         composable("settings") {
             SettingsScreen()

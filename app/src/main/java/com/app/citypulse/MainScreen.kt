@@ -28,20 +28,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.NavItem
 import com.app.citypulse.presentation.components.SearchTopbar
-import com.app.citypulse.presentation.screens.ContactsScreen
 import com.app.citypulse.presentation.screens.MapScreen
 import com.app.citypulse.presentation.screens.SettingsScreen
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.mutableStateOf
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
+import com.app.citypulse.presentation.screens.ProfileScreen
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
-import com.google.android.gms.maps.model.LatLng
+
 
 @Composable
 fun MainScreen(navController: NavController = rememberNavController(), authViewModel: AuthViewModel) {
@@ -56,7 +54,6 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
     )
 
     var selectedIndex by remember { mutableIntStateOf(1) }
-    var selectedEvent by remember { mutableStateOf<EventEntity?>(null) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -92,13 +89,12 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
                 selectedIndex = selectedIndex,
                 navController = navController,
                 viewModel = viewModel,
+                authViewModel = authViewModel, // Se pasa el AuthViewModel aquí
                 onMarkerClicked = { eventEntity ->
                     navController.navigate("event_details/${eventEntity.id}")
                 }
             )
             if (selectedIndex == 1) {
-
-
                 SearchTopbar(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -118,10 +114,11 @@ fun ContentScreen(
     selectedIndex: Int,
     navController: NavController,
     viewModel: EventViewModel,
+    authViewModel: AuthViewModel,
     onMarkerClicked: (EventUiModel) -> Unit
 ) {
     when (selectedIndex) {
-        0 -> ContactsScreen()
+        0 -> ProfileScreen(navController = navController, viewModel = authViewModel)
         1 -> {
             MapScreen(
                 viewModel = viewModel,

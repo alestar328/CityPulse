@@ -18,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class AuthViewModel : ViewModel() {
     private val authRepository = AuthRepository()
@@ -26,6 +27,30 @@ class AuthViewModel : ViewModel() {
     private val _isAuthenticated = MutableStateFlow(false)  // Inicialmente no está autenticado
     val isAuthenticated: StateFlow<Boolean> get() = _isAuthenticated  // Exponemos el estado
 
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
+    fun loadUserData(onResult: (UserItem?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val currentUser = auth.currentUser
+                if (currentUser != null && currentUser.email != null) {
+                    // Se asume que en Firestore se guarda el usuario con el ID igual a su email.
+                    val docSnapshot = firestore.collection("users")
+                        .document(currentUser.email!!)
+                        .get()
+                        .await()
+                    val userData = docSnapshot.toObject(UserItem::class.java)
+                    onResult(userData)
+                } else {
+                    onResult(null)
+                }
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Error loading user data", e)
+                onResult(null)
+            }
+        }
+    }
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val result = authRepository.login(email, password)
@@ -71,7 +96,6 @@ class AuthViewModel : ViewModel() {
         tempPassword = password
     }
 
-    private val firestore = FirebaseFirestore.getInstance()
 
     fun saveUser(user: UserItem, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -163,7 +187,6 @@ class AuthViewModel : ViewModel() {
         )
     }
 
-    private val auth = FirebaseAuth.getInstance()
 
     // Obtener el cliente de inicio de sesión de Google
     fun getGoogleSignInClient(activity: Activity): GoogleSignInClient {
