@@ -132,7 +132,6 @@ class AuthViewModel : ViewModel() {
     fun registerCompleteUser(
         name: String,
         surname: String,
-        age: Int,
         documentId: String,
         gender: String,
         fiscalAddress: String?,
@@ -152,7 +151,6 @@ class AuthViewModel : ViewModel() {
                 tempPassword ?: "",  // Usamos la contraseña temporal guardada
                 name,
                 surname,
-                age,
                 documentId,
                 gender,
                 fiscalAddress,

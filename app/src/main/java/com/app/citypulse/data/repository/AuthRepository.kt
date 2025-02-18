@@ -6,6 +6,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.tasks.await
@@ -34,16 +35,28 @@ class AuthRepository {
 
     suspend fun checkIfUserExists(email: String): Boolean {
         return try {
-            val auth = FirebaseAuth.getInstance()
-            val signInResult = auth.signInWithEmailAndPassword(email, "dummyPassword").await()
-            true // Si llega aquí, el correo ya está registrado.
-        } catch (e: FirebaseAuthInvalidCredentialsException) {
-            false // Si el error es de credenciales inválidas, significa que el correo no está registrado.
+            // Referencia a la colección de 'users' en Firestore
+            val db = FirebaseFirestore.getInstance()
+            val usersCollection = db.collection("users")
+
+            // Realizar una búsqueda en la colección 'users' donde el campo 'email' coincida con el correo dado
+            val querySnapshot = usersCollection.whereEqualTo("email", email).get().await()
+
+            // Si la query devuelve algún documento, significa que el correo existe
+            if (!querySnapshot.isEmpty) {
+                Log.d("FirestoreCheck", "Correo $email encontrado en la colección de usuarios.")
+                return true
+            } else {
+                Log.d("FirestoreCheck", "Correo $email no encontrado en la colección de usuarios.")
+                return false
+            }
         } catch (e: Exception) {
-            Log.e("AuthCheck", "Error al verificar el correo: ${e.message}")
-            false // Otros errores (por ejemplo, red o problemas de red).
+            Log.e("FirestoreCheck", "Error al verificar el correo en Firestore: ${e.message}")
+            return false
         }
     }
+
+
 
 
 
@@ -53,7 +66,6 @@ class AuthRepository {
         password: String,
         name: String,
         surname: String,
-        age: Int,
         documentId: String,
         gender: String,
         fiscalAddress: String?,
@@ -67,7 +79,6 @@ class AuthRepository {
             val userData = hashMapOf(
                 "name" to name,
                 "surname" to surname,
-                "age" to age,
                 "documentId" to documentId,
                 "gender" to gender,
                 "fiscalAddress" to fiscalAddress.orEmpty(),
