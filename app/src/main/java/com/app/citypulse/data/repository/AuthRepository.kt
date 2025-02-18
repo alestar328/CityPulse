@@ -4,6 +4,8 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.tasks.await
@@ -32,21 +34,18 @@ class AuthRepository {
 
     suspend fun checkIfUserExists(email: String): Boolean {
         return try {
-            // Intentamos registrar al usuario con el correo y una contraseña ficticia
-            FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, "dummyPassword123").await()
-
-            // Si no ocurre ninguna excepción, significa que el correo no está registrado
-            FirebaseAuth.getInstance().signOut()  // Desconectamos al usuario creado
-            false // El correo no está registrado
-        } catch (e: FirebaseAuthException) {
-            // Si ocurre una excepción, significa que el correo ya está registrado
-            true // El correo ya está registrado
+            val auth = FirebaseAuth.getInstance()
+            val signInResult = auth.signInWithEmailAndPassword(email, "dummyPassword").await()
+            true // Si llega aquí, el correo ya está registrado.
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+            false // Si el error es de credenciales inválidas, significa que el correo no está registrado.
         } catch (e: Exception) {
-            // Manejar cualquier otro tipo de error
             Log.e("AuthCheck", "Error al verificar el correo: ${e.message}")
-            false // Devolvemos false si hay un error
+            false // Otros errores (por ejemplo, red o problemas de red).
         }
     }
+
+
 
     // Función para registrar un usuario con datos completos en Firestore
     suspend fun registerCompleteUser(

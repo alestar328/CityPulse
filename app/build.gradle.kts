@@ -90,6 +90,7 @@ dependencies {
 
     implementation ("com.google.android.gms:play-services-auth:20.7.0") // Google Sign-In
     implementation ("com.google.firebase:firebase-auth-ktx:22.1.2") // Firebase Auth
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") // Corutinas para servicios de Google
 
 
     // Dependencias de UI y Lifecycle

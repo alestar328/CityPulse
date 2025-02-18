@@ -75,11 +75,11 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                                 val user = UserItem(
                                     name = name,
                                     surname = surname,
-                                    age = 30, // Lo puedes pedir al usuario o calcularlo
+                                    age = 30,
                                     email = email,
                                     documentId = documentId,
                                     userType = userType,
-                                    valoracion = null, // O lo que sea necesario
+                                    valoracion = null,
                                     password = password,
                                     gender = gender,
                                 )
