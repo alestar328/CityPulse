@@ -2,7 +2,8 @@ package com.app.citypulse.data.model
 
 import com.app.citypulse.data.dataUsers.AccountType
 
-data class tempUserData(
+data class UserEntity(
+    val id: Int,
     val email: String,
     val password: String,
     val name: String? = null,
