@@ -28,30 +28,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.NavItem
 import com.app.citypulse.presentation.components.SearchTopbar
-import com.app.citypulse.presentation.screens.ContactsScreen
 import com.app.citypulse.presentation.screens.MapScreen
 import com.app.citypulse.presentation.screens.SettingsScreen
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.mutableStateOf
-import com.app.citypulse.data.model.EventEntity
+import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
+import com.app.citypulse.presentation.screens.ContactsScreen
+import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
-import com.google.android.gms.maps.model.LatLng
+
 
 @Composable
-fun MainScreen(navController: NavController = rememberNavController()) {
+fun MainScreen(navController: NavController = rememberNavController(), authViewModel: AuthViewModel) {
+
+    // Creamos instancia para manejar logica eventos en el mapa.
     val viewModel = EventViewModel(EventRepository())
+
     val navitemList = listOf(
-        NavItem("Contacts", Icons.Default.Person, 5),
-        NavItem("Map", Icons.Default.LocationOn, 0),
-        NavItem("Settings", Icons.Default.Settings, 0)
+        NavItem("Perfil", Icons.Default.Person, 5),
+        NavItem("Mapa", Icons.Default.LocationOn, 0),
+        NavItem("Configuración", Icons.Default.Settings, 0)
     )
 
     var selectedIndex by remember { mutableIntStateOf(1) }
-    var selectedEvent by remember { mutableStateOf<EventEntity?>(null) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -87,20 +87,24 @@ fun MainScreen(navController: NavController = rememberNavController()) {
                 selectedIndex = selectedIndex,
                 navController = navController,
                 viewModel = viewModel,
+                authViewModel = authViewModel, // Se pasa el AuthViewModel aquí
                 onMarkerClicked = { eventEntity ->
                     navController.navigate("event_details/${eventEntity.id}")
                 }
             )
-            SearchTopbar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .align(Alignment.TopCenter)
-                    .background(Color.Transparent)
-            )
+            if (selectedIndex == 1) {
+                SearchTopbar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.TopCenter)
+                        .background(Color.Transparent)
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun ContentScreen(
@@ -108,7 +112,8 @@ fun ContentScreen(
     selectedIndex: Int,
     navController: NavController,
     viewModel: EventViewModel,
-    onMarkerClicked: (EventEntity) -> Unit
+    authViewModel: AuthViewModel,
+    onMarkerClicked: (EventUiModel) -> Unit
 ) {
     when (selectedIndex) {
         0 -> ContactsScreen()

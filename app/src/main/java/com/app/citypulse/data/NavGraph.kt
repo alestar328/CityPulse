@@ -35,7 +35,7 @@ fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewM
 
         // Pantalla Principal
         composable("main_screen") {
-            MainScreen(navController)
+            MainScreen(navController, authViewModel)
         }
 
         // Eventos
@@ -56,20 +56,16 @@ fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewM
                     navController.popBackStack()
                 },
                 onMarkerClicked = { eventEntity ->
-                    // Aquí puedes agregar cualquier acción que quieras realizar cuando se haga clic en el marcador
-                    // Por ejemplo, podrías navegar a los detalles del evento:
                     navController.navigate("event_details/${eventEntity.id}")
                 }
             )
         }
-
 
         // Detalles del evento
         composable("event_details/{eventId}") { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
             EventDetailsScreen(eventId = eventId, viewModel = eventViewModel, navController = navController)
         }
-
 
         // Otras pantallas
         composable("contacts") {

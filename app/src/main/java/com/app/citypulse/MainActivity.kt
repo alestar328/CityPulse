@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.presentation.viewmodel.EventViewModel
@@ -33,5 +36,15 @@ class MainActivity : ComponentActivity() {
                 NavigationGraph(navController = navController, eventViewModel = eventViewModel, authViewModel = authViewModel)
             }
         }
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            // Oculta la barra de navegación (botones virtuales) y la barra de estado si lo deseas
+            hide(WindowInsetsCompat.Type.navigationBars())
+
+            // Comportamiento: se muestran transitoriamente al deslizar desde el borde
+            systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
     }
 }

@@ -9,21 +9,27 @@ import androidx.navigation.NavController
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 
 @Composable
-fun EventDetailsScreen(eventId: String, viewModel: EventViewModel, navController: NavController) {
+fun EventDetailsScreen(
+    eventId: String,
+    viewModel: EventViewModel,
+    navController: NavController
+) {
+    // Se dispara la carga de los detalles usando el eventId
     LaunchedEffect(eventId) {
         viewModel.getEventById(eventId)
     }
 
+    // Supongamos que en el ViewModel has adaptado eventDetails para que sea un EventUiModel
     val event = viewModel.eventDetails.value
 
     event?.let {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Nombre: ${it.nombre}")
-            Text("Categoría: ${it.categoria.displayName}")
+            Text("Categoría: ${it.categoria}")
             Text("Descripción: ${it.descripcion}")
             Text("Ubicación: ${it.lugar}")
-            Text("Fecha y hora de inicio: ${it.fechaInicio}")
-            Text("Fecha y hora de fin: ${it.fechaFin}")
+            Text("Fecha y hora de inicio: ${it.fechaInicio}")  // Formateada previamente
+            Text("Fecha y hora de fin: ${it.fechaFin}")        // Formateada previamente
             Text("Precio: ${it.precio}")
             Text("Aforo: ${it.aforo}")
 
