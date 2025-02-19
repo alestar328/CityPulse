@@ -34,6 +34,7 @@ import com.app.citypulse.presentation.screens.SettingsScreen
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.mutableStateOf
+import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
@@ -45,7 +46,10 @@ import com.app.citypulse.presentation.viewmodel.EventViewModel
 
 
 @Composable
-fun MainScreen(navController: NavController = rememberNavController(), authViewModel: AuthViewModel) {
+fun MainScreen(
+    navController: NavController = rememberNavController(),
+    authViewModel: AuthViewModel
+) {
 
     // Creamos instancia para manejar logica eventos en el mapa.
     val viewModel = EventViewModel(EventRepository())
@@ -57,6 +61,8 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
     )
 
     var selectedIndex by remember { mutableIntStateOf(1) }
+    var selectedCategory by remember { mutableStateOf(TipoCategoria.NONE) }
+
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -106,7 +112,9 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
                 authViewModel = authViewModel, // Se pasa el AuthViewModel aquí
                 onMarkerClicked = { eventEntity ->
                     navController.navigate("event_details/${eventEntity.id}")
-                }
+                },
+                selectedCategory = selectedCategory
+
             )
             if (selectedIndex == 1) {
                 SearchTopbar(
@@ -114,7 +122,9 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
                         .fillMaxWidth()
                         .padding(16.dp)
                         .align(Alignment.TopCenter)
-                        .background(Color.Transparent)
+                        .background(Color.Transparent),
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { selectedCategory = it }
                 )
             }
         }
@@ -126,6 +136,7 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
 fun ContentScreen(
     modifier: Modifier = Modifier,
     selectedIndex: Int,
+    selectedCategory: TipoCategoria,
     navController: NavController,
     viewModel: EventViewModel,
     authViewModel: AuthViewModel,
@@ -136,6 +147,8 @@ fun ContentScreen(
         1 -> {
             MapScreen(
                 viewModel = viewModel,
+                selectedCategory = selectedCategory,
+
                 onLocationSelected = { navController.navigate("create_event") },
                 onMarkerClicked = onMarkerClicked
             )

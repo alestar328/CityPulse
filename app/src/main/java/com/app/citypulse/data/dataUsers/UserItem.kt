@@ -1,6 +1,6 @@
 package com.app.citypulse.data.dataUsers
 
-import java.util.regex.Pattern
+import com.app.citypulse.data.enums.AccountType
 
 
 // Data class para almacenar usuarios con los campos necesarios

@@ -20,15 +20,13 @@ import androidx.navigation.NavController
 import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.app.citypulse.data.dataUsers.AccountType
+import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.presentation.screens.ui.theme.YellowLight
 
 @Composable

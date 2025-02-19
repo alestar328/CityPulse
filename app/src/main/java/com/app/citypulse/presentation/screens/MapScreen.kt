@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.presentation.components.EventOrganizerMapCard
@@ -21,6 +22,7 @@ import com.google.maps.android.compose.*
 
 @Composable
 fun MapScreen(viewModel: EventViewModel,
+              selectedCategory: TipoCategoria = TipoCategoria.NONE,
               onLocationSelected: (LatLng) -> Unit,
               onMarkerClicked: (EventUiModel) -> Unit
 ) {
@@ -29,9 +31,17 @@ fun MapScreen(viewModel: EventViewModel,
     }
 
     val eventLocations by viewModel.eventUiList.collectAsState()
-    val markerStates = remember { mutableStateMapOf<String, MarkerState>() }
+  //  val markerStates = remember { mutableStateMapOf<String, MarkerState>() }
     var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
 
+    val filteredEvents = if (selectedCategory != TipoCategoria.NONE) {
+        eventLocations.filter { event ->
+            // Compara el string de la categoría (por ejemplo, "GASTRONOMICO") con el nombre del enum
+            event.categoria.equals(selectedCategory.name, ignoreCase = true)
+        }
+    } else {
+        eventLocations
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
@@ -42,14 +52,11 @@ fun MapScreen(viewModel: EventViewModel,
                 selectedEvent = null
             }
         ) {
-            eventLocations.forEach { event ->
+            filteredEvents.forEach { event ->
                 val position = LatLng(event.latitud, event.longitud)
-                val markerState = markerStates.getOrPut(event.id) {
-                    // Recuerda usar rememberMarkerState para cada marcador
-                    rememberMarkerState(position = position)
-                }
+
                 Marker(
-                    state = markerState,
+                    state = rememberMarkerState(position = position),
                     title = event.nombre,
                     snippet = event.descripcion,
                     onClick = {

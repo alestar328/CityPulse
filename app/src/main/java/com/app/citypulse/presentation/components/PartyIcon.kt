@@ -1,6 +1,7 @@
 package com.app.citypulse.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,16 +15,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.R
+import com.app.citypulse.presentation.screens.ui.theme.YellowLight
 
 @Composable
 fun PartyIcon(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isSelected: Boolean,
+    onClick: () -> Unit
 ){
+    val backgroundColor = if (isSelected) YellowLight /* YellowLight */ else Color.Gray
+
     Box(
         modifier = modifier
-            .background(color = Color.Gray, shape = RoundedCornerShape(24.dp))
+            .background(color = backgroundColor, shape = RoundedCornerShape(24.dp))
             .padding(horizontal = 10.dp)
-            .size(40.dp),
+            .size(40.dp)
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ){
         Icon(
@@ -43,5 +50,8 @@ fun PartyIcon(
 @Preview
 @Composable
 fun PartyIconPreview(){
-    PartyIcon()
+    PartyIcon(
+        onClick ={},
+        isSelected = false
+    )
 }

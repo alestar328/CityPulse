@@ -1,4 +1,4 @@
-package com.app.citypulse.data.dataUsers
+package com.app.citypulse.data.enums
 
 enum class AccountType {
     Persona,

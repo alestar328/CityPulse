@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import com.app.citypulse.R
-import com.app.citypulse.data.dataUsers.AccountType
+import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 // Función para validar el DNI

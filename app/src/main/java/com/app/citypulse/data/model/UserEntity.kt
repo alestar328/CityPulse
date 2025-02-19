@@ -1,6 +1,6 @@
 package com.app.citypulse.data.model
 
-import com.app.citypulse.data.dataUsers.AccountType
+import com.app.citypulse.data.enums.AccountType
 
 data class UserEntity(
     val id: Int,

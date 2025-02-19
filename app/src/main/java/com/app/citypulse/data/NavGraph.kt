@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.app.citypulse.MainScreen
-import com.app.citypulse.data.model.EventUiModel
+import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.screens.*
 import com.app.citypulse.presentation.register_screens.RegisterScreen
@@ -53,6 +53,7 @@ fun NavigationGraph(
         composable("map_screen") {
             MapScreen(
                 viewModel = eventViewModel,
+                selectedCategory = TipoCategoria.NONE, // Se pasa el valor por defecto o el que corresponda
                 onLocationSelected = { latLng ->
                     navController.previousBackStackEntry?.savedStateHandle?.apply {
                         set("latitud", latLng.latitude)
@@ -60,9 +61,8 @@ fun NavigationGraph(
                     }
                     navController.popBackStack()
                 },
-                onMarkerClicked = { eventUi  ->
-                    // Aquí puedes agregar cualquier acción que quieras realizar cuando se haga clic en el marcador
-                    // Por ejemplo, podrías navegar a los detalles del evento:
+                onMarkerClicked = { eventUi ->
+                    // Navega a los detalles del evento usando su id
                     navController.navigate("event_details/${eventUi.id}")
                 }
             )

@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventEntity
-import com.app.citypulse.data.model.TipoCategoria
+import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -190,7 +190,7 @@ fun CategoriaDropdown(selectedCategoria: TipoCategoria, onCategoriaSelected: (Ti
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Gray.copy(alpha = 0.2f))
             ) {
-                Text(selectedCategoria.displayName, color = Color.White)
+                Text(selectedCategoria.displayName ?: "Sin categoría", color = Color.White)
             }
 
             DropdownMenu(
@@ -200,7 +200,7 @@ fun CategoriaDropdown(selectedCategoria: TipoCategoria, onCategoriaSelected: (Ti
             ) {
                 TipoCategoria.values().forEach { categoria ->
                     DropdownMenuItem(
-                        text = { Text(categoria.displayName, color = Color.White) },
+                        text = { Text(categoria.displayName ?: "", color = Color.White) },
                         onClick = {
                             onCategoriaSelected(categoria)
                             expanded = false
