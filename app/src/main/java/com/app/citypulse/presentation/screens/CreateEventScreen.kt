@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.presentation.screens.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -120,7 +121,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
 
             Button(
                 onClick = { navController.navigate("location_picker_screen") },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
+                colors = ButtonDefaults.buttonColors(containerColor = YellowLight),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Escoger ubicación", color = Color.White)
@@ -276,7 +277,7 @@ fun DateTimePickerField(
     ) {
         Text(
             text = if (dateTime.isEmpty()) label else dateTime,
-            color = Color.Blue
+            color = YellowLight
         )
     }
 }

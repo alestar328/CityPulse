@@ -11,8 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -24,7 +22,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.NavItem
@@ -34,8 +31,9 @@ import com.app.citypulse.presentation.screens.SettingsScreen
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
 import com.app.citypulse.data.enums.TipoCategoria
-import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.presentation.screens.ProfileScreen
@@ -43,7 +41,7 @@ import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
 import com.app.citypulse.presentation.screens.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
-import com.google.android.gms.maps.model.LatLng
+import androidx.compose.foundation.layout.size
 
 @Composable
 fun MainScreen(
@@ -69,7 +67,8 @@ fun MainScreen(
         contentWindowInsets = WindowInsets(0.dp),
         bottomBar = {
             NavigationBar(
-                modifier = Modifier.height(60.dp), // Ajusta a la altura que prefieras
+                modifier = Modifier
+                    .height(100.dp), // Ajusta a la altura que prefieras
                 containerColor = TurkBlue,   // Fondo turquesa
                 contentColor = YellowLight
             ) {
@@ -78,14 +77,18 @@ fun MainScreen(
                         selected = selectedIndex == index,
                         onClick = { selectedIndex = index },
                         icon = {
-                            BadgedBox(badge = {
-                                if (navItem.badgeCount > 0)
-                                    Badge { Text(text = navItem.badgeCount.toString()) }
-                            }) {
-                                Icon(imageVector = navItem.icon, contentDescription = "Icon")
-                            }
+                                Icon(
+                                    imageVector = navItem.icon,
+                                    contentDescription = "Icon",
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                )
                         },
-                        label = { Text(text = navItem.label) },
+                        label = {
+                            Text(
+                                text = navItem.label,
+                                fontSize = 12.sp
+                            ) },
                         colors = androidx.compose.material3.NavigationBarItemDefaults.colors(
                             indicatorColor = Color.Black,
                             selectedIconColor = YellowLight,

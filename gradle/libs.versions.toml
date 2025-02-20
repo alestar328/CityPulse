@@ -1,6 +1,7 @@
 [versions]
 agp = "8.6.1"
 concurrentFutures = "1.2.0"
+datastorePreferences = "1.1.2"
 googleFirebaseFirestoreKtx = "25.1.2"
 googleFirebaseFirestoreKtxVersion = "24.0.0"
 kotlin = "2.1.0"
@@ -19,11 +20,13 @@ firebaseAuthKtx = "23.1.0"
 firebaseFirestoreKtxVersion = "25.1.2"
 firebaseAuthKtxVersion = "23.2.0"
 appcompat = "1.7.0"
+datastoreCoreAndroid = "1.1.2"
 
 [libraries]
 androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrentFutures" }
 androidx-concurrent-futures-ktx = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrentFutures" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 firebase-firestore-ktx-v2400 = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "googleFirebaseFirestoreKtx" }
 google-firebase-firestore-ktx-v2400 = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "googleFirebaseFirestoreKtxVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -46,6 +49,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtxVersion" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 google-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtxVersion" }
+androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
