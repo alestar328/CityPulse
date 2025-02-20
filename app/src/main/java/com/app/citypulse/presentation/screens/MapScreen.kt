@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.screens
 
+import android.util.Log
 import  androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -13,16 +14,19 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.presentation.components.EventOrganizerMapCard
+import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 
 @Composable
-fun MapScreen(viewModel: EventViewModel,
-              onLocationSelected: (LatLng) -> Unit,
-              onMarkerClicked: (EventUiModel) -> Unit,
-              navController: NavController
+fun MapScreen(
+    viewModel: EventViewModel,
+    onLocationSelected: (LatLng) -> Unit,
+    onMarkerClicked: (EventUiModel) -> Unit,
+    navController: NavController,
+    authViewModel: AuthViewModel // 🔥 Agregamos el AuthViewModel
 ) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(41.57008436408339, 1.9954403499999671), 15f)
@@ -32,26 +36,26 @@ fun MapScreen(viewModel: EventViewModel,
     val markerStates = remember { mutableStateMapOf<String, MarkerState>() }
     var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
 
+    // 🔥 Obtenemos el tipo de usuario
+    val userType by authViewModel.userType.collectAsState()
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             onMapClick = {
-                // Cada vez que el usuario toque el mapa (y no un marcador):
                 selectedEvent = null
             }
         ) {
             eventLocations.forEach { event ->
                 val position = LatLng(event.latitud, event.longitud)
                 val markerState = markerStates.getOrPut(event.id) {
-                    // Recuerda usar rememberMarkerState para cada marcador
                     rememberMarkerState(position = position)
                 }
                 Marker(
                     state = markerState,
                     onClick = {
-                        // Alterna la selección del evento.
                         selectedEvent = if (selectedEvent == event) null else event
                         true
                     }
@@ -59,33 +63,33 @@ fun MapScreen(viewModel: EventViewModel,
             }
         }
 
-        // Solo muestra el botón correspondiente según el evento seleccionado
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 24.dp, bottom = 18.dp),
-            contentAlignment = Alignment.BottomStart
-        ) {
-            FloatingActionButton(
-                onClick = {
-                    if (selectedEvent == null) {
-                        // Navegar al mapa si no hay evento seleccionado.
-                        onLocationSelected(cameraPositionState.position.target)
-                    } else {
-                        // Navegar a los detalles del evento seleccionado.
-                        onMarkerClicked(selectedEvent!!)
-                    }
-                },
-                modifier = Modifier.padding(4.dp),
-                containerColor = if (selectedEvent == null) Color.LightGray else Color.Blue
+        // 🔥 Mostrar el botón solo si el usuario es Organizador
+        if (userType == "Organizador" || userType == "Asociacion") {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 24.dp, bottom = 18.dp),
+                contentAlignment = Alignment.BottomStart
             ) {
-                if (selectedEvent == null) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Crear Evento")
+                FloatingActionButton(
+                    onClick = {
+                        if (selectedEvent == null) {
+                            onLocationSelected(cameraPositionState.position.target)
+                        } else {
+                            onMarkerClicked(selectedEvent!!)
+                        }
+                    },
+                    modifier = Modifier.padding(4.dp),
+                    containerColor = if (selectedEvent == null) Color.LightGray else Color.Blue
+                ) {
+                    if (selectedEvent == null) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "Crear Evento")
+                    }
                 }
             }
         }
 
-        // --- Tarjeta con la información del evento seleccionado ---
+        // Tarjeta con la información del evento seleccionado
         selectedEvent?.let { event ->
             Box(
                 modifier = Modifier
@@ -95,7 +99,6 @@ fun MapScreen(viewModel: EventViewModel,
                     .background(Color.White.copy(alpha = 0.9f))
                     .padding(8.dp)
             ) {
-                // Reutilizamos EventOrganizerMapCard
                 EventOrganizerMapCard(
                     nombre = event.nombre,
                     categoria = event.categoria,
@@ -112,4 +115,5 @@ fun MapScreen(viewModel: EventViewModel,
         }
     }
 }
+
 

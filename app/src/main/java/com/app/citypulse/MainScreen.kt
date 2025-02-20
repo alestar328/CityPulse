@@ -40,7 +40,6 @@ import com.app.citypulse.presentation.viewmodel.EventViewModel
 import android.util.Log
 import androidx.compose.runtime.LaunchedEffect
 
-
 @Composable
 fun MainScreen(navController: NavController = rememberNavController(), authViewModel: AuthViewModel) {
 
@@ -130,7 +129,8 @@ fun ContentScreen(
                 viewModel = viewModel,
                 onLocationSelected = { navController.navigate("create_event") },
                 onMarkerClicked = onMarkerClicked,
-                navController = navController
+                navController = navController,
+                authViewModel = authViewModel
             )
         }
         2 -> SettingsScreen()

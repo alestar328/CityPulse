@@ -42,9 +42,11 @@ fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewM
         composable("create_event") {
             CreateEventScreen(eventViewModel, navController)
         }
+
         composable("location_picker_screen") {
             LocationPickerScreen(navController)
         }
+
         composable("map_screen") {
             MapScreen(
                 viewModel = eventViewModel,
@@ -58,9 +60,11 @@ fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewM
                 onMarkerClicked = { eventEntity ->
                     navController.navigate("event_details/${eventEntity.id}")
                 },
-                navController = navController
+                navController = navController,
+                authViewModel = authViewModel
             )
         }
+
 
         // Detalles del evento
         composable("event_details/{eventId}") { backStackEntry ->
