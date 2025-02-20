@@ -21,7 +21,9 @@ import androidx.compose.ui.res.painterResource
 import com.app.citypulse.R
 
 @Composable
-fun EventDetailsScreen(event: EventUiModel) {
+fun EventDetailsScreen(
+    event: EventUiModel
+) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {

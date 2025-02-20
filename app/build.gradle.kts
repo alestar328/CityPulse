@@ -66,6 +66,13 @@ android {
 }
 
 dependencies {
+    //Imagenes desde el movil:
+    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
+    implementation(platform("androidx.compose:compose-bom:2025.01.01"))
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+
     val room_version = "2.6.1"
     ksp("androidx.room:room-compiler:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
@@ -137,6 +144,7 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation ("com.google.firebase:firebase-auth-ktx:23.2.0")
     implementation ("com.google.firebase:firebase-firestore-ktx:25.1.2")
+
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

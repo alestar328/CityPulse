@@ -1,5 +1,7 @@
 package com.app.citypulse.presentation.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,11 +37,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import android.net.Uri
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.presentation.components.ActionBox
 import com.app.citypulse.presentation.components.ButtonBar
 import com.app.citypulse.presentation.components.PersonalScoreBar
 import com.app.citypulse.presentation.components.PhotoContainer
+import com.app.citypulse.presentation.components.ProfileHeader
 
 
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
@@ -53,7 +57,38 @@ fun ProfileScreen(
 ) {
     var user by remember { mutableStateOf<UserItem?>(null) }
     var isLoading by remember { mutableStateOf(true) }
+    var selectedImageUri0 by remember { mutableStateOf<Uri?>(null) }
+    var selectedImageUri1 by remember { mutableStateOf<Uri?>(null) }
+    var selectedImageUri2 by remember { mutableStateOf<Uri?>(null) }
+    var selectedImageUri3 by remember { mutableStateOf<Uri?>(null) }
 
+    val launcher0 = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri -> selectedImageUri0 = uri }
+
+    val launcher1 = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri -> selectedImageUri1 = uri }
+
+    val launcher2 = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri -> selectedImageUri2 = uri }
+
+    val launcher3 = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri -> selectedImageUri3 = uri }
+
+
+
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Launcher para obtener contenido de tipo imagen
+    val galleryLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri: Uri? ->
+            // Actualizamos el estado con la URI seleccionada
+            selectedImageUri = uri
+    }
     // Llamamos a loadUserData (asegúrate de tenerla implementada en tu AuthViewModel)
     LaunchedEffect(Unit) {
         viewModel.loadUserData { fetchedUser ->
@@ -78,44 +113,17 @@ fun ProfileScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
+                    .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF4CAF50)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "User Icon",
-                        tint = Color.White,
-                        modifier = Modifier.size(50.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-                Column(
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = user?.name?.plus(" ")?.plus(user?.surname ?: "") ?: "Nombre Apellido",
-                        fontSize = 20.sp,
-                        color = Color.Black
-                    )
-                    Text(
-                        text = user?.email ?: "Correo no disponible",
-                        fontSize = 16.sp,
-                        color = Color.LightGray
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = user?.userType?.name ?: "Tipo Usuario",
-                        fontSize = 14.sp,
-                        color = Color(0xFFBBDEFB)
-                    )
-                }
+                ProfileHeader(
+                    user = user!!,
+                    selectedImageUri = selectedImageUri,
+                    onClick = {
+                        // Al hacer click se abre la galería para elegir una foto de perfil
+                        galleryLauncher.launch("image/*")
+                    }
+                )
             }
             // Reseña con 5 estrellas
             Row(
@@ -166,9 +174,28 @@ fun ProfileScreen(
                     horizontalArrangement = Arrangement.SpaceAround,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    PhotoContainer { }
-                    PhotoContainer { }
-                    PhotoContainer { }
+                    PhotoContainer (
+                        selectedImageUri = selectedImageUri1,
+                        onClick = {
+                            // Al hacer click se abre la galería
+                            launcher1.launch("image/*")
+
+                        }
+                    )
+                    PhotoContainer (
+                        selectedImageUri = selectedImageUri2,
+                        onClick = {
+                            // Al hacer click se abre la galería
+                            launcher2.launch("image/*")
+                        }
+                    )
+                    PhotoContainer (
+                        selectedImageUri = selectedImageUri3,
+                        onClick = {
+                            // Al hacer click se abre la galería
+                            launcher3.launch("image/*")
+                        }
+                    )
                 }
                 ButtonBar("Cerrar Sesión", backgroundColor = Color.Red, onClick = { viewModel.logout() })
 
