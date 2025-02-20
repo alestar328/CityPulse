@@ -62,9 +62,7 @@ fun ProfileScreen(
     var selectedImageUri2 by remember { mutableStateOf<Uri?>(null) }
     var selectedImageUri3 by remember { mutableStateOf<Uri?>(null) }
 
-    val launcher0 = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri -> selectedImageUri0 = uri }
+
 
     val launcher1 = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
@@ -119,10 +117,7 @@ fun ProfileScreen(
                 ProfileHeader(
                     user = user!!,
                     selectedImageUri = selectedImageUri,
-                    onClick = {
-                        // Al hacer click se abre la galería para elegir una foto de perfil
-                        galleryLauncher.launch("image/*")
-                    }
+                    onClick = { galleryLauncher.launch("image/*") }
                 )
             }
             // Reseña con 5 estrellas
@@ -176,25 +171,21 @@ fun ProfileScreen(
                 ) {
                     PhotoContainer (
                         selectedImageUri = selectedImageUri1,
-                        onClick = {
-                            // Al hacer click se abre la galería
-                            launcher1.launch("image/*")
+                        onClick = { launcher1.launch("image/*") },
+                        onDelete = { selectedImageUri1 = null }
 
-                        }
                     )
                     PhotoContainer (
                         selectedImageUri = selectedImageUri2,
-                        onClick = {
-                            // Al hacer click se abre la galería
-                            launcher2.launch("image/*")
-                        }
+                        onClick = { launcher2.launch("image/*") },
+                        onDelete = { selectedImageUri2 = null }
+
                     )
                     PhotoContainer (
                         selectedImageUri = selectedImageUri3,
-                        onClick = {
-                            // Al hacer click se abre la galería
-                            launcher3.launch("image/*")
-                        }
+                        onClick = { launcher3.launch("image/*") },
+                        onDelete = { selectedImageUri3 = null }
+
                     )
                 }
                 ButtonBar("Cerrar Sesión", backgroundColor = Color.Red, onClick = { viewModel.logout() })
