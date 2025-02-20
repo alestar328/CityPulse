@@ -87,7 +87,6 @@ fun MapScreen(viewModel: EventViewModel,
 
         // --- Tarjeta con la información del evento seleccionado ---
         selectedEvent?.let { event ->
-            // Un contenedor para la tarjeta, alineado en la parte inferior
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

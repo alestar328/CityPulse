@@ -9,15 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.app.citypulse.R // Asegúrate de tener una imagen en res/drawable/placeholder.png
 
 @Composable
 fun EventDetailsScreen(
@@ -32,91 +30,95 @@ fun EventDetailsScreen(
     val event = viewModel.eventDetails.value
 
     event?.let {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Fondo con imagen oscurecida
-            Box(modifier = Modifier.fillMaxWidth().height(300.dp)) {
-                Image(
-                    painter = painterResource(id = R.drawable.barnaw),
-                    contentDescription = "Imagen del evento",
-                    modifier = Modifier.fillMaxSize().graphicsLayer { alpha = 0.7f },
-                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.3f))
-                )
-            }
-
-            // Texto debajo de la imagen
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // 🔥 Imagen ocupa toda la parte superior sin bordes grises
+            Image(
+                painter = painterResource(id = R.drawable.barnaw),
+                contentDescription = "Imagen del evento",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFBDBDBD))
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = it.nombre.uppercase(),
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = "${it.fechaInicio} - ${it.fechaFin}",
-                    fontSize = 18.sp,
-                    color = Color.White
-                )
+                    .height(250.dp), // Ajusta la altura si quieres que ocupe más
+                contentScale = ContentScale.Crop // Recorta la imagen para que ocupe toda la anchura sin bordes
+            )
 
-                Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    InfoBox(label = "Lugar", value = it.lugar, wide = true)
+            // 🏗️ Organiza los datos en bloques que llenen la pantalla
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(horizontal = 12.dp)) {
+
+                // 🔷 Nombre y Horario
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    EventDetailBox("Nombre", it.nombre, Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    EventDetailBox("Hora Inicial", it.fechaInicio, Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    EventDetailBox("Hora Final", it.fechaFin, Modifier.weight(1f))
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                    InfoBox(label = "Descripción", value = it.descripcion, wide = true)
-                    Spacer(modifier = Modifier.width(16.dp))
-                    InfoBox(label = "Categoría", value = it.categoria, wide = true)
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    EventDetailBox("Lugar", it.lugar, Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    EventDetailBox("Categoría", it.categoria, Modifier.weight(1f))
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    InfoBox(label = "Aforo", value = it.aforo.toString())
-                    InfoBox(label = "Precio", value = "${it.precio}€")
-                }
+                // 📜 Descripción (ocupa todo el ancho)
+                EventDetailBox("Descripción", it.descripcion, Modifier.fillMaxWidth().weight(1f))
 
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Button(
-                    onClick = { navController.popBackStack() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE91E63)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                ) {
-                    Text("Volver", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                // 💰 Precio, Aforo y Subcategoría
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    EventDetailBox("Precio", it.precio.toString(), Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    EventDetailBox("Aforo", it.aforo.toString(), Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    EventDetailBox("Subcategoría", "Mediterránea", Modifier.weight(1f))
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 🔘 Botón de volver (fijo abajo)
+            Button(
+                onClick = { navController.popBackStack() },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6A1B9A)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Volver", color = Color.White)
+            }
         }
-    } ?: Text("Cargando detalles del evento...", modifier = Modifier.padding(16.dp))
+    } ?: Text("Cargando detalles del evento...", color = Color.White)
 }
 
+// 📝 Componente reutilizable para los campos de información
 @Composable
-fun InfoBox(label: String, value: String, wide: Boolean = false) {
+fun EventDetailBox(label: String, value: String, modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier
-            .width(if (wide) 320.dp else 160.dp)
-            .padding(8.dp)
+        modifier = modifier
+            .padding(4.dp)
     ) {
-        Text(text = label, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
-        Card(
-            shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(6.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+        Text(label, color = Color.White, fontSize = 14.sp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White, RoundedCornerShape(8.dp))
+                .padding(12.dp) // Más padding para que se vea mejor
         ) {
-            Text(
-                text = value,
-                modifier = Modifier.padding(12.dp),
-                fontSize = 18.sp
-            )
+            Text(value, color = Color.Blue, fontSize = 16.sp)
         }
     }
 }

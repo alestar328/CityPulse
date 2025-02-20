@@ -4,6 +4,5 @@ enum class AccountType {
     Persona,
     Organizador,
     Asociacion,
-    Admin
     
 }
