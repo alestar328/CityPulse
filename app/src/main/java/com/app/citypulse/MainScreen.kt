@@ -43,7 +43,7 @@ import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
 import com.app.citypulse.presentation.screens.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
-
+import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun MainScreen(
@@ -53,7 +53,6 @@ fun MainScreen(
 
     // Creamos instancia para manejar logica eventos en el mapa.
     val viewModel = EventViewModel(EventRepository())
-
     val navitemList = listOf(
         NavItem("Perfil", Icons.Default.Person, 0),
         NavItem("Mapa", Icons.Default.LocationOn, 0),
@@ -130,7 +129,6 @@ fun MainScreen(
         }
     }
 }
-
 
 @Composable
 fun ContentScreen(

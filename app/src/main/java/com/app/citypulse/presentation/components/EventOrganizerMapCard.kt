@@ -59,7 +59,7 @@ fun EventOrganizerMapCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // INFORMACION DEL EVENTO
+        // INFORMACION DEL EVENTO
 
             Column {
                 Text(text = nombre, fontSize = 18.sp, fontWeight = FontWeight.Bold)

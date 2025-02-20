@@ -69,7 +69,6 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
 
     fun getEventById(eventId: String) {
         viewModelScope.launch {
-            // Aquí debes implementar la lógica para obtener el evento filtrado de eventUiList o desde el repositorio.
             val event = eventUiList.value.find { it.id == eventId }
             _eventDetails.value = event
         }

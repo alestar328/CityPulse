@@ -1,6 +1,5 @@
 package com.app.citypulse.presentation.screens
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -11,8 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.app.citypulse.data.enums.TipoCategoria
-import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.presentation.components.EventOrganizerMapCard
 import com.app.citypulse.presentation.viewmodel.EventViewModel
@@ -60,9 +57,8 @@ fun MapScreen(viewModel: EventViewModel,
                     title = event.nombre,
                     snippet = event.descripcion,
                     onClick = {
-                        // Alterna la selección del evento
                         selectedEvent = if (selectedEvent == event) null else event
-                        true // Indicamos que el evento se ha manejado
+                        true
                     }
                 )
             }

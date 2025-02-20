@@ -21,7 +21,7 @@ class EventRepository {
             val document = db.collection("Eventos").document(eventId).get().await()
             document.toObject(EventEntity::class.java)?.copy(id = document.id)
         } catch (e: Exception) {
-            null // En caso de error, retornamos null
+            null
         }
     }
 
