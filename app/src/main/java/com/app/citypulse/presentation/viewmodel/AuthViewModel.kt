@@ -1,9 +1,7 @@
 package com.app.citypulse.presentation.viewmodel
 
-import android.accounts.Account
 import android.app.Activity
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.AccountType
@@ -13,7 +11,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -104,6 +101,29 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    fun getUserType(onResult: (String?) -> Unit) {
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val userId = it.uid
+            FirebaseFirestore.getInstance().collection("users").document(userId)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val userType = document.getString("UserType")
+                        onResult(userType)
+                    } else {
+                        onResult(null)
+                    }
+                }
+                .addOnFailureListener {
+                    onResult(null)
+                }
+        } ?: run {
+            onResult(null)
+        }
+    }
+
+
     // Función para registrar el usuario con los datos completos
     fun registerCompleteUser(
         name: String,
@@ -189,8 +209,5 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
-
-
-
 }
 

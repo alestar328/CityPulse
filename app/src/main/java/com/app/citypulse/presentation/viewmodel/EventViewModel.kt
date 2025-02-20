@@ -78,6 +78,4 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
             _uiState.value = UiState.Success(uiEvents)
         }
     }
-
-
 }

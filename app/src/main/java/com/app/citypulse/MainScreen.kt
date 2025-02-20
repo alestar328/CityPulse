@@ -37,10 +37,19 @@ import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.presentation.screens.ContactsScreen
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
 
 
 @Composable
 fun MainScreen(navController: NavController = rememberNavController(), authViewModel: AuthViewModel) {
+
+    // Obtener el tipo de usuario y mostrarlo en el log
+    LaunchedEffect(Unit) {
+        authViewModel.getUserType { userType ->
+            Log.d("UserType", "El tipo de usuario es: $userType")
+        }
+    }
 
     // Creamos instancia para manejar logica eventos en el mapa.
     val viewModel = EventViewModel(EventRepository())
@@ -105,7 +114,6 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
     }
 }
 
-
 @Composable
 fun ContentScreen(
     modifier: Modifier = Modifier,
@@ -128,6 +136,7 @@ fun ContentScreen(
         2 -> SettingsScreen()
     }
 }
+
 
 
 
