@@ -1,29 +1,26 @@
 package com.app.citypulse.presentation.screens
 
+import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,12 +29,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.presentation.components.ActionBox
 import com.app.citypulse.presentation.components.ButtonBar
@@ -62,6 +61,39 @@ fun ProfileScreen(
     var selectedImageUri2 by remember { mutableStateOf<Uri?>(null) }
     var selectedImageUri3 by remember { mutableStateOf<Uri?>(null) }
 
+    val isUploading = remember{ mutableStateOf(false) }
+    val context = LocalContext.current
+    val img : Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.drawable.ic_menu_report_image)
+    val bitmap = remember { mutableStateOf(img) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) {
+        if(it != null){
+            bitmap.value = it
+        }
+    }
+
+// Launcher para obtener contenido de tipo imagen
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) {
+        if(Build.VERSION.SDK_INT < 26){
+            bitmap.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
+        } else{
+            val source = it?.let{
+                it1 -> ImageDecoder.createSource(context.contentResolver, it1)
+            }
+            bitmap.value = source?.let{
+                it1 -> ImageDecoder.decodeBitmap(it1)
+            }!!
+        }
+    }
+
+
+
+
+
 
 
     val launcher1 = rememberLauncherForActivityResult(
@@ -80,13 +112,7 @@ fun ProfileScreen(
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Launcher para obtener contenido de tipo imagen
-    val galleryLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent()
-        ) { uri: Uri? ->
-            // Actualizamos el estado con la URI seleccionada
-            selectedImageUri = uri
-    }
+
     // Llamamos a loadUserData (asegúrate de tenerla implementada en tu AuthViewModel)
     LaunchedEffect(Unit) {
         viewModel.loadUserData { fetchedUser ->
@@ -106,7 +132,6 @@ fun ProfileScreen(
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
             // Encabezado integrado (antes era ProfileHeader separado)
             Row(
                 modifier = Modifier
@@ -135,7 +160,6 @@ fun ProfileScreen(
             }
             // Componente para mostrar puntaje personal (ya existente)
             PersonalScoreBar()
-            Spacer(modifier = Modifier.height(12.dp))
             // Botones y cajas de acción
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -164,24 +188,26 @@ fun ProfileScreen(
                         onClick = { navController.navigate("assisted_events") }
                     )
                 }
-                Spacer(modifier = Modifier.height(6.dp))
                 Row(
                     horizontalArrangement = Arrangement.SpaceAround,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     PhotoContainer (
+                        bitmap = bitmap.value.asImageBitmap(),
                         selectedImageUri = selectedImageUri1,
                         onClick = { launcher1.launch("image/*") },
                         onDelete = { selectedImageUri1 = null }
 
                     )
                     PhotoContainer (
+                        bitmap = bitmap.value.asImageBitmap(),
                         selectedImageUri = selectedImageUri2,
                         onClick = { launcher2.launch("image/*") },
                         onDelete = { selectedImageUri2 = null }
 
                     )
                     PhotoContainer (
+                        bitmap = bitmap.value.asImageBitmap(),
                         selectedImageUri = selectedImageUri3,
                         onClick = { launcher3.launch("image/*") },
                         onDelete = { selectedImageUri3 = null }

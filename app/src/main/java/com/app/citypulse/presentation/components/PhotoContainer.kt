@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.components
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +28,7 @@ import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
 
 @Composable
 fun PhotoContainer(
+    bitmap: Bitmap,
     modifier: Modifier = Modifier,
     selectedImageUri: Uri? = null,
     onClick: () -> Unit,
@@ -74,7 +76,10 @@ fun PhotoContainer(
 @Preview
 @Composable
 fun PhotoContainerPreview(){
+    val dummyBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+
     PhotoContainer(
+        bitmap = dummyBitmap,
         onClick = {},
         onDelete = {}
         )

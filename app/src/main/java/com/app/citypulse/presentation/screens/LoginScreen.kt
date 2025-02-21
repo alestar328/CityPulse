@@ -84,7 +84,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                                 viewModel.saveUser(user) { success ->
                                     if (success) {
                                         // Si el usuario se guardó correctamente, navega al mapa
-                                        navController.navigate("map_screen") {
+                                        navController.navigate("main_screen") {
                                             popUpTo("login") { inclusive = true }
                                         }
                                     } else {

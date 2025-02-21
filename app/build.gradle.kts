@@ -20,7 +20,7 @@ android {
     }
     defaultConfig {
         applicationId = "com.app.citypulse"
-        minSdk = 27
+        minSdk = 28
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -71,6 +71,7 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
     implementation(platform("androidx.compose:compose-bom:2025.01.01"))
     implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation(libs.firebase.storage)
 
 
     val room_version = "2.6.1"
