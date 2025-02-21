@@ -30,6 +30,9 @@ class AuthViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
+    private val _userType = MutableStateFlow<String?>(null)
+    val userType: StateFlow<String?> = _userType
+
     fun loadUserData(onResult: (UserItem?) -> Unit) {
         viewModelScope.launch {
             try {
@@ -51,6 +54,7 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val result = authRepository.login(email, password)
@@ -59,6 +63,10 @@ class AuthViewModel : ViewModel() {
 
             // Si el login es exitoso, actualizamos el estado
             _isAuthenticated.value = isSuccessful
+
+            if (isSuccessful) {
+                loadUserType(email)  // Cargar el tipo de usuario
+            }
         }
     }
 
@@ -70,6 +78,26 @@ class AuthViewModel : ViewModel() {
 
             // Si el registro es exitoso, actualizamos el estado
             _isAuthenticated.value = isSuccessful
+
+            if (isSuccessful) {
+                loadUserType(email)
+            }
+        }
+    }
+
+    private fun loadUserType(email: String) {
+        viewModelScope.launch {
+            try {
+                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                val userRef = firestore.collection("users").document(uid)
+                userRef.get().addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val type = document.getString("UserType")
+                        _userType.value = type
+                    }
+                }
+            } catch (e: Exception) {
+            }
         }
     }
 
@@ -95,7 +123,6 @@ class AuthViewModel : ViewModel() {
         tempEmail = email
         tempPassword = password
     }
-
 
     fun saveUser(user: UserItem, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -185,7 +212,6 @@ class AuthViewModel : ViewModel() {
         )
     }
 
-
     // Obtener el cliente de inicio de sesión de Google
     fun getGoogleSignInClient(activity: Activity): GoogleSignInClient {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -195,8 +221,6 @@ class AuthViewModel : ViewModel() {
 
         return GoogleSignIn.getClient(activity, gso)
     }
-
-
 
     fun checkIfUserExists(email: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -210,8 +234,5 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
-
-
-
 }
 

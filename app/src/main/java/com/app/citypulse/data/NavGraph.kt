@@ -14,11 +14,7 @@ import com.app.citypulse.presentation.register_screens.RegisterScreen2
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 @Composable
-fun NavigationGraph(
-    navController: NavHostController,
-    eventViewModel: EventViewModel,
-    authViewModel: AuthViewModel
-) {
+fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewModel, authViewModel: AuthViewModel) {
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
     val context = LocalContext.current
 
@@ -46,9 +42,11 @@ fun NavigationGraph(
         composable("create_event") {
             CreateEventScreen(eventViewModel, navController)
         }
+
         composable("location_picker_screen") {
             LocationPickerScreen(navController)
         }
+
         composable("map_screen") {
             MapScreen(
                 viewModel = eventViewModel,
@@ -59,21 +57,19 @@ fun NavigationGraph(
                     }
                     navController.popBackStack()
                 },
-                onMarkerClicked = { eventUi  ->
-                    // Aquí puedes agregar cualquier acción que quieras realizar cuando se haga clic en el marcador
-                    // Por ejemplo, podrías navegar a los detalles del evento:
-                    navController.navigate("event_details/${eventUi.id}")
-                }
+                onMarkerClicked = { eventEntity ->
+                    navController.navigate("event_details/${eventEntity.id}")
+                },
+                navController = navController,
+                authViewModel = authViewModel
             )
         }
-
 
         // Detalles del evento
         composable("event_details/{eventId}") { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
             EventDetailsScreen(eventId = eventId, viewModel = eventViewModel, navController = navController)
         }
-
 
         // Otras pantallas
         composable("profile") {

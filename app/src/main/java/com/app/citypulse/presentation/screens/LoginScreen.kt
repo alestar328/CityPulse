@@ -1,10 +1,8 @@
 package com.app.citypulse.presentation.screens
 
 import android.app.Activity
-import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -13,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -24,14 +21,12 @@ import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
@@ -116,7 +111,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -133,10 +127,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
 
                 Text("CityPulse", color = Color.White, fontSize = 40.sp, textAlign = TextAlign.Center)
 
-
                 Text("¡Encuentra eventos cerca de ti!", color = Color.White, fontSize = 22.sp, textAlign = TextAlign.Center)
-
-
 
                 // Formulario para iniciar sesión con correo y contraseña
                 Card(
@@ -153,8 +144,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
-
-
                         TextField(
                             value = password,
                             onValueChange = { password = it },
@@ -163,7 +152,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                             visualTransformation = PasswordVisualTransformation(),
                             modifier = Modifier.fillMaxWidth()
                         )
-
                         if (loginError) {
                             Text(
                                 "Error al iniciar sesión. Verifique sus credenciales.",
@@ -177,14 +165,12 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                         }
                     }
                 }
-
-
                 // Botón de inicio de sesión con correo y contraseña
                 Button(
                     onClick = {
                         viewModel.login(email, password) { success ->
                             if (success) {
-                                navController.navigate("map_screen") {
+                                navController.navigate("main_screen") {
                                     popUpTo("login") { inclusive = true }
                                 }
                             } else {
