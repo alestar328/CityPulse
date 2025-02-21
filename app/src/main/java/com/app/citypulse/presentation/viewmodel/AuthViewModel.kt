@@ -161,7 +161,6 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-
     // Función para registrar el usuario con los datos completos
     fun registerCompleteUser(
         name: String,

@@ -65,7 +65,6 @@ fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewM
             )
         }
 
-
         // Detalles del evento
         composable("event_details/{eventId}") { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId") ?: ""

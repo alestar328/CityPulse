@@ -1,7 +1,6 @@
 package com.app.citypulse.presentation.screens
 
 import android.app.Activity
-import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -23,14 +21,12 @@ import androidx.navigation.NavController
 import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
@@ -87,7 +83,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                                 viewModel.saveUser(user) { success ->
                                     if (success) {
                                         // Si el usuario se guardó correctamente, navega al mapa
-                                        navController.navigate("map_screen") {
+                                        navController.navigate("main_screen") {
                                             popUpTo("login") { inclusive = true }
                                         }
                                     } else {
