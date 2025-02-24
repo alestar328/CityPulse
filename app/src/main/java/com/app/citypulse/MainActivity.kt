@@ -13,6 +13,7 @@ import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.screens.ui.theme.CityPulseTheme
 import com.app.citypulse.data.NavigationGraph
+import com.app.citypulse.presentation.viewmodel.FriendsViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -32,8 +33,11 @@ class MainActivity : ComponentActivity() {
                 val eventRepository = EventRepository()
                 val eventViewModel = EventViewModel(eventRepository)
                 val authViewModel = AuthViewModel()
+                val friendsViewModel = FriendsViewModel(authViewModel)
 
-                NavigationGraph(navController = navController, eventViewModel = eventViewModel, authViewModel = authViewModel)
+                NavigationGraph(navController = navController, eventViewModel = eventViewModel,
+                    authViewModel = authViewModel, friendsViewModel = FriendsViewModel(authViewModel)
+                )
             }
         }
         WindowCompat.setDecorFitsSystemWindows(window, false)

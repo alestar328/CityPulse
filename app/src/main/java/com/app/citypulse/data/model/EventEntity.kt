@@ -16,5 +16,5 @@ data class EventEntity(
     val aforo: Int = 0,
     val precio: Double = 0.0,
     val valoracion: Int = 0,
-    val idRealizador: Int = 0
+    val idRealizador: String = ""
 )

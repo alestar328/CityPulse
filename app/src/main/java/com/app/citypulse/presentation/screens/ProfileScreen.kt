@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.screens
 
+import android.widget.Button
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -136,10 +138,17 @@ fun ProfileScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                ButtonBar(
-                    text = "Mis Amigos",
-                    backgroundColor = Color.White
-                )
+                Button(
+                    onClick = {
+                                navController.navigate("friends")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text("Mis Amigos")
+                }
+
                 ButtonBar(
                     text = "Mis Descuentos",
                     backgroundColor = Color.White

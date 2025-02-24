@@ -44,7 +44,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
     val context = LocalContext.current
     val activity = context as? Activity
 
-    // Nuevo launcher para manejar el resultado de la actividad de Google Sign-In
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -53,47 +52,49 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             val account = task.getResult(ApiException::class.java)
 
             if (account != null) {
-                // Extraer la información de la cuenta de Google
                 val idToken = account.idToken
                 if (idToken != null) {
-                    // Usar el idToken para autenticar con Firebase
                     val credential = GoogleAuthProvider.getCredential(idToken, null)
                     FirebaseAuth.getInstance().signInWithCredential(credential)
                         .addOnCompleteListener(activity!!) { authTask ->
                             if (authTask.isSuccessful) {
-                                // El usuario está autenticado con Firebase
                                 val firebaseUser = FirebaseAuth.getInstance().currentUser
-                                val name = account.displayName?.split(" ")?.get(0) ?: "Nombre"
-                                val surname = account.displayName?.split(" ")?.getOrElse(1) { "Apellido" } ?: "Apellido"
-                                val email = account.email ?: "email@default.com"
-                                val documentId = null // Si tienes un campo para el documento del usuario
-                                val userType = AccountType.Persona // El tipo de cuenta que desees asignar
-                                val password = generatePassword() // Función para generar una contraseña automáticamente
-                                val gender = null // Género si lo tienes
+                                if (firebaseUser != null) {
+                                    val uid = firebaseUser.uid // 📌 Obtener el UID de Firebase
+                                    val name = account.displayName?.split(" ")?.getOrNull(0) ?: "Nombre"
+                                    val surname = account.displayName?.split(" ")?.getOrNull(1) ?: "Apellido"
+                                    val email = account.email ?: "email@default.com"
+                                    val documentId = null
+                                    val userType = AccountType.Persona
+                                    val password = generatePassword()
+                                    val gender = null
+                                    val google = "Sí"
 
-                                // Crear un objeto UserItem
-                                val user = UserItem(
-                                    name = name,
-                                    surname = surname,
-                                    age = 30,
-                                    email = email,
-                                    documentId = documentId,
-                                    userType = userType,
-                                    valoracion = null,
-                                    password = password,
-                                    gender = gender,
-                                )
+                                    // 📌 Incluir el UID en el objeto UserItem
+                                    val user = UserItem(
+                                        name = name,
+                                        surname = surname,
+                                        email = email,
+                                        documentId = documentId,
+                                        userType = userType,
+                                        valoracion = null,
+                                        gender = gender,
+                                        google = google,
+                                        uid = uid // 📌 Guardamos el UID del usuario
+                                    )
 
-                                // Guardar el usuario en la base de datos o en el ViewModel
-                                viewModel.saveUser(user) { success ->
-                                    if (success) {
-                                        // Si el usuario se guardó correctamente, navega al mapa
-                                        navController.navigate("map_screen") {
-                                            popUpTo("login") { inclusive = true }
+                                    // 📌 Guardamos el usuario en la base de datos
+                                    viewModel.saveUser(user) { success ->
+                                        if (success) {
+                                            navController.navigate("main_screen") {
+                                                popUpTo("login") { inclusive = true }
+                                            }
+                                        } else {
+                                            loginError = true
                                         }
-                                    } else {
-                                        loginError = true
                                     }
+                                } else {
+                                    loginError = true
                                 }
                             } else {
                                 loginError = true
@@ -184,7 +185,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     onClick = {
                         viewModel.login(email, password) { success ->
                             if (success) {
-                                navController.navigate("map_screen") {
+                                navController.navigate("main_screen") {
                                     popUpTo("login") { inclusive = true }
                                 }
                             } else {
