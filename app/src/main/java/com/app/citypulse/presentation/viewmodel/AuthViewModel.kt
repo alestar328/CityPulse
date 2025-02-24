@@ -111,10 +111,16 @@ class AuthViewModel : ViewModel() {
                 "surname" to user.surname,
                 "email" to user.email,
                 "age" to user.age,
-                "documentId" to user.documentId,
-                "gender" to user.gender,
-                "userType" to (user.userType?.name ?: "Persona")  // Si userType es null, usamos "PERSON" como valor por defecto
+                "documentId" to (user.documentId ?: ""),
+                "gender" to (user.gender ?: ""),
+                "userType" to (user.userType?.name ?: "Persona"),
+                "valoracion" to (user.valoracion ?: 0),
+                "password" to user.password,
+                "google" to (user.google ?: "No"),
+                "uid" to (user.uid ?: ""),
+                "friends" to user.friends
             )
+
 
             // Referencia a la colección "users" en Firestore
             val userRef = firestore.collection("users").document(user.email) // Usamos el correo como ID del documento
