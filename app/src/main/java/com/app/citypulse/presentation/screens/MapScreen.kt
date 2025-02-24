@@ -1,6 +1,5 @@
 package com.app.citypulse.presentation.screens
 
-import android.util.Log
 import  androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -36,9 +35,7 @@ fun MapScreen(
     val markerStates = remember { mutableStateMapOf<String, MarkerState>() }
     var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
 
-    // 🔥 Obtenemos el tipo de usuario
     val userType by authViewModel.userType.collectAsState()
-
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
@@ -63,7 +60,6 @@ fun MapScreen(
             }
         }
 
-        // 🔥 Mostrar el botón solo si el usuario es Organizador
         if (userType == "Organizador" || userType == "Asociacion") {
             Box(
                 modifier = Modifier

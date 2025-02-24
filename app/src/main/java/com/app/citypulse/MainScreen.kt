@@ -43,13 +43,6 @@ import androidx.compose.runtime.LaunchedEffect
 @Composable
 fun MainScreen(navController: NavController = rememberNavController(), authViewModel: AuthViewModel) {
 
-    // Obtener el tipo de usuario y mostrarlo en el log
-    LaunchedEffect(Unit) {
-        authViewModel.getUserType { userType ->
-            Log.d("UserType", "El tipo de usuario es: $userType")
-        }
-    }
-
     // Creamos instancia para manejar logica eventos en el mapa.
     val viewModel = EventViewModel(EventRepository())
 

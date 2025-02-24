@@ -42,8 +42,8 @@ fun EventOrganizerMapCard(
     fechaFin: String,
     precio: Double,
     aforo: Int,
-    eventId: String,  // 🔹 Agregado eventId
-    navController: NavController, // 🔹 Agregado navController
+    eventId: String,
+    navController: NavController,
     images: List<Int> = listOf(
         R.drawable.sample_party,
         R.drawable.sample_cena,

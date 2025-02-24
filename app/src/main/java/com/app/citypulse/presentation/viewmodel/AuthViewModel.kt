@@ -41,21 +41,6 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-
-    fun register(email: String, password: String, onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            val result = authRepository.register(email, password)
-            val isSuccessful = result != null
-            onResult(isSuccessful)
-
-            _isAuthenticated.value = isSuccessful
-
-            if (isSuccessful) {
-                loadUserType(email)  // Cargar el tipo de usuario
-            }
-        }
-    }
-
     private fun loadUserType(email: String) {
         viewModelScope.launch {
             try {
@@ -81,13 +66,11 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-
     fun logout() {
         authRepository.logout()
         _isAuthenticated.value = false
         _userType.value = null
     }
-
 
     // Variables temporales para almacenar datos antes del registro final
     private var tempEmail: String? = null
@@ -136,28 +119,6 @@ class AuthViewModel : ViewModel() {
                 onResult(false)
                 println("Error saving user: $e")
             }
-        }
-    }
-
-    fun getUserType(onResult: (String?) -> Unit) {
-        val user = FirebaseAuth.getInstance().currentUser
-        user?.let {
-            val userId = it.uid
-            FirebaseFirestore.getInstance().collection("users").document(userId)
-                .get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        val userType = document.getString("UserType")
-                        onResult(userType)
-                    } else {
-                        onResult(null)
-                    }
-                }
-                .addOnFailureListener {
-                    onResult(null)
-                }
-        } ?: run {
-            onResult(null)
         }
     }
 
@@ -231,8 +192,6 @@ class AuthViewModel : ViewModel() {
 
         return GoogleSignIn.getClient(activity, gso)
     }
-
-
 
     fun checkIfUserExists(email: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
