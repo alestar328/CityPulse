@@ -35,6 +35,9 @@ import androidx.navigation.NavController
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import com.app.citypulse.data.dataUsers.UserItem
@@ -46,6 +49,9 @@ import com.app.citypulse.presentation.components.ProfileHeader
 
 
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import java.io.ByteArrayOutputStream
 
 
 @Composable
@@ -193,31 +199,71 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     PhotoContainer (
-                        bitmap = bitmap.value.asImageBitmap(),
+                        bitmap = bitmap.value,
                         selectedImageUri = selectedImageUri1,
                         onClick = { launcher1.launch("image/*") },
                         onDelete = { selectedImageUri1 = null }
 
                     )
                     PhotoContainer (
-                        bitmap = bitmap.value.asImageBitmap(),
+                        bitmap = bitmap.value,
                         selectedImageUri = selectedImageUri2,
                         onClick = { launcher2.launch("image/*") },
                         onDelete = { selectedImageUri2 = null }
 
                     )
                     PhotoContainer (
-                        bitmap = bitmap.value.asImageBitmap(),
+                        bitmap = bitmap.value,
                         selectedImageUri = selectedImageUri3,
                         onClick = { launcher3.launch("image/*") },
                         onDelete = { selectedImageUri3 = null }
-
                     )
                 }
+                }
+                ButtonBar("Subir fotos", backgroundColor = Color.Blue,
+                    onClick = {
+                        isUploading.value = true
+                        user?.let { currentUser  ->
+                            uploadImageToFirebase(currentUser,bitmap.value, context as ComponentActivity){ success ->
+                                isUploading.value = false
+                                if(success){
+                                    Toast.makeText(context, "Subida exitosa", Toast.LENGTH_LONG).show()
+                                }else{
+                                    Toast.makeText(context, "Fallo al cargar fotos", Toast.LENGTH_LONG).show()
+
+                                }
+
+                            }
+                        }
+                    }
+                )
+
                 ButtonBar("Cerrar Sesión", backgroundColor = Color.Red, onClick = { viewModel.logout() })
 
 
             }
         }
     }
+
+
+fun uploadImageToFirebase(user:UserItem, bitmap: Bitmap, context: ComponentActivity, callback:(Boolean)->Unit){
+    val storageRef = Firebase.storage.reference
+    val imageName = "images/${user.uid ?: "anonymous"}_${System.currentTimeMillis()}.jpg"
+    val imageRef = storageRef.child(imageName)
+
+    val baos = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+    val imageData = baos.toByteArray()
+
+    imageRef.putBytes(imageData).addOnSuccessListener {
+        callback(true)
+    }.addOnFailureListener {
+        callback(false)
+    }
+}
+fun deleteImageFromFirebase(imageUrl: String, callback: (Boolean) -> Unit) {
+    val storageRef = Firebase.storage.getReferenceFromUrl(imageUrl)
+    storageRef.delete()
+        .addOnSuccessListener { callback(true) }
+        .addOnFailureListener { callback(false) }
 }

@@ -72,6 +72,7 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2025.01.01"))
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation(libs.firebase.storage)
+    implementation(libs.firebase.storage.ktx)
 
 
     val room_version = "2.6.1"
@@ -91,7 +92,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     //FireBase:
-    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
     implementation("com.google.firebase:firebase-analytics")
 
     //Crashlitics
@@ -145,6 +146,9 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation ("com.google.firebase:firebase-auth-ktx:23.2.0")
     implementation ("com.google.firebase:firebase-firestore-ktx:25.1.2")
+
+    //Dependencia para las fotos
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
 
 
     androidTestImplementation(libs.androidx.junit)

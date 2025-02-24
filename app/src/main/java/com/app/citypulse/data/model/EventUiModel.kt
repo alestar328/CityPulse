@@ -14,5 +14,5 @@ data class EventUiModel(
     val aforo: Int,
     val precio: Double,
     val valoracion: Int,
-    val idRealizador: Int
+    val idRealizador: String = ""
 )
