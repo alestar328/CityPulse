@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.R
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun EventDetailsScreen(
@@ -28,6 +29,8 @@ fun EventDetailsScreen(
     }
 
     val event = viewModel.eventDetails.value
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+    val isCreator = event?.idRealizador == currentUserId
 
     event?.let {
         Column(
@@ -84,6 +87,27 @@ fun EventDetailsScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            if (isCreator) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = { /* Navegar a la pantalla de edición */ },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                    ) {
+                        Text("Editar", color = Color.White)
+                    }
+
+                    Button(
+                        onClick = { viewModel.deleteEvent(eventId, navController) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                    ) {
+                        Text("Eliminar", color = Color.White)
+                    }
+                }
+            }
 
             Button(
                 onClick = { navController.popBackStack() },

@@ -16,6 +16,14 @@ class EventRepository {
         }
     }
 
+    suspend fun deleteEvent(eventId: String) {
+        try {
+            db.collection("Eventos").document(eventId).delete().await()
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
     suspend fun getEventById(eventId: String): EventEntity? {
         return try {
             val document = db.collection("Eventos").document(eventId).get().await()

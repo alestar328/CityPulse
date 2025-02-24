@@ -1,10 +1,10 @@
 package com.app.citypulse.presentation.viewmodel
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
@@ -18,9 +18,7 @@ import java.util.Locale
 sealed class UiState<out T> {
     object Loading : UiState<Nothing>()
     data class Success<T>(val data: T) : UiState<T>()
-    data class Error(val message: String) : UiState<Nothing>()
 }
-
 
 class EventViewModel(private val repository: EventRepository) : ViewModel() {
 
@@ -28,11 +26,11 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
     val eventUiList: StateFlow<List<EventUiModel>> = _eventUiList
 
     private val _uiState = MutableStateFlow<UiState<List<EventUiModel>>>(UiState.Loading)
-    val uiState: StateFlow<UiState<List<EventUiModel>>> = _uiState
 
     init {
         loadEvents()
     }
+
     // Función que mapea de EventEntity a EventUiModel
     private fun mapToUiModel(event: EventEntity): EventUiModel {
         val dateFormat = SimpleDateFormat("HH:mm (EEE)", Locale.getDefault())
@@ -54,6 +52,7 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
             idRealizador = event.idRealizador
         )
     }
+
     fun createEvent(event: EventEntity) {
         viewModelScope.launch {
             try {
@@ -64,6 +63,18 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
             }
         }
     }
+
+    fun deleteEvent(eventId: String, navController: NavController) {
+        viewModelScope.launch {
+            try {
+                repository.deleteEvent(eventId)
+                navController.popBackStack()
+            } catch (e: Exception) {
+                println("Error al eliminar evento: ${e.message}")
+            }
+        }
+    }
+
     private val _eventDetails = mutableStateOf<EventUiModel?>(null)
     val eventDetails: State<EventUiModel?> = _eventDetails
 
@@ -74,6 +85,7 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
             _eventDetails.value = event
         }
     }
+
     fun loadEvents() {
         _uiState.value = UiState.Loading
         repository.getEvents { events ->
@@ -82,6 +94,4 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
             _uiState.value = UiState.Success(uiEvents)
         }
     }
-
-
 }

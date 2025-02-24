@@ -9,10 +9,10 @@ data class EventUiModel(
     val lugar: String,
     val latitud: Double,
     val longitud: Double,
-    val fechaInicio: String, // ya formateada para la UI
-    val fechaFin: String,    // ya formateada para la UI
+    val fechaInicio: String,
+    val fechaFin: String,
     val aforo: Int,
     val precio: Double,
     val valoracion: Int,
-    val idRealizador: Int
+    val idRealizador: String
 )

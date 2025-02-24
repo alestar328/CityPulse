@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.TipoCategoria
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,6 +42,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
     var aforo by rememberSaveable { mutableStateOf("") }
 
     val context = LocalContext.current
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
     LaunchedEffect(navController.currentBackStackEntry) {
         val savedState = navController.currentBackStackEntry?.savedStateHandle
@@ -164,7 +166,8 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                                 fechaInicio = parseDate(fechaInicio),
                                 fechaFin = parseDate(fechaFin),
                                 precio = precio.toDouble(),
-                                aforo = aforo.toInt()
+                                aforo = aforo.toInt(),
+                                idRealizador = currentUserId ?: ""
                             )
 
                             viewModel.createEvent(event)
