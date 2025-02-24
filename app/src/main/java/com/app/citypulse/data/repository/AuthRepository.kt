@@ -85,7 +85,7 @@ class AuthRepository {
                 "documentId" to documentId,
                 "gender" to gender,
                 "fiscalAddress" to fiscalAddress.orEmpty(),
-                "UserType" to userType,
+                "userType" to userType,
                 "email" to email, // Guardar el email también en Firestore
                 "uid" to uid,
                 "google" to google,
