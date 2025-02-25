@@ -4,8 +4,8 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
+import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.data.repository.AuthRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -15,7 +15,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class AuthViewModel : ViewModel() {
     private val authRepository = AuthRepository()
@@ -23,6 +22,10 @@ class AuthViewModel : ViewModel() {
     // Estado de autenticación
     private val _isAuthenticated = MutableStateFlow(false)  // Inicialmente no está autenticado
     val isAuthenticated: StateFlow<Boolean> get() = _isAuthenticated  // Exponemos el estado
+
+    private val _userType = MutableStateFlow<String?>(null)
+    val userType: StateFlow<String?> = _userType
+
 
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -56,9 +59,12 @@ class AuthViewModel : ViewModel() {
 
             // Si el login es exitoso, actualizamos el estado
             _isAuthenticated.value = isSuccessful
+
+            if (isSuccessful) {
+                loadUserType(email)  // Cargar el tipo de usuario
+            }
         }
     }
-
     fun register(email: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val result = authRepository.register(email, password)
@@ -69,11 +75,35 @@ class AuthViewModel : ViewModel() {
             _isAuthenticated.value = isSuccessful
         }
     }
+    private fun loadUserType(email: String) {
+        viewModelScope.launch {
+            try {
+                Log.d("AuthViewModel", "Intentando obtener datos del usuario con email: $email") // 👈 Agregado aquí
+
+                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                val userRef = firestore.collection("users").document(uid)
+                userRef.get().addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        Log.d("AuthViewModel", "Datos del usuario en Firestore: ${document.data}")
+                        val type = document.getString("UserType")
+                        _userType.value = type
+                        Log.d("AuthViewModel", "Tipo de usuario obtenido: $type") // 👈 Verifica qué devuelve
+                    } else {
+                        Log.e("AuthViewModel", "El documento no existe en Firestore")
+                    }
+                }.addOnFailureListener { exception ->
+                    Log.e("AuthViewModel", "Error al cargar el tipo de usuario: ${exception.message}")
+                }
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Excepción al cargar el tipo de usuario: $e")
+            }
+        }
+    }
 
     fun logout() {
         authRepository.logout()
-        _isAuthenticated.value =
-            false  // Actualizamos el estado cuando el usuario cierra sesión
+        _isAuthenticated.value = false
+        _userType.value = null
     }
 
     // Variables temporales para almacenar datos antes del registro final
@@ -184,6 +214,7 @@ class AuthViewModel : ViewModel() {
         )
     }
 
+    private val auth = FirebaseAuth.getInstance()
 
     // Obtener el cliente de inicio de sesión de Google
     fun getGoogleSignInClient(activity: Activity): GoogleSignInClient {

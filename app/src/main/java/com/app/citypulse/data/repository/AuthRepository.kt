@@ -93,8 +93,4 @@ class AuthRepository {
     fun logout() {
         auth.signOut()
     }
-
-
-    // Obtener el usuario actual autenticado
-    fun getCurrentUser() = auth.currentUser
 }

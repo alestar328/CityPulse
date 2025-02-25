@@ -15,7 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.presentation.viewmodel.EventViewModel
-import com.app.citypulse.R // Asegúrate de tener una imagen en res/drawable/placeholder.png
+import com.app.citypulse.R
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun EventDetailsScreen(
@@ -28,6 +29,8 @@ fun EventDetailsScreen(
     }
 
     val event = viewModel.eventDetails.value
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+    val isCreator = event?.idRealizador == currentUserId
 
     event?.let {
         Column(
@@ -36,25 +39,22 @@ fun EventDetailsScreen(
                 .background(Color.Black),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 🔥 Imagen ocupa toda la parte superior sin bordes grises
             Image(
-                painter = painterResource(id = R.drawable.eventimagecard),
+                painter = painterResource(id = R.drawable.barnaw),
                 contentDescription = "Imagen del evento",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp), // Ajusta la altura si quieres que ocupe más
-                contentScale = ContentScale.Crop // Recorta la imagen para que ocupe toda la anchura sin bordes
+                    .height(250.dp),
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 🏗️ Organiza los datos en bloques que llenen la pantalla
             Column(modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
                 .padding(horizontal = 12.dp)) {
 
-                // 🔷 Nombre y Horario
                 Row(modifier = Modifier.fillMaxWidth()) {
                     EventDetailBox("Nombre", it.nombre, Modifier.weight(1f))
                     Spacer(modifier = Modifier.width(8.dp))
@@ -73,12 +73,10 @@ fun EventDetailsScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // 📜 Descripción (ocupa todo el ancho)
                 EventDetailBox("Descripción", it.descripcion, Modifier.fillMaxWidth().weight(1f))
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // 💰 Precio, Aforo y Subcategoría
                 Row(modifier = Modifier.fillMaxWidth()) {
                     EventDetailBox("Precio", it.precio.toString(), Modifier.weight(1f))
                     Spacer(modifier = Modifier.width(8.dp))
@@ -90,7 +88,27 @@ fun EventDetailsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 🔘 Botón de volver (fijo abajo)
+            if (isCreator) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = { /* Navegar a la pantalla de edición */ },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                    ) {
+                        Text("Editar", color = Color.White)
+                    }
+
+                    Button(
+                        onClick = { viewModel.deleteEvent(eventId, navController) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                    ) {
+                        Text("Eliminar", color = Color.White)
+                    }
+                }
+            }
+
             Button(
                 onClick = { navController.popBackStack() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6A1B9A)),
@@ -104,7 +122,6 @@ fun EventDetailsScreen(
     } ?: Text("Cargando detalles del evento...", color = Color.White)
 }
 
-// 📝 Componente reutilizable para los campos de información
 @Composable
 fun EventDetailBox(label: String, value: String, modifier: Modifier = Modifier) {
     Column(

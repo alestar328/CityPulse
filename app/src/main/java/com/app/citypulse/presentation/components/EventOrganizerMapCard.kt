@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.R
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -39,161 +41,153 @@ fun EventOrganizerMapCard(
     fechaFin: String,       // Fecha ya formateada
     precio: Double,
     aforo: Int,
-
-
+    eventId: String,
+    navController: NavController,
     images: List<Int> = listOf(
         R.drawable.sample_party,
         R.drawable.sample_cena,
         R.drawable.sample_cultura
     )
-){
-
-    val dateFormat = SimpleDateFormat("HH:mm (EEE)", Locale.getDefault())
-
+) {
     Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            EventImageGallery(images = images, modifier = Modifier.height(120.dp))
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        EventImageGallery(images = images, modifier = Modifier.height(120.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // INFORMACION DEL EVENTO
+        Column {
+            Text(text = nombre, fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
-            Column {
-                Text(text = nombre, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    repeat(5) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Estrella",
-                            tint = Color(0xFFFFD700),
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-                    Text(
-                        text = "4.3(2,666)",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                // CATEGORIA
-                Row {
-                    Text(text = categoria, fontSize = 14.sp, color = Color.Gray)
-
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    subcategoria?.let {
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = it, fontSize = 14.sp, color = Color.Gray)
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text("Aforo: $aforo", fontSize = 14.sp, color = Color.Gray)
-
-
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                //Estado y apertura
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Empieza",
-                        fontSize = 14.sp,
-                        color = Color(0xFF2E7D32),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.width(5.dp))
-
-                    Text(text = fechaInicio, fontSize = 14.sp, color = Color.Gray)
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    Text(
-                        text = "Termina",
-                        fontSize = 14.sp,
-                        color = Color(0xFFFF0606),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.width(5.dp))
-
-                    Text(text = fechaFin, fontSize = 14.sp, color = Color.Gray)
-
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Ubicación: $lugar", fontSize = 14.sp, color = Color.Gray)
-                }
-            }
-            Spacer(modifier = Modifier.height(7.dp)) // 🔹 Espacio antes de los botones
+            Spacer(modifier = Modifier.height(4.dp))
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                ActionButton(
-                    text = "Asistiré",
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = "Asistencia"
-                        )
-                    },
-                    onClick = {},
-                    modifier = Modifier.weight(1f)
-                )
-                ActionButton(
-                    text = "Entradas",
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = "Entradas"
-                        )
-                    },
-                    onClick = {},
-                    modifier = Modifier.weight(1f)
-                )
-                ActionButton(
-                    text = "Compartir",
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "Compartir"
-                        )
-                    },
-                    onClick = {},
-                    modifier = Modifier.weight(1f)
+                repeat(5) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Estrella",
+                        tint = Color(0xFFFFD700),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+                Text(
+                    text = "4.3(2,666)",
+                    fontSize = 14.sp,
+                    color = Color.Gray
                 )
             }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Row {
+                Text(text = categoria, fontSize = 14.sp, color = Color.Gray)
+                Spacer(modifier = Modifier.width(4.dp))
+                subcategoria?.let {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = it, fontSize = 14.sp, color = Color.Gray)
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Text("Aforo: $aforo", fontSize = 14.sp, color = Color.Gray)
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Empieza",
+                    fontSize = 14.sp,
+                    color = Color(0xFF2E7D32),
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = fechaInicio, fontSize = 14.sp, color = Color.Gray)
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "Termina",
+                    fontSize = 14.sp,
+                    color = Color(0xFFFF0606),
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = fechaFin, fontSize = 14.sp, color = Color.Gray)
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Ubicación: $lugar", fontSize = 14.sp, color = Color.Gray)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(7.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            ActionButton(
+                text = "Inscribirse",
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Asistencia"
+                    )
+                },
+                onClick = {},
+                modifier = Modifier.weight(1f)
+            )
+            ActionButton(
+                text = "Compartir",
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Compartir"
+                    )
+                },
+                onClick = {},
+                modifier = Modifier.weight(1f)
+            )
+            // 🔹 Nuevo botón de "Información"
+            ActionButton(
+                text = "Info",
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "Información"
+                    )
+                },
+                onClick = { navController.navigate("event_details/$eventId") },  // 🚀 Navega a los detalles del evento
+                modifier = Modifier.weight(1f)
+            )
         }
     }
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun EventOrganizerMapCardPreview() {
-    val sampleDate = Date()
+    val fakeNavController = rememberNavController()
 
     EventOrganizerMapCard(
         nombre = "Full day with your friends",
         categoria = "Fiesta",
         subcategoria = "Techno",
         aforo = 666,
-        fechaInicio = "18:00 (Wed)",    // Fecha preformateada
+        fechaInicio = "18:00 (Wed)",
         fechaFin = "23:00 (Wed)",
         precio = 50.5,
-        lugar = "Calle Paris 123, Barcelona"
+        lugar = "Calle Paris 123, Barcelona",
+        eventId = "123", // 🔹 Agregamos un ID de prueba
+        navController = fakeNavController // 🔹 Pasamos un NavController de prueba
     )
 }
+

@@ -71,11 +71,11 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                                 val user = UserItem(
                                     name = name,
                                     surname = surname,
-                                    age = 30,
+                                    age = 30, // Lo puedes pedir al usuario o calcularlo
                                     email = email,
                                     documentId = documentId,
                                     userType = userType,
-                                    valoracion = null,
+                                    valoracion = null, // O lo que sea necesario
                                     password = password,
                                     gender = gender,
                                 )
@@ -241,7 +241,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     Text("Iniciar sesión con Google", color = Color.Black)
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(56.dp))
 
                 // Botón para ir a la pantalla de registro
                 Button(

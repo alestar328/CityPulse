@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -22,6 +24,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.NavItem
@@ -36,12 +39,12 @@ import androidx.compose.ui.unit.sp
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
+import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.screens.ProfileScreen
 import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
 import com.app.citypulse.presentation.screens.ui.theme.YellowLight
-import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
-import androidx.compose.foundation.layout.size
+
 
 @Composable
 fun MainScreen(
@@ -51,6 +54,7 @@ fun MainScreen(
 
     // Creamos instancia para manejar logica eventos en el mapa.
     val viewModel = EventViewModel(EventRepository())
+
     val navitemList = listOf(
         NavItem("Perfil", Icons.Default.Person, 0),
         NavItem("Mapa", Icons.Default.LocationOn, 0),
@@ -133,11 +137,11 @@ fun MainScreen(
     }
 }
 
+
 @Composable
 fun ContentScreen(
     modifier: Modifier = Modifier,
     selectedIndex: Int,
-    selectedCategory: TipoCategoria,
     navController: NavController,
     viewModel: EventViewModel,
     authViewModel: AuthViewModel,
@@ -151,7 +155,9 @@ fun ContentScreen(
                 selectedCategory = selectedCategory,
 
                 onLocationSelected = { navController.navigate("create_event") },
-                onMarkerClicked = onMarkerClicked
+                onMarkerClicked = onMarkerClicked,
+                navController = navController,
+                authViewModel = authViewModel
             )
         }
         2 -> SettingsScreen()

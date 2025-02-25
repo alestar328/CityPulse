@@ -2,6 +2,7 @@ package com.app.citypulse.presentation.screens
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -25,6 +26,7 @@ import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.screens.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -42,6 +44,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
     var aforo by rememberSaveable { mutableStateOf("") }
 
     val context = LocalContext.current
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
     LaunchedEffect(navController.currentBackStackEntry) {
         val savedState = navController.currentBackStackEntry?.savedStateHandle
@@ -86,7 +89,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                 categoriaSeleccionada = it
             }
 
-            CustomTextField(value = descripcion, label = "Descripción", onValueChange = { descripcion = it })
+            DescriptionTextField(value = descripcion, onValueChange = { descripcion = it })
 
             NumericTextField(value = precio, label = "Precio", onValueChange = { precio = it }, isDecimal = true)
 
@@ -145,6 +148,11 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                         if (nombre.isNotEmpty() && fechaInicio.isNotEmpty() && fechaFin.isNotEmpty() &&
                             precio.isNotEmpty() && aforo.isNotEmpty()
                         ) {
+                            if (descripcion.length !in 200..240) {
+                                Toast.makeText(context, "La descripción debe tener entre 200 y 240 caracteres", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+
                             if (latitud == 0.0 || longitud == 0.0) {
                                 Toast.makeText(context, "Ubicación no seleccionada", Toast.LENGTH_SHORT).show()
                                 return@Button
@@ -160,9 +168,9 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                                 fechaInicio = parseDate(fechaInicio),
                                 fechaFin = parseDate(fechaFin),
                                 precio = precio.toDouble(),
-                                aforo = aforo.toInt()
+                                aforo = aforo.toInt(),
+                                idRealizador = currentUserId ?: ""
                             )
-
                             viewModel.createEvent(event)
                             navController.popBackStack()
                         } else {
@@ -306,6 +314,40 @@ fun CustomTextField(value: String, label: String, onValueChange: (String) -> Uni
         shape = RoundedCornerShape(12.dp)
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DescriptionTextField(value: String, onValueChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {
+            if (it.length <= 240) onValueChange(it)
+        },
+        label = { Text("Descripción", color = Color.White) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = Color.Gray.copy(alpha = 0.2f),
+            unfocusedContainerColor = Color.Gray.copy(alpha = 0.2f),
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            disabledTextColor = Color.LightGray,
+            disabledContainerColor = Color.Gray.copy(alpha = 0.1f),
+            focusedBorderColor = Color.White,
+            unfocusedBorderColor = Color.LightGray
+        ),
+        shape = RoundedCornerShape(12.dp),
+        trailingIcon = {
+            Text(
+                text = "${value.length}/240",
+                color = if (value.length in 200..240) Color.Green else Color.Red,
+                fontSize = 12.sp
+            )
+        }
+    )
+}
+
 
 @Composable
 fun NumericTextField(value: String, label: String, onValueChange: (String) -> Unit, isDecimal: Boolean = false) {
