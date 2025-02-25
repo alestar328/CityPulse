@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.app.citypulse.MainScreen
+import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.screens.*
 import com.app.citypulse.presentation.register_screens.RegisterScreen

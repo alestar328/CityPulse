@@ -71,7 +71,6 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
     implementation(platform("androidx.compose:compose-bom:2025.01.01"))
     implementation("io.coil-kt:coil-compose:2.6.0")
-    implementation(libs.firebase.storage)
     implementation(libs.firebase.storage.ktx)
 
 
@@ -122,7 +121,7 @@ dependencies {
     implementation(libs.androidx.material3)
 
     // Firebase Firestore
-    implementation(libs.google.firebase.firestore.ktx.v2400)
+
 
     // Firebase Auth y Database
     implementation("com.google.firebase:firebase-auth-ktx:23.2.0")

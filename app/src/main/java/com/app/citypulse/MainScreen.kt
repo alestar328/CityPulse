@@ -11,8 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -24,7 +22,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.NavItem
@@ -44,6 +41,7 @@ import com.app.citypulse.presentation.screens.ProfileScreen
 import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
 import com.app.citypulse.presentation.screens.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import androidx.compose.foundation.layout.size
 
 
 @Composable
@@ -84,8 +82,7 @@ fun MainScreen(
                                 Icon(
                                     imageVector = navItem.icon,
                                     contentDescription = "Icon",
-                                    modifier = Modifier
-                                        .size(20.dp)
+                                    modifier = Modifier.size(20.dp)
                                 )
                         },
                         label = {
@@ -145,7 +142,9 @@ fun ContentScreen(
     navController: NavController,
     viewModel: EventViewModel,
     authViewModel: AuthViewModel,
-    onMarkerClicked: (EventUiModel) -> Unit
+    onMarkerClicked: (EventUiModel) -> Unit,
+    selectedCategory: TipoCategoria
+
 ) {
     when (selectedIndex) {
         0 -> ProfileScreen(navController = navController, viewModel = authViewModel)
@@ -153,7 +152,6 @@ fun ContentScreen(
             MapScreen(
                 viewModel = viewModel,
                 selectedCategory = selectedCategory,
-
                 onLocationSelected = { navController.navigate("create_event") },
                 onMarkerClicked = onMarkerClicked,
                 navController = navController,

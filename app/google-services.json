@@ -12,36 +12,7 @@
           "package_name": "com.app.citypulse"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "79725582630-5eoqrhe0vht72nc33mm9habjb0v26he8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.app.citypulse",
-            "certificate_hash": "fbd7592f9a33eaae1f1bb6ce051c87aea9d82ece"
-          }
-        },
-        {
-          "client_id": "79725582630-r4legfo5bets5n2qbcls7ffbj34i7gtk.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.app.citypulse",
-            "certificate_hash": "c793ec1a3413790a820d555456aa3947e97beb1c"
-          }
-        },
-        {
-          "client_id": "79725582630-v8j549oo4gagak9862porshhfdpdqa4e.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.app.citypulse",
-            "certificate_hash": "9a8929d49c2c125265589f1d073c54c9ffdc495b"
-          }
-        },
-        {
-          "client_id": "79725582630-2mn226j2pnrpcn7ljg07j6o7hish6p3s.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
           "current_key": "AIzaSyD2dEbscmWE_5FbbZ_b6qrTQ4JZOHiA5fA"
@@ -49,12 +20,7 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "79725582630-2mn226j2pnrpcn7ljg07j6o7hish6p3s.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

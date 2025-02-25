@@ -15,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class AuthViewModel : ViewModel() {
     private val authRepository = AuthRepository()
@@ -214,7 +215,6 @@ class AuthViewModel : ViewModel() {
         )
     }
 
-    private val auth = FirebaseAuth.getInstance()
 
     // Obtener el cliente de inicio de sesión de Google
     fun getGoogleSignInClient(activity: Activity): GoogleSignInClient {

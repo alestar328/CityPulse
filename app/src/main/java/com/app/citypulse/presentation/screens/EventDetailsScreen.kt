@@ -40,7 +40,7 @@ fun EventDetailsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.barnaw),
+                painter = painterResource(id = R.drawable.dubai),
                 contentDescription = "Imagen del evento",
                 modifier = Modifier
                     .fillMaxWidth()
