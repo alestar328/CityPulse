@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
@@ -39,28 +38,41 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
             )
 
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.Top
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.splash_screen),
                     contentDescription = "Logo de la app",
-                    modifier = Modifier.size(140.dp)
+                    modifier = Modifier
+                        .width(230.dp)
+                        .height(230.dp)
+                        .padding(top = 20.dp)
                 )
 
-                Text("CityPulse", color = Color.White, fontSize = 38.sp)
+                Spacer(modifier = Modifier.height(20.dp))
 
+                Text(
+                    "CityPulse",
+                    color = Color.White,
+                    style = MaterialTheme.typography.displayLarge
+                )
 
-                Text("¡Encuentra eventos cerca de ti!", color = Color.White, fontSize = 22.sp, textAlign = TextAlign.Center)
+                Text(
+                    "¡Una aplicación que te ayudará a encontrar eventos cerca de ti!",
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(16.dp)
+                )
 
+                Spacer(modifier = Modifier.height(40.dp))
 
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp)
+                        .padding(horizontal = 16.dp)
                         .background(Color.White.copy(alpha = 0.8f)),
                     shape = MaterialTheme.shapes.medium,
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -74,7 +86,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         TextField(
                             value = password,
@@ -85,7 +97,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         TextField(
                             value = confirmPassword,
@@ -110,12 +122,22 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
                     onClick = {
-
                         Log.d("RegisterScreen", "Verificando correo: $email")
+
+                        val missingFields = mutableListOf<String>()
+                        if (email.isBlank()) missingFields.add("Correo electrónico")
+                        if (!email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) missingFields.add("Correo electrónico inválido")
+                        if (password.length < 6) missingFields.add("Contraseña (mínimo 6 caracteres)")
+                        if (password != confirmPassword) missingFields.add("Las contraseñas no coinciden")
+
+                        if (missingFields.isNotEmpty()) {
+                            errorMessage = "Faltan los siguientes campos: ${missingFields.joinToString(", ")}"
+                            return@Button
+                        }
 
                         viewModel.checkIfUserExists(email) { exists ->
                             Log.d("RegisterScreen", "Correo $email ya registrado: $exists")
@@ -123,32 +145,19 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                             if (exists) {
                                 errorMessage = "El correo electrónico ya está registrado."
                             } else {
-                                // Validaciones adicionales
-                                errorMessage = when {
-                                    email.isBlank() -> "El correo electrónico no puede estar vacío."
-                                    !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> "Por favor, ingresa un correo electrónico válido."
-                                    password.length < 6 -> "La contraseña debe tener al menos 6 caracteres."
-                                    password != confirmPassword -> "Las contraseñas no coinciden."
-                                    else -> ""
-                                }
-
-                                if (errorMessage.isEmpty()) {
-                                    viewModel.setTempUserData(email, password)
-                                    navController.navigate("register2")
-                                }
+                                viewModel.setTempUserData(email, password)
+                                navController.navigate("register2")
                             }
-
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp)
+                        .padding(horizontal = 16.dp)
                 ) {
                     Text("Siguiente")
                 }
 
-
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 // Aquí agregamos el botón "¿Ya tienes cuenta? Inicia sesión"
                 TextButton(

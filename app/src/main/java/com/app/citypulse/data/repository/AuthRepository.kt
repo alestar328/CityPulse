@@ -6,6 +6,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.tasks.await
@@ -34,30 +35,44 @@ class AuthRepository {
 
     suspend fun checkIfUserExists(email: String): Boolean {
         return try {
-            val auth = FirebaseAuth.getInstance()
-            val signInResult = auth.signInWithEmailAndPassword(email, "dummyPassword").await()
-            true // Si llega aquí, el correo ya está registrado.
-        } catch (e: FirebaseAuthInvalidCredentialsException) {
-            false // Si el error es de credenciales inválidas, significa que el correo no está registrado.
+            // Referencia a la colección de 'users' en Firestore
+            val db = FirebaseFirestore.getInstance()
+            val usersCollection = db.collection("users")
+
+            // Realizar una búsqueda en la colección 'users' donde el campo 'email' coincida con el correo dado
+            val querySnapshot = usersCollection.whereEqualTo("email", email).get().await()
+
+            // Si la query devuelve algún documento, significa que el correo existe
+            if (!querySnapshot.isEmpty) {
+                Log.d("FirestoreCheck", "Correo $email encontrado en la colección de usuarios.")
+                return true
+            } else {
+                Log.d("FirestoreCheck", "Correo $email no encontrado en la colección de usuarios.")
+                return false
+            }
         } catch (e: Exception) {
-            Log.e("AuthCheck", "Error al verificar el correo: ${e.message}")
-            false // Otros errores (por ejemplo, red o problemas de red).
+            Log.e("FirestoreCheck", "Error al verificar el correo en Firestore: ${e.message}")
+            return false
         }
     }
+
+
 
 
 
     // Función para registrar un usuario con datos completos en Firestore
     suspend fun registerCompleteUser(
         email: String,
-        password: String,
+        password: String,  // Recibimos el password
         name: String,
         surname: String,
-        age: Int,
         documentId: String,
         gender: String,
         fiscalAddress: String?,
-        userType: String
+        userType: String,
+        uid: String,
+        google: String,
+        friends: MutableList<String>
     ): Boolean {
         return try {
             // Primero, creamos al usuario con email y contraseña
@@ -67,12 +82,14 @@ class AuthRepository {
             val userData = hashMapOf(
                 "name" to name,
                 "surname" to surname,
-                "age" to age,
                 "documentId" to documentId,
                 "gender" to gender,
                 "fiscalAddress" to fiscalAddress.orEmpty(),
-                "UserType" to userType,
-                "email" to email // Guardar el email también en Firestore
+                "userType" to userType,
+                "email" to email, // Guardar el email también en Firestore
+                "uid" to uid,
+                "google" to google,
+                "friends" to friends
             )
 
             // Guardamos la información en la colección de "users" usando el UID del usuario
