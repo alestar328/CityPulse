@@ -1,18 +1,17 @@
 package com.app.citypulse.presentation.viewmodel
 
-import android.accounts.Account
 import android.app.Activity
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.data.repository.AuthRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
@@ -23,6 +22,7 @@ import kotlinx.coroutines.tasks.await
 
 class AuthViewModel : ViewModel() {
     private val authRepository = AuthRepository()
+    private var tempPhotoUrls: MutableList<String> = mutableListOf()
 
     // Estado de autenticación
     private val _isAuthenticated = MutableStateFlow(false)  // Inicialmente no está autenticado
@@ -56,6 +56,7 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val result = authRepository.login(email, password)
@@ -77,10 +78,14 @@ class AuthViewModel : ViewModel() {
             _isAuthenticated.value = isSuccessful
         }
     }
+
     private fun loadUserType(email: String) {
         viewModelScope.launch {
             try {
-                Log.d("AuthViewModel", "Intentando obtener datos del usuario con email: $email") // 👈 Agregado aquí
+                Log.d(
+                    "AuthViewModel",
+                    "Intentando obtener datos del usuario con email: $email"
+                ) // 👈 Agregado aquí
 
                 val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
                 val userRef = firestore.collection("users").document(uid)
@@ -89,12 +94,18 @@ class AuthViewModel : ViewModel() {
                         Log.d("AuthViewModel", "Datos del usuario en Firestore: ${document.data}")
                         val type = document.getString("UserType")
                         _userType.value = type
-                        Log.d("AuthViewModel", "Tipo de usuario obtenido: $type") // 👈 Verifica qué devuelve
+                        Log.d(
+                            "AuthViewModel",
+                            "Tipo de usuario obtenido: $type"
+                        ) // 👈 Verifica qué devuelve
                     } else {
                         Log.e("AuthViewModel", "El documento no existe en Firestore")
                     }
                 }.addOnFailureListener { exception ->
-                    Log.e("AuthViewModel", "Error al cargar el tipo de usuario: ${exception.message}")
+                    Log.e(
+                        "AuthViewModel",
+                        "Error al cargar el tipo de usuario: ${exception.message}"
+                    )
                 }
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Excepción al cargar el tipo de usuario: $e")
@@ -136,11 +147,13 @@ class AuthViewModel : ViewModel() {
                 "age" to user.age,
                 "documentId" to user.documentId,
                 "gender" to user.gender,
-                "userType" to (user.userType?.name ?: "Persona")  // Si userType es null, usamos "PERSON" como valor por defecto
+                "userType" to (user.userType?.name
+                    ?: "Persona")  // Si userType es null, usamos "PERSON" como valor por defecto
             )
 
             // Referencia a la colección "users" en Firestore
-            val userRef = firestore.collection("users").document(user.email) // Usamos el correo como ID del documento
+            val userRef = firestore.collection("users")
+                .document(user.email) // Usamos el correo como ID del documento
 
             try {
                 // Guardamos el usuario en Firestore
@@ -159,13 +172,8 @@ class AuthViewModel : ViewModel() {
 
     // Función para registrar el usuario con los datos completos
     fun registerCompleteUser(
-        name: String,
-        surname: String,
-        age: Int,
-        documentId: String,
-        gender: String,
+        userItem: UserItem,  // Aquí recibimos el objeto completo con todos los campos
         fiscalAddress: String?,
-        userType: AccountType,
         onResult: (Boolean) -> Unit
     ) {
         viewModelScope.launch {
@@ -181,13 +189,16 @@ class AuthViewModel : ViewModel() {
                 tempPassword ?: "",  //
                 name = userItem.name,
                 surname = userItem.surname,
-                documentId = userItem.documentId ?: "",  // Si 'documentId' es null, se usa una cadena vacía ""
+                documentId = userItem.documentId
+                    ?: "",  // Si 'documentId' es null, se usa una cadena vacía ""
                 gender = userItem.gender ?: "",  // Si 'gender' es null, se usa una cadena vacía ""
-                fiscalAddress = fiscalAddress ?: "",  // Si 'fiscalAddress' es null, se usa una cadena vacía ""
+                fiscalAddress = fiscalAddress
+                    ?: "",  // Si 'fiscalAddress' es null, se usa una cadena vacía ""
                 userType = userItem.userType.name,
                 uid = userItem.uid ?: "",  // Si 'uid' es null, se usa una cadena vacía ""
                 google = userItem.google ?: "no",  // Si 'google' es null, se usa "no"
-                friends = userItem.friends.takeIf { it.isNotEmpty() } ?: mutableListOf()  // Si 'friends' es null o vacío, se usa una lista vacía
+                friends = userItem.friends.takeIf { it.isNotEmpty() }
+                    ?: mutableListOf()  // Si 'friends' es null o vacío, se usa una lista vacía
             )
 
             // Verificar si el registro fue exitoso
@@ -203,6 +214,11 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+
+    fun addTempPhotoUrl(url: String) {
+        tempPhotoUrls.add(url)
+    }
+
     // Obtener los datos temporales del usuario
     fun getTempUserData(): Map<String, Any?> {
         return mapOf(
@@ -214,7 +230,9 @@ class AuthViewModel : ViewModel() {
             "documentId" to tempDocumentId,
             "gender" to tempGender,
             "fiscalAddress" to tempFiscalAddress,
-            "userType" to tempUserType  // Agregar el tipo de cuenta
+            "userType" to tempUserType,  // Agregar el tipo de cuenta
+            "photoUrls" to tempPhotoUrls
+
         )
     }
 
@@ -228,7 +246,6 @@ class AuthViewModel : ViewModel() {
 
         return GoogleSignIn.getClient(activity, gso)
     }
-
 
 
     fun checkIfUserExists(email: String, onResult: (Boolean) -> Unit) {
@@ -247,6 +264,7 @@ class AuthViewModel : ViewModel() {
     fun getCurrentUserUid(): String {
         return auth.currentUser?.uid ?: "" // Retorna el UID o una cadena vacía si no hay usuario
     }
+
     // Marca esta función como 'suspend' para permitir que use 'await'
     suspend fun getCurrentUser(): UserItem? {
         val currentUser = auth.currentUser

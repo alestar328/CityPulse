@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.screens
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -8,21 +9,15 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -42,10 +37,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.annotation.RequiresApi
 import androidx.compose.material3.Button
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.presentation.components.ActionBox
@@ -188,10 +180,6 @@ fun ProfileScreen(
                     Text("Mis Amigos")
                 }
 
-                ButtonBar(
-                    text = "Mis Descuentos",
-                    backgroundColor = Color.White
-                )
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
@@ -239,15 +227,15 @@ fun ProfileScreen(
                     onClick = {
                         isUploading.value = true
                         user?.let { currentUser  ->
-                            uploadImageToFirebase(currentUser,bitmap.value, context as ComponentActivity){ success ->
+                            uploadImageToFirebase(currentUser, bitmap.value, context) { success, url ->
                                 isUploading.value = false
-                                if(success){
+                                if (success && url != null) {
+                                    // Aquí, por ejemplo, se añade la URL a una lista temporal en el ViewModel:
+                                    viewModel.addTempPhotoUrl(url)
                                     Toast.makeText(context, "Subida exitosa", Toast.LENGTH_LONG).show()
-                                }else{
+                                } else {
                                     Toast.makeText(context, "Fallo al cargar fotos", Toast.LENGTH_LONG).show()
-
                                 }
-
                             }
                         }
                     }
@@ -261,7 +249,12 @@ fun ProfileScreen(
     }
 
 
-fun uploadImageToFirebase(user:UserItem, bitmap: Bitmap, context: ComponentActivity, callback:(Boolean)->Unit){
+fun uploadImageToFirebase(
+    user: UserItem,
+    bitmap: Bitmap,
+    context: Context,
+    callback: (Boolean, String?) -> Unit
+) {
     val storageRef = Firebase.storage.reference
     val imageName = "images/${user.uid ?: "anonymous"}_${System.currentTimeMillis()}.jpg"
     val imageRef = storageRef.child(imageName)
@@ -270,11 +263,21 @@ fun uploadImageToFirebase(user:UserItem, bitmap: Bitmap, context: ComponentActiv
     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
     val imageData = baos.toByteArray()
 
-    imageRef.putBytes(imageData).addOnSuccessListener {
-        callback(true)
-    }.addOnFailureListener {
-        callback(false)
-    }
+    imageRef.putBytes(imageData)
+        .addOnSuccessListener {
+            // Una vez la imagen se sube, obtenemos su URL de descarga
+            imageRef.downloadUrl.addOnSuccessListener { uri ->
+                // Aquí retornamos true junto con la URL
+                callback(true, uri.toString())
+            }.addOnFailureListener {
+                // Error al obtener la URL
+                callback(false, null)
+            }
+        }
+        .addOnFailureListener {
+            // Error al subir la imagen
+            callback(false, null)
+        }
 }
 fun deleteImageFromFirebase(imageUrl: String, callback: (Boolean) -> Unit) {
     val storageRef = Firebase.storage.getReferenceFromUrl(imageUrl)

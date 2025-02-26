@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import com.app.citypulse.R
-import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
+import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -215,7 +215,6 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                                     google = "no",  // Asegúrate de tener el campo 'google' definido
                                     friends = mutableListOf() // Asegúrate de tener el campo 'friends' definido
                                 )
-
 
                                 viewModel.registerCompleteUser(
                                     userItem = userItem,  // Pasar el objeto completo
