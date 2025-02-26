@@ -1,22 +1,16 @@
 package com.app.citypulse.presentation.viewmodel
 
-import android.accounts.Account
 import android.app.Activity
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.repository.AuthRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,12 +34,21 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val currentUser = auth.currentUser
-                if (currentUser != null && currentUser.email != null) {
-                    // Se asume que en Firestore se guarda el usuario con el ID igual a su email.
-                    val docSnapshot = firestore.collection("users")
-                        .document(currentUser.email!!)
-                        .get()
-                        .await()
+                if (currentUser != null) {
+                    // Si el usuario se autenticó con Google, usamos el email
+                    val docSnapshot = if (currentUser.providerData.any { it.providerId == "google.com" }) {
+                        firestore.collection("users")
+                            .document(currentUser.email!!)  // Usamos el email para Google Sign-In
+                            .get()
+                            .await()
+                    } else {
+                        // Si el usuario no es de Google, usamos el UID
+                        firestore.collection("users")
+                            .document(currentUser.uid)  // Usamos UID para otros tipos de autenticación
+                            .get()
+                            .await()
+                    }
+
                     val userData = docSnapshot.toObject(UserItem::class.java)
                     onResult(userData)
                 } else {
@@ -57,6 +60,8 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+
+
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val result = authRepository.login(email, password)
@@ -64,17 +69,6 @@ class AuthViewModel : ViewModel() {
             onResult(isSuccessful)
 
             // Si el login es exitoso, actualizamos el estado
-            _isAuthenticated.value = isSuccessful
-        }
-    }
-
-    fun register(email: String, password: String, onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            val result = authRepository.register(email, password)
-            val isSuccessful = result != null
-            onResult(isSuccessful)
-
-            // Si el registro es exitoso, actualizamos el estado
             _isAuthenticated.value = isSuccessful
         }
     }
@@ -243,53 +237,20 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    fun checkifGoogleUserExists(email: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val docSnapshot = firestore.collection("users")
+                    .document(email) // Usamos el correo como ID del documento
+                    .get()
+                    .await()
 
-    fun signInWithGoogle(account: GoogleSignInAccount, onResult: (Boolean) -> Unit) {
-        val idToken = account.idToken
-        if (idToken != null) {
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
-
-            viewModelScope.launch {
-                try {
-                    val authResult: AuthResult = auth.signInWithCredential(credential).await()
-
-                    val user = auth.currentUser
-                    if (user != null) {
-                        val userData = UserItem(
-                            name = user.displayName ?: "",
-                            surname = "",
-                            age = 0,
-                            email = user.email ?: "",
-                            documentId = null,
-                            userType = AccountType.Persona,
-                            valoracion = null,
-                            password = "",
-                            gender = null,
-                            uid = user.uid,
-                            friends = mutableListOf()
-                        )
-
-                        firestore.collection("users").document(user.uid).set(userData).await()
-
-                        // 🔹 Guardamos el usuario en FirebaseAuth para que mantenga la sesión
-                        _isAuthenticated.value = true
-                        onResult(true)
-                    } else {
-                        onResult(false)
-                    }
-                } catch (e: Exception) {
-                    Log.e("AuthViewModel", "Error al autenticar usuario con Google", e)
-                    onResult(false)
-                }
+                onResult(docSnapshot.exists())
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Error checking user existence", e)
+                onResult(false)
             }
-        } else {
-            onResult(false)
         }
-    }
-
-    fun checkUserSession(onResult: (Boolean) -> Unit) {
-        val currentUser = auth.currentUser
-        onResult(currentUser != null)
     }
 
 

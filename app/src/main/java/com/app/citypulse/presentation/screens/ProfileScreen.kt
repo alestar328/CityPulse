@@ -1,6 +1,5 @@
 package com.app.citypulse.presentation.screens
 
-import android.widget.Button
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +43,7 @@ import com.app.citypulse.presentation.components.PhotoContainer
 import com.app.citypulse.presentation.components.ProfileHeader
 
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
@@ -54,6 +54,8 @@ fun ProfileScreen(
 ) {
     var user by remember { mutableStateOf<UserItem?>(null) }
     var isLoading by remember { mutableStateOf(true) }
+    val firebaseUser = FirebaseAuth.getInstance().currentUser
+    val uid = firebaseUser?.uid
 
     // Llamamos a loadUserData (asegúrate de tenerla implementada en tu AuthViewModel)
     LaunchedEffect(Unit) {

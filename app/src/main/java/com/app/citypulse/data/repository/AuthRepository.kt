@@ -3,12 +3,7 @@ package com.app.citypulse.data.repository
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.tasks.await
 
 class AuthRepository {
@@ -19,15 +14,6 @@ class AuthRepository {
     suspend fun login(email: String, password: String): AuthResult? {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    // Función para registrar un usuario con correo y contraseña
-    suspend fun register(email: String, password: String): AuthResult? {
-        return try {
-            auth.createUserWithEmailAndPassword(email, password).await()
         } catch (e: Exception) {
             null
         }

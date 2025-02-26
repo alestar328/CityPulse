@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -16,23 +17,107 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.data.NavItem
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
-import com.app.citypulse.data.dataUsers.UserItem
+import com.app.citypulse.presentation.viewmodel.FriendsViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun FriendsScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: AuthViewModel,
-    currentUser: UserItem
+    authViewModel: AuthViewModel,
+    viewModel: FriendsViewModel
 ) {
-    val navitemList = listOf(
-        NavItem("Perfil", Icons.Default.Person, 0),
-        NavItem("Mapa", Icons.Default.LocationOn, 0),
-        NavItem("Config", Icons.Default.Settings, 0)
-    )
+    val friends by viewModel.friends.collectAsState()
+    val currentUser = FirebaseAuth.getInstance().currentUser
 
-    var selectedIndex by remember { mutableIntStateOf(0) }
-    val userId = viewModel.getCurrentUserUid()
+    // Determinar si el usuario se autenticó con Google
+    val isGoogleUser = currentUser?.providerData?.any { it.providerId == "google.com" } ?: false
+
+    // Mostrar el email si es un usuario de Google, de lo contrario mostrar el UID
+    val userIdentifier = if (isGoogleUser) {
+        currentUser?.email ?: "No se pudo obtener el email"
+    } else {
+        currentUser?.uid ?: "No se pudo obtener el UID"
+    }
+
+    // Estado para controlar la visibilidad del diálogo de confirmación
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // Estado para almacenar el friendId que se va a eliminar
+    var friendIdToDelete by remember { mutableStateOf<String?>(null) }
+
+    // Mapa para almacenar los nombres de los amigos
+    val friendNames = remember { mutableStateMapOf<String, String>() }
+
+    // Logs para depuración
+    LaunchedEffect(Unit) {
+        Log.d("FriendsScreen", "Current user UID: ${currentUser?.uid}")
+        Log.d("FriendsScreen", "Is Google user: $isGoogleUser")
+        Log.d("FriendsScreen", "User identifier: $userIdentifier")
+        Log.d("FriendsScreen", "Loading friends...")
+        viewModel.loadFriends()
+    }
+
+    // Obtener los nombres de los amigos
+    LaunchedEffect(friends) {
+        friends.forEach { friendId ->
+            if (!friendNames.containsKey(friendId)) {
+                viewModel.getFriendName(friendId) { name ->
+                    if (name != null) {
+                        friendNames[friendId] = name
+                    } else {
+                        friendNames[friendId] = "Nombre no disponible"
+                    }
+                }
+            }
+        }
+    }
+
+    // Diálogo de confirmación para eliminar un amigo
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                // Ocultar el diálogo si el usuario hace clic fuera de él
+                showDeleteDialog = false
+            },
+            title = { Text("Eliminar amigo") },
+            text = { Text("¿Estás seguro de que quieres eliminar a este amigo?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        // Ocultar el diálogo
+                        showDeleteDialog = false
+
+                        // Llamar a la función removeFriend si hay un friendId válido
+                        friendIdToDelete?.let { friendId ->
+                            viewModel.removeFriend(
+                                friendUid = friendId,
+                                currentUser = currentUser, // Pasamos el FirebaseUser actual
+                                onSuccess = {
+                                    Log.d("FriendsScreen", "Amigo eliminado: $friendId")
+                                },
+                                onError = { error ->
+                                    Log.e("FriendsScreen", "Error al eliminar amigo: $error")
+                                }
+                            )
+                        }
+                    }
+                ) {
+                    Text("Eliminar", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        // Ocultar el diálogo sin eliminar al amigo
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -40,36 +125,20 @@ fun FriendsScreen(
             NavigationBar(
                 modifier = Modifier.fillMaxWidth().background(Color.White)
             ) {
-                navitemList.forEachIndexed { index, navItem ->
-                    NavigationBarItem(
-                        selected = selectedIndex == index,
-                        onClick = {
-                            selectedIndex = index
-                            when (index) {
-                                0 -> navController.navigate("profile")
-                                1 -> navController.navigate("main_screen")
-                                2 -> navController.navigate("settings")
-                            }
-                        },
-                        icon = { Icon(imageVector = navItem.icon, contentDescription = navItem.label) },
-                        label = { Text(text = navItem.label) }
-                    )
-                }
+                // Implementa tu barra de navegación aquí
             }
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {navController.navigate("addfriend")},
+                onClick = { navController.navigate("addfriend") },
                 containerColor = Color(0xFF4CAF50),
                 contentColor = Color.White,
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Spacer(modifier = Modifier.width(8.dp))
                     Text("Añadir amigo")
                 }
             }
@@ -84,43 +153,79 @@ fun FriendsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(32.dp))
+
+            // Mostrar el identificador del usuario (email o UID)
             OutlinedTextField(
-                value = userId,
+                value = userIdentifier,
                 onValueChange = {},
-                label = { Text("MI ID") },
+                label = { Text(if (isGoogleUser) "MI EMAIL" else "MI ID") },
                 readOnly = true,
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Verificar si hay amigos en la lista
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                currentUser.friends.forEach { friendId ->
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth().padding(8.dp)
-                    ) {
-                        Box(
+                if (friends.isEmpty()) {
+                    Text("No tienes amigos aún.", color = Color.Black)
+                } else {
+                    friends.forEach { friendId ->
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .size(60.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF4CAF50)),
-                            contentAlignment = Alignment.Center
+                                .fillMaxWidth()
+                                .padding(8.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Friend Icon",
-                                tint = Color.White,
-                                modifier = Modifier.size(40.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column(verticalArrangement = Arrangement.Center) {
-                            Text(text = friendId, fontSize = 18.sp, color = Color.Black)
+                            // Información del amigo
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(60.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF4CAF50)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Person,
+                                        contentDescription = "Friend Icon",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(40.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Column(verticalArrangement = Arrangement.Center) {
+                                    // Mostrar el nombre del amigo si está disponible
+                                    Text(
+                                        text = friendNames[friendId] ?: "Cargando...",
+                                        fontSize = 18.sp,
+                                        color = Color.Black
+                                    )
+                                }
+                            }
+
+                            // Ícono de basura para eliminar
+                            IconButton(
+                                onClick = {
+                                    // Mostrar el diálogo de confirmación
+                                    friendIdToDelete = friendId
+                                    showDeleteDialog = true
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Eliminar amigo",
+                                    tint = Color.Red,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
                         }
                     }
                 }

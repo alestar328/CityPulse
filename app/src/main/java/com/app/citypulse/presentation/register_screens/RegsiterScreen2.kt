@@ -200,7 +200,7 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                         onClick = {
                             if (isFormValid) {
                                 // Obtener el UID de la sesión actual (usando Firebase Auth como ejemplo)
-                                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""  // Si no hay uid, lo dejamos vacío
+                                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""  // Si no hay UID, lo dejamos vacío
 
                                 // Crear un objeto UserItem con todos los datos
                                 val userItem = UserItem(
@@ -211,15 +211,15 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                                     gender = gender,
                                     userType = userType ?: AccountType.Persona,
                                     valoracion = null,  // Si lo tienes, pasa el valor
-                                    uid = uid,  // Asegúrate de tener el campo 'uid' definido
+                                    uid = uid,  // Aquí se pasa el UID del usuario
                                     google = "no",  // Asegúrate de tener el campo 'google' definido
                                     friends = mutableListOf() // Asegúrate de tener el campo 'friends' definido
                                 )
 
-
+                                // Aquí llamamos a la función de tu ViewModel para registrar al usuario
                                 viewModel.registerCompleteUser(
-                                    userItem = userItem,  // Pasar el objeto completo
-                                    fiscalAddress = fiscalAddress  // Asegúrate de que 'fiscalAddress' también se esté pasando correctamente
+                                    userItem = userItem,  // Pasar el objeto completo con UID
+                                    fiscalAddress = fiscalAddress  // Pasar la dirección fiscal (si aplica)
                                 ) { isRegistered ->
                                     if (isRegistered) {
                                         navController.navigate("main_screen")  // Navegar a la siguiente pantalla si es exitoso
@@ -231,10 +231,10 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                                 errorMessage = "Faltan los siguientes campos: ${missingFields.joinToString(", ")}"
                             }
                         },
-                        // Aquí puedes agregar otras configuraciones del botón si lo necesitas
                     ) {
                         Text("Siguiente")  // El texto que aparece en el botón
                     }
+
                 }
 
                 // Mostrar mensaje de error si existe

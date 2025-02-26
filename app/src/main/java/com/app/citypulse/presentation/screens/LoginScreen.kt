@@ -61,36 +61,47 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                                 val firebaseUser = FirebaseAuth.getInstance().currentUser
                                 if (firebaseUser != null) {
                                     val uid = firebaseUser.uid // 📌 Obtener el UID de Firebase
-                                    val name = account.displayName?.split(" ")?.getOrNull(0) ?: "Nombre"
-                                    val surname = account.displayName?.split(" ")?.getOrNull(1) ?: "Apellido"
-                                    val email = account.email ?: "email@default.com"
-                                    val documentId = null
-                                    val userType = AccountType.Persona
-                                    val password = generatePassword()
-                                    val gender = null
-                                    val google = "Sí"
+                                    val email = account.email ?: "email@default.com" // 📌 Obtener el correo
 
-                                    // 📌 Incluir el UID en el objeto UserItem
-                                    val user = UserItem(
-                                        name = name,
-                                        surname = surname,
-                                        email = email,
-                                        documentId = documentId,
-                                        userType = userType,
-                                        valoracion = null,
-                                        gender = gender,
-                                        google = google,
-                                        uid = uid // 📌 Guardamos el UID del usuario
-                                    )
-
-                                    // 📌 Guardamos el usuario en la base de datos
-                                    viewModel.saveUser(user) { success ->
-                                        if (success) {
+                                    // Verificar si el usuario ya existe
+                                    viewModel.checkifGoogleUserExists(email) { userExists ->
+                                        if (userExists) {
+                                            // El usuario ya existe, solo inicia sesión
                                             navController.navigate("main_screen") {
                                                 popUpTo("login") { inclusive = true }
                                             }
                                         } else {
-                                            loginError = true
+                                            // El usuario no existe, crea un nuevo registro
+                                            val name = account.displayName?.split(" ")?.getOrNull(0) ?: "Nombre"
+                                            val surname = account.displayName?.split(" ")?.getOrNull(1) ?: "Apellido"
+                                            val documentId = null
+                                            val userType = AccountType.Persona
+                                            val password = generatePassword()
+                                            val gender = null
+                                            val google = "Sí"
+
+                                            val user = UserItem(
+                                                name = name,
+                                                surname = surname,
+                                                email = email,
+                                                documentId = documentId,
+                                                userType = userType,
+                                                valoracion = null,
+                                                gender = gender,
+                                                google = google,
+                                                uid = uid // 📌 Guardamos el UID del usuario
+                                            )
+
+                                            // Guardamos el usuario en la base de datos
+                                            viewModel.saveUser(user) { success ->
+                                                if (success) {
+                                                    navController.navigate("main_screen") {
+                                                        popUpTo("login") { inclusive = true }
+                                                    }
+                                                } else {
+                                                    loginError = true
+                                                }
+                                            }
                                         }
                                     }
                                 } else {
@@ -108,7 +119,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             loginError = true
         }
     }
-
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
