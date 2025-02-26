@@ -24,7 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.app.citypulse.data.NavItem
+import com.app.citypulse.navigation.NavItem
 import com.app.citypulse.presentation.components.SearchTopbar
 import com.app.citypulse.presentation.screens.MapScreen
 import com.app.citypulse.presentation.screens.SettingsScreen
@@ -87,7 +87,7 @@ fun MainScreen(
                         },
                         label = {
                             Text(
-                                text = navItem.label,
+                                text = navItem.title,
                                 fontSize = 12.sp
                             ) },
                         colors = androidx.compose.material3.NavigationBarItemDefaults.colors(

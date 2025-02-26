@@ -1,4 +1,4 @@
-package com.app.citypulse.data
+package com.app.citypulse.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

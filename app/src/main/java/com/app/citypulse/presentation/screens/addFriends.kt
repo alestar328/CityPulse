@@ -2,7 +2,6 @@ package com.app.citypulse.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
@@ -17,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.FriendsViewModel
-import com.app.citypulse.data.NavItem
+import com.app.citypulse.navigation.NavItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +79,7 @@ fun AddFriendScreen(
                         selected = selectedIndex == index,
                         onClick = {
                             selectedIndex = index
-                            navController.navigate(navItem.label.lowercase()) // Usar el label como ruta
+                            navController.navigate(navItem.title.lowercase()) // Usar el label como ruta
                         },
                         icon = {
                             if (navItem.badgeCount > 0) {
@@ -94,13 +93,13 @@ fun AddFriendScreen(
                                         }
                                     }
                                 ) {
-                                    Icon(imageVector = navItem.icon, contentDescription = navItem.label)
+                                    Icon(imageVector = navItem.icon, contentDescription = navItem.title)
                                 }
                             } else {
-                                Icon(imageVector = navItem.icon, contentDescription = navItem.label)
+                                Icon(imageVector = navItem.icon, contentDescription = navItem.title)
                             }
                         },
-                        label = { Text(navItem.label) }
+                        label = { Text(navItem.title) }
                     )
                 }
             }

@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.app.citypulse.data.NavItem
+import com.app.citypulse.navigation.NavItem
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.data.dataUsers.UserItem
 
@@ -51,8 +51,8 @@ fun FriendsScreen(
                                 2 -> navController.navigate("settings")
                             }
                         },
-                        icon = { Icon(imageVector = navItem.icon, contentDescription = navItem.label) },
-                        label = { Text(text = navItem.label) }
+                        icon = { Icon(imageVector = navItem.icon, contentDescription = navItem.title) },
+                        label = { Text(text = navItem.title) }
                     )
                 }
             }
