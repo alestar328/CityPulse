@@ -165,7 +165,7 @@ fun EventOrganizerMapCard(
                         contentDescription = "Información"
                     )
                 },
-                onClick = { navController.navigate("event_details/$eventId") },  // 🚀 Navega a los detalles del evento
+                onClick = { navController.navigate("event_details/$eventId") },
                 modifier = Modifier.weight(1f)
             )
         }

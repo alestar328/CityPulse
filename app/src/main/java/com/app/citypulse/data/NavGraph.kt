@@ -71,6 +71,11 @@ fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewM
             EventDetailsScreen(eventId = eventId, viewModel = eventViewModel, navController = navController)
         }
 
+        composable("edit_event/{eventId}") { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+            EditEventScreen(eventId = eventId, viewModel = eventViewModel, navController = navController)
+        }
+
         // Otras pantallas
         composable("profile") {
             ProfileScreen(navController = navController, viewModel = authViewModel)

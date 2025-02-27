@@ -24,12 +24,25 @@ class EventRepository {
         }
     }
 
+    suspend fun updateEvent(event: EventEntity) {
+        try {
+            db.collection("Eventos").document(event.id).set(event).await()
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+
     suspend fun getEventById(eventId: String): EventEntity? {
         return try {
             val document = db.collection("Eventos").document(eventId).get().await()
-            document.toObject(EventEntity::class.java)?.copy(id = document.id)
+            document.toObject(EventEntity::class.java)?.copy(
+                id = document.id,
+                fechaInicio = document.getTimestamp("fechaInicio")?.toDate(),
+                fechaFin = document.getTimestamp("fechaFin")?.toDate()
+            )
         } catch (e: Exception) {
-            null // En caso de error, retornamos null
+            null
         }
     }
 

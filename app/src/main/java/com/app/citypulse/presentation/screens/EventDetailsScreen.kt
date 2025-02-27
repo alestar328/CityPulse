@@ -94,11 +94,14 @@ fun EventDetailsScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(
-                        onClick = { /* Navegar a la pantalla de edición */ },
+                        onClick = {
+                            navController.navigate("edit_event/$eventId")
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
                     ) {
                         Text("Editar", color = Color.White)
                     }
+
 
                     Button(
                         onClick = { viewModel.deleteEvent(eventId, navController) },
