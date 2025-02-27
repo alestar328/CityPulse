@@ -32,17 +32,19 @@ import com.app.citypulse.presentation.screens.MapScreen
 import com.app.citypulse.presentation.screens.SettingsScreen
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.runtime.mutableStateOf
-import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.presentation.screens.ProfileScreen
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
 fun MainScreen(navController: NavController = rememberNavController(), authViewModel: AuthViewModel) {
+
+    val firebaseUser = FirebaseAuth.getInstance().currentUser
+    val uid = firebaseUser?.uid
 
     // Creamos instancia para manejar logica eventos en el mapa.
     val viewModel = EventViewModel(EventRepository())

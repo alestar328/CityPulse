@@ -1,8 +1,10 @@
 package com.app.citypulse.presentation.screens
 
 import android.app.Activity
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -11,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -21,12 +24,14 @@ import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
@@ -39,7 +44,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
     val context = LocalContext.current
     val activity = context as? Activity
 
-    // Nuevo launcher para manejar el resultado de la actividad de Google Sign-In
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -48,47 +52,60 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             val account = task.getResult(ApiException::class.java)
 
             if (account != null) {
-                // Extraer la información de la cuenta de Google
                 val idToken = account.idToken
                 if (idToken != null) {
-                    // Usar el idToken para autenticar con Firebase
                     val credential = GoogleAuthProvider.getCredential(idToken, null)
                     FirebaseAuth.getInstance().signInWithCredential(credential)
                         .addOnCompleteListener(activity!!) { authTask ->
                             if (authTask.isSuccessful) {
-                                // El usuario está autenticado con Firebase
                                 val firebaseUser = FirebaseAuth.getInstance().currentUser
-                                val name = account.displayName?.split(" ")?.get(0) ?: "Nombre"
-                                val surname = account.displayName?.split(" ")?.getOrElse(1) { "Apellido" } ?: "Apellido"
-                                val email = account.email ?: "email@default.com"
-                                val documentId = null // Si tienes un campo para el documento del usuario
-                                val userType = AccountType.Persona // El tipo de cuenta que desees asignar
-                                val password = generatePassword() // Función para generar una contraseña automáticamente
-                                val gender = null // Género si lo tienes
+                                if (firebaseUser != null) {
+                                    val uid = firebaseUser.uid // 📌 Obtener el UID de Firebase
+                                    val email = account.email ?: "email@default.com" // 📌 Obtener el correo
 
-                                // Crear un objeto UserItem
-                                val user = UserItem(
-                                    name = name,
-                                    surname = surname,
-                                    age = 30,
-                                    email = email,
-                                    documentId = documentId,
-                                    userType = userType,
-                                    valoracion = null,
-                                    password = password,
-                                    gender = gender,
-                                )
+                                    // Verificar si el usuario ya existe
+                                    viewModel.checkifGoogleUserExists(email) { userExists ->
+                                        if (userExists) {
+                                            // El usuario ya existe, solo inicia sesión
+                                            navController.navigate("main_screen") {
+                                                popUpTo("login") { inclusive = true }
+                                            }
+                                        } else {
+                                            // El usuario no existe, crea un nuevo registro
+                                            val name = account.displayName?.split(" ")?.getOrNull(0) ?: "Nombre"
+                                            val surname = account.displayName?.split(" ")?.getOrNull(1) ?: "Apellido"
+                                            val documentId = null
+                                            val userType = AccountType.Persona
+                                            val password = generatePassword()
+                                            val gender = null
+                                            val google = "Sí"
 
-                                // Guardar el usuario en la base de datos o en el ViewModel
-                                viewModel.saveUser(user) { success ->
-                                    if (success) {
-                                        // Si el usuario se guardó correctamente, navega al mapa
-                                        navController.navigate("main_screen") {
-                                            popUpTo("login") { inclusive = true }
+                                            val user = UserItem(
+                                                name = name,
+                                                surname = surname,
+                                                email = email,
+                                                documentId = documentId,
+                                                userType = userType,
+                                                valoracion = null,
+                                                gender = gender,
+                                                google = google,
+                                                uid = uid // 📌 Guardamos el UID del usuario
+                                            )
+
+                                            // Guardamos el usuario en la base de datos
+                                            viewModel.saveUser(user) { success ->
+                                                if (success) {
+                                                    navController.navigate("main_screen") {
+                                                        popUpTo("login") { inclusive = true }
+                                                    }
+                                                } else {
+                                                    loginError = true
+                                                }
+                                            }
                                         }
-                                    } else {
-                                        loginError = true
                                     }
+                                } else {
+                                    loginError = true
                                 }
                             } else {
                                 loginError = true
@@ -102,7 +119,6 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             loginError = true
         }
     }
-
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
@@ -111,6 +127,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -127,7 +144,10 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
 
                 Text("CityPulse", color = Color.White, fontSize = 40.sp, textAlign = TextAlign.Center)
 
+
                 Text("¡Encuentra eventos cerca de ti!", color = Color.White, fontSize = 22.sp, textAlign = TextAlign.Center)
+
+
 
                 // Formulario para iniciar sesión con correo y contraseña
                 Card(
@@ -144,6 +164,8 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
+
+
                         TextField(
                             value = password,
                             onValueChange = { password = it },
@@ -152,6 +174,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                             visualTransformation = PasswordVisualTransformation(),
                             modifier = Modifier.fillMaxWidth()
                         )
+
                         if (loginError) {
                             Text(
                                 "Error al iniciar sesión. Verifique sus credenciales.",
@@ -165,6 +188,8 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                         }
                     }
                 }
+
+
                 // Botón de inicio de sesión con correo y contraseña
                 Button(
                     onClick = {

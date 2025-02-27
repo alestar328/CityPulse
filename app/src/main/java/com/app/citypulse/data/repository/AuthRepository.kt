@@ -3,12 +3,7 @@ package com.app.citypulse.data.repository
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.tasks.await
 
 class AuthRepository {
@@ -19,15 +14,6 @@ class AuthRepository {
     suspend fun login(email: String, password: String): AuthResult? {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    // Función para registrar un usuario con correo y contraseña
-    suspend fun register(email: String, password: String): AuthResult? {
-        return try {
-            auth.createUserWithEmailAndPassword(email, password).await()
         } catch (e: Exception) {
             null
         }
@@ -63,13 +49,16 @@ class AuthRepository {
     // Función para registrar un usuario con datos completos en Firestore
     suspend fun registerCompleteUser(
         email: String,
-        password: String,
+        password: String,  // Recibimos el password
         name: String,
         surname: String,
         documentId: String,
         gender: String,
         fiscalAddress: String?,
-        userType: String
+        userType: String,
+        uid: String,
+        google: String,
+        friends: MutableList<String>
     ): Boolean {
         return try {
             // Primero, creamos al usuario con email y contraseña
@@ -82,8 +71,11 @@ class AuthRepository {
                 "documentId" to documentId,
                 "gender" to gender,
                 "fiscalAddress" to fiscalAddress.orEmpty(),
-                "UserType" to userType,
-                "email" to email // Guardar el email también en Firestore
+                "userType" to userType,
+                "email" to email, // Guardar el email también en Firestore
+                "uid" to uid,
+                "google" to google,
+                "friends" to friends
             )
 
             // Guardamos la información en la colección de "users" usando el UID del usuario

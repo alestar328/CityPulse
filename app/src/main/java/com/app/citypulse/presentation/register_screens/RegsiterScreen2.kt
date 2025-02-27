@@ -15,7 +15,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import com.app.citypulse.R
 import com.app.citypulse.data.dataUsers.AccountType
+import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 // Función para validar el DNI
 fun isValidDNI(dni: String): Boolean {
@@ -197,16 +199,30 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                     Button(
                         onClick = {
                             if (isFormValid) {
+                                // Obtener el UID de la sesión actual (usando Firebase Auth como ejemplo)
+                                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""  // Si no hay UID, lo dejamos vacío
+
+                                // Crear un objeto UserItem con todos los datos
+                                val userItem = UserItem(
+                                    name = name,
+                                    surname = surname,
+                                    email = email,  // Asegúrate de tener el campo 'email' definido
+                                    documentId = documentId,
+                                    gender = gender,
+                                    userType = userType ?: AccountType.Persona,
+                                    valoracion = null,  // Si lo tienes, pasa el valor
+                                    uid = uid,  // Aquí se pasa el UID del usuario
+                                    google = "no",  // Asegúrate de tener el campo 'google' definido
+                                    friends = mutableListOf() // Asegúrate de tener el campo 'friends' definido
+                                )
+
+                                // Aquí llamamos a la función de tu ViewModel para registrar al usuario
                                 viewModel.registerCompleteUser(
-                                    name,
-                                    surname,
-                                    documentId,
-                                    gender,
-                                    fiscalAddress,
-                                    userType ?: AccountType.Persona
+                                    userItem = userItem,  // Pasar el objeto completo con UID
+                                    fiscalAddress = fiscalAddress  // Pasar la dirección fiscal (si aplica)
                                 ) { isRegistered ->
                                     if (isRegistered) {
-                                        navController.navigate("map_screen")
+                                        navController.navigate("main_screen")  // Navegar a la siguiente pantalla si es exitoso
                                     } else {
                                         errorMessage = "Ocurrió un error al registrar el usuario."
                                     }
@@ -215,11 +231,10 @@ fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
                                 errorMessage = "Faltan los siguientes campos: ${missingFields.joinToString(", ")}"
                             }
                         },
-                        enabled = true, // El botón siempre está habilitado
-                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Siguiente")
+                        Text("Siguiente")  // El texto que aparece en el botón
                     }
+
                 }
 
                 // Mostrar mensaje de error si existe

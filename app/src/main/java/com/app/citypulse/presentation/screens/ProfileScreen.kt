@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -42,6 +43,7 @@ import com.app.citypulse.presentation.components.PhotoContainer
 import com.app.citypulse.presentation.components.ProfileHeader
 
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
@@ -52,6 +54,8 @@ fun ProfileScreen(
 ) {
     var user by remember { mutableStateOf<UserItem?>(null) }
     var isLoading by remember { mutableStateOf(true) }
+    val firebaseUser = FirebaseAuth.getInstance().currentUser
+    val uid = firebaseUser?.uid
 
     // Llamamos a loadUserData (asegúrate de tenerla implementada en tu AuthViewModel)
     LaunchedEffect(Unit) {
@@ -136,10 +140,17 @@ fun ProfileScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                ButtonBar(
-                    text = "Mis Amigos",
-                    backgroundColor = Color.White
-                )
+                Button(
+                    onClick = {
+                                navController.navigate("friends")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text("Mis Amigos")
+                }
+
                 ButtonBar(
                     text = "Mis Descuentos",
                     backgroundColor = Color.White
