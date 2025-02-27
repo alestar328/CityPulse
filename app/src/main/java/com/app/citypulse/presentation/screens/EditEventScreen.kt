@@ -1,6 +1,7 @@
 package com.app.citypulse.presentation.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,7 +19,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.Brush
 import com.app.citypulse.data.model.TipoCategoria
+import com.app.citypulse.presentation.components.CustomTextField
+import com.app.citypulse.presentation.components.DescriptionTextField
+import com.app.citypulse.presentation.components.NumericTextField
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import java.text.SimpleDateFormat
 
@@ -67,9 +72,21 @@ fun EditEventScreen(eventId: String, viewModel: EventViewModel, navController: N
 
     var fechaInicioCalendar by rememberSaveable { mutableStateOf<Calendar?>(null) }
 
-    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color.DarkGray, Color.Black)
+                )
+            ),
+        contentAlignment = Alignment.Center
+    ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Editar evento", style = TextStyle(color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold))
+            Text(
+                "Editar evento",
+                style = TextStyle(color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             CustomTextField(value = nombre, label = "Nombre del evento", onValueChange = { nombre = it })

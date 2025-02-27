@@ -134,8 +134,6 @@ fun EventDetailsScreen(
     }
 }
 
-
-
 @Composable
 fun EventDetailBox(label: String, value: String, modifier: Modifier = Modifier) {
     Column(

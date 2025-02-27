@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.TipoCategoria
+import com.app.citypulse.presentation.components.CustomTextField
+import com.app.citypulse.presentation.components.DescriptionTextField
+import com.app.citypulse.presentation.components.NumericTextField
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
@@ -289,95 +292,3 @@ fun DateTimePickerField(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomTextField(value: String, label: String, onValueChange: (String) -> Unit, enabled: Boolean = true) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label, color = Color.White) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = Color.Gray.copy(alpha = 0.2f),
-            unfocusedContainerColor = Color.Gray.copy(alpha = 0.2f),
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            disabledTextColor = Color.LightGray,
-            disabledContainerColor = Color.Gray.copy(alpha = 0.1f),
-            focusedBorderColor = Color.White,
-            unfocusedBorderColor = Color.LightGray
-        ),
-        enabled = enabled,
-        shape = RoundedCornerShape(12.dp)
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DescriptionTextField(value: String, onValueChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = {
-            if (it.length <= 240) onValueChange(it)
-        },
-        label = { Text("Descripción", color = Color.White) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = Color.Gray.copy(alpha = 0.2f),
-            unfocusedContainerColor = Color.Gray.copy(alpha = 0.2f),
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            disabledTextColor = Color.LightGray,
-            disabledContainerColor = Color.Gray.copy(alpha = 0.1f),
-            focusedBorderColor = Color.White,
-            unfocusedBorderColor = Color.LightGray
-        ),
-        shape = RoundedCornerShape(12.dp),
-        trailingIcon = {
-            Text(
-                text = "${value.length}/240",
-                color = if (value.length in 200..240) Color.Green else Color.Red,
-                fontSize = 12.sp
-            )
-        }
-    )
-}
-
-
-@Composable
-fun NumericTextField(value: String, label: String, onValueChange: (String) -> Unit, isDecimal: Boolean = false) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = { input ->
-            // Permitir solo números y un punto decimal si es necesario
-            val filteredInput = if (isDecimal) {
-                input.filterIndexed { index, c -> c.isDigit() || (c == '.' && index != 0 && !value.contains('.')) }
-            } else {
-                input.filter { it.isDigit() }
-            }
-            onValueChange(filteredInput)
-        },
-        label = { Text(label, color = Color.White) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = if (isDecimal) KeyboardType.Number else KeyboardType.Number
-        ),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = Color.Gray.copy(alpha = 0.2f),
-            unfocusedContainerColor = Color.Gray.copy(alpha = 0.2f),
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            disabledTextColor = Color.LightGray,
-            disabledContainerColor = Color.Gray.copy(alpha = 0.1f),
-            focusedBorderColor = Color.White,
-            unfocusedBorderColor = Color.LightGray
-        ),
-        shape = RoundedCornerShape(12.dp)
-    )
-}
