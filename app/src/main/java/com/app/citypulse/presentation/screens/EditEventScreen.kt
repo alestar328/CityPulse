@@ -25,7 +25,19 @@ import java.text.SimpleDateFormat
 @Composable
 fun EditEventScreen(eventId: String, viewModel: EventViewModel, navController: NavController) {
     val context = LocalContext.current
-    val eventState by viewModel.getEventById(eventId).collectAsState(initial = null)
+
+    val eventState by viewModel.eventFlow.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getEventById(eventId)
+    }
+
+    if (eventState == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
 
     var nombre by rememberSaveable { mutableStateOf("") }
     var categoriaSeleccionada by rememberSaveable { mutableStateOf(TipoCategoria.CULTURAL) }
@@ -33,23 +45,23 @@ fun EditEventScreen(eventId: String, viewModel: EventViewModel, navController: N
     var lugar by rememberSaveable { mutableStateOf("Ubicación no seleccionada") }
     var latitud by rememberSaveable { mutableStateOf(0.0) }
     var longitud by rememberSaveable { mutableStateOf(0.0) }
-    var fechaInicio by rememberSaveable { mutableStateOf("") }
-    var fechaFin by rememberSaveable { mutableStateOf("") }
+    var fechaInicio by rememberSaveable { mutableStateOf("Sin fecha") }
+    var fechaFin by rememberSaveable { mutableStateOf("Sin fecha") }
     var precio by rememberSaveable { mutableStateOf("") }
     var aforo by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(eventState) {
-        eventState?.let { event ->
-            nombre = event.nombre
-            categoriaSeleccionada = event.categoria
-            descripcion = event.descripcion
-            lugar = event.lugar
-            latitud = event.latitud
-            longitud = event.longitud
-            fechaInicio = formatDate(event.fechaInicio)
-            fechaFin = formatDate(event.fechaFin)
-            precio = event.precio.toString()
-            aforo = event.aforo.toString()
+        eventState?.let {
+            nombre = it.nombre
+            categoriaSeleccionada = it.categoria
+            descripcion = it.descripcion
+            lugar = it.lugar
+            latitud = it.latitud
+            longitud = it.longitud
+            fechaInicio = formatDate(it.fechaInicio)
+            fechaFin = formatDate(it.fechaFin)
+            precio = it.precio.toString()
+            aforo = it.aforo.toString()
         }
     }
 
@@ -138,6 +150,3 @@ fun formatDate(date: Date?): String {
         "Sin fecha"
     }
 }
-
-
-

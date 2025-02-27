@@ -84,19 +84,15 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
     }
 
 
-    private val _eventDetails = mutableStateOf<EventUiModel?>(null)
-    val eventDetails: State<EventUiModel?> = _eventDetails
+    private val _eventFlow = MutableStateFlow<EventEntity?>(null)
+    val eventFlow: StateFlow<EventEntity?> = _eventFlow // Exponer correctamente
 
-    fun getEventById(eventId: String): StateFlow<EventEntity?> {
-        val eventFlow = MutableStateFlow<EventEntity?>(null)
+    fun getEventById(eventId: String) {
         viewModelScope.launch {
             val event = repository.getEventById(eventId)
-            _eventDetails.value = event?.let { mapToUiModel(it) }
-            eventFlow.value = event
+            _eventFlow.value = event
         }
-        return eventFlow
     }
-
 
     fun loadEvents() {
         _uiState.value = UiState.Loading
