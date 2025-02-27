@@ -37,6 +37,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.widget.Toast
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Button
 import androidx.compose.ui.platform.LocalContext
 import com.app.citypulse.data.dataUsers.UserItem
@@ -57,7 +58,8 @@ import java.io.ByteArrayOutputStream
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: AuthViewModel
+    viewModel: AuthViewModel,
+    innerPadding: PaddingValues
 ) {
     var user by remember { mutableStateOf<UserItem?>(null) }
     var isLoading by remember { mutableStateOf(true) }

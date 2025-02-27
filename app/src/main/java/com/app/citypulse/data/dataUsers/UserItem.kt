@@ -17,6 +17,6 @@ data class UserItem @JvmOverloads constructor(
     val uid: String? = null,
     val google: String? = null,
     val friends: MutableList<String> = mutableListOf(),
-    val photoUrls: MutableList<String> = mutableListOf()
-
+    val photoUrls: MutableList<String> = mutableListOf(),
+    val eventAssit : MutableList<String> = mutableListOf()
 )

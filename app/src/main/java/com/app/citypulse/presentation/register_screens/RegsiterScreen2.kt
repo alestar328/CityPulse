@@ -32,7 +32,11 @@ fun isValidNIF(nif: String): Boolean {
 }
 
 @Composable
-fun RegisterScreen2(navController: NavController, viewModel: AuthViewModel) {
+fun RegisterScreen2(
+    navController: NavController,
+    viewModel: AuthViewModel,
+    innerPadding: PaddingValues
+) {
     val backgroundImage = if (isSystemInDarkTheme()) R.drawable.hotelvelabarna else R.drawable.dubai
 
     var userType by remember { mutableStateOf<AccountType?>(null) }

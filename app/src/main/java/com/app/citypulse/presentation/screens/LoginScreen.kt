@@ -33,7 +33,11 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.app.citypulse.presentation.screens.ui.theme.YellowLight
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
+fun LoginScreen(
+    navController: NavController,
+    viewModel: AuthViewModel,
+    innerPadding: PaddingValues
+) {
     val backgroundImage = if (isSystemInDarkTheme()) R.drawable.hotelvelabarna else R.drawable.dubai
 
     var email by remember { mutableStateOf("") }
@@ -89,7 +93,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                                     // 📌 Guardamos el usuario en la base de datos
                                     viewModel.saveUser(user) { success ->
                                         if (success) {
-                                            navController.navigate("main_screen") {
+                                            navController.navigate("map_screen") {
                                                 popUpTo("login") { inclusive = true }
                                             }
                                         } else {

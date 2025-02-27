@@ -31,7 +31,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
+fun CreateEventScreen(
+    viewModel: EventViewModel,
+    navController: NavController,
+    innerPadding: PaddingValues
+) {
     var nombre by rememberSaveable { mutableStateOf("") }
     var categoriaSeleccionada by rememberSaveable { mutableStateOf(TipoCategoria.CULTURAL) }
     var descripcion by rememberSaveable { mutableStateOf("") }

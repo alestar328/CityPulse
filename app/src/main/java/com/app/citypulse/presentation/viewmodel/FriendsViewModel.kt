@@ -2,6 +2,7 @@ package com.app.citypulse.presentation.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,5 +64,16 @@ class FriendsViewModel(private val authViewModel: AuthViewModel) : ViewModel() {
                 Log.e("FriendsViewModel", "Error adding friend: $e")
             }
         }
+    }
+}
+class FriendsViewModelFactory(
+    private val authViewModel: AuthViewModel
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(FriendsViewModel::class.java)) {
+            return FriendsViewModel(authViewModel) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

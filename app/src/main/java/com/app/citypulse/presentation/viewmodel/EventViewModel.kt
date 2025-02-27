@@ -21,7 +21,8 @@ sealed class UiState<out T> {
     data class Success<T>(val data: T) : UiState<T>()
 }
 
-class EventViewModel(private val repository: EventRepository) : ViewModel() {
+class EventViewModel : ViewModel() {
+    private val repository = EventRepository()
 
     private val _eventUiList = MutableStateFlow<List<EventUiModel>>(emptyList())
     val eventUiList: StateFlow<List<EventUiModel>> = _eventUiList
@@ -31,13 +32,12 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
     init {
         loadEvents()
     }
-    // Función que mapea de EventEntity a EventUiModel
+
     private fun mapToUiModel(event: EventEntity): EventUiModel {
-        val dateFormat = SimpleDateFormat("HH:mm (EEE)", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
         return EventUiModel(
             id = event.id,
             nombre = event.nombre,
-            // Convertimos el enum a String (puedes personalizarlo si lo deseas)
             categoria = event.categoria.name,
             subcategoria = event.subcategoria,
             descripcion = event.descripcion,
@@ -53,7 +53,6 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
         )
     }
 
-    // Crear evento.
     fun createEvent(event: EventEntity) {
         viewModelScope.launch {
             try {
@@ -65,7 +64,6 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
         }
     }
 
-    // Eliminar evento.
     fun deleteEvent(eventId: String, navController: NavController) {
         viewModelScope.launch {
             try {
@@ -77,18 +75,28 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
         }
     }
 
-    private val _eventDetails = mutableStateOf<EventUiModel?>(null)
-    val eventDetails: State<EventUiModel?> = _eventDetails
-
-    // Obtener evento por id.
-    fun getEventById(eventId: String) {
+    fun updateEvent(event: EventEntity) {
         viewModelScope.launch {
-            val event = eventUiList.value.find { it.id == eventId }
-            _eventDetails.value = event
+            try {
+                repository.updateEvent(event)
+                loadEvents()
+            } catch (e: Exception) {
+                println("Error al actualizar evento: ${e.message}")
+            }
         }
     }
 
-    // Cargar eventos.
+
+    private val _eventFlow = MutableStateFlow<EventEntity?>(null)
+    val eventFlow: StateFlow<EventEntity?> = _eventFlow // Exponer correctamente
+
+    fun getEventById(eventId: String) {
+        viewModelScope.launch {
+            val event = repository.getEventById(eventId)
+            _eventFlow.value = event
+        }
+    }
+
     fun loadEvents() {
         _uiState.value = UiState.Loading
         repository.getEvents { events ->

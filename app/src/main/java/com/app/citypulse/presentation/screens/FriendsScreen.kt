@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.app.citypulse.navigation.NavItem
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.data.dataUsers.UserItem
 
@@ -23,40 +22,19 @@ fun FriendsScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     viewModel: AuthViewModel,
-    currentUser: UserItem
+    currentUser: UserItem,
+    innerPadding: PaddingValues
 ) {
-    val navitemList = listOf(
-        NavItem("Perfil", Icons.Default.Person, 0),
-        NavItem("Mapa", Icons.Default.LocationOn, 0),
-        NavItem("Config", Icons.Default.Settings, 0)
-    )
 
-    var selectedIndex by remember { mutableIntStateOf(0) }
+
     val userId = viewModel.getCurrentUserUid()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBar(
-                modifier = Modifier.fillMaxWidth().background(Color.White)
-            ) {
-                navitemList.forEachIndexed { index, navItem ->
-                    NavigationBarItem(
-                        selected = selectedIndex == index,
-                        onClick = {
-                            selectedIndex = index
-                            when (index) {
-                                0 -> navController.navigate("profile")
-                                1 -> navController.navigate("main_screen")
-                                2 -> navController.navigate("settings")
-                            }
-                        },
-                        icon = { Icon(imageVector = navItem.icon, contentDescription = navItem.title) },
-                        label = { Text(text = navItem.title) }
-                    )
-                }
-            }
-        },
+
+            },
+
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {navController.navigate("addfriend")},

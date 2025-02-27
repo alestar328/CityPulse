@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,10 +28,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.app.citypulse.presentation.components.SettingButton
 
 @Composable
-fun SettingsScreen(modifier: Modifier = Modifier) {
+fun SettingsScreen(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    innerPadding: PaddingValues
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -80,8 +86,12 @@ fun SettingSection(
         content()
     }
 }
+/*
 @Preview
 @Composable
 fun SettingsScreenPreview() {
-    SettingsScreen()
+    SettingsScreen(
+
+    )
 }
+*/

@@ -28,7 +28,7 @@ fun MapScreen(
     navController: NavController,
     authViewModel: AuthViewModel,
     selectedCategory: TipoCategoria = TipoCategoria.NONE,
-// 🔥 Agregamos el AuthViewModel
+    innerPadding: PaddingValues
 ) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(41.57008436408339, 1.9954403499999671), 15f)
