@@ -47,6 +47,10 @@ fun NavigationGraph(navController: NavHostController, eventViewModel: EventViewM
             LocationPickerScreen(navController)
         }
 
+        composable("language_screen") {
+            LanguageScreen(navController)
+        }
+
         composable("map_screen") {
             MapScreen(
                 viewModel = eventViewModel,

@@ -42,13 +42,17 @@ fun CustomTextField(value: String, label: String, onValueChange: (String) -> Uni
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DescriptionTextField(value: String, onValueChange: (String) -> Unit) {
+fun DescriptionTextField(
+    value: String,
+    label: String, // Agregamos el parámetro label
+    onValueChange: (String) -> Unit
+) {
     OutlinedTextField(
         value = value,
         onValueChange = {
             if (it.length <= 240) onValueChange(it)
         },
-        label = { Text("Descripción", color = Color.White) },
+        label = { Text(label, color = Color.White) }, // Usamos el parámetro label aquí
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
@@ -72,7 +76,6 @@ fun DescriptionTextField(value: String, onValueChange: (String) -> Unit) {
         }
     )
 }
-
 
 @Composable
 fun NumericTextField(value: String, label: String, onValueChange: (String) -> Unit, isDecimal: Boolean = false) {

@@ -5,8 +5,6 @@ import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -15,12 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.app.citypulse.R
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.TipoCategoria
 import com.app.citypulse.presentation.components.CustomTextField
@@ -47,6 +46,11 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
     val context = LocalContext.current
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
+    // Cargar los textos antes del onClick
+    val errorDescripcion = stringResource(id = R.string.error_descripcion)
+    val errorUbicacion = stringResource(id = R.string.error_ubicacion)
+    val errorCampos = stringResource(id = R.string.error_campos)
+
     LaunchedEffect(navController.currentBackStackEntry) {
         val savedState = navController.currentBackStackEntry?.savedStateHandle
 
@@ -64,42 +68,39 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color.DarkGray, Color.Black)
-                )
-            ),
+            .background(Brush.verticalGradient(colors = listOf(Color.DarkGray, Color.Black))),
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Text(
-                text = "Crear evento",
+                text = stringResource(id = R.string.crear_evento),
                 style = TextStyle(color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            CustomTextField(value = nombre, label = "Nombre del evento", onValueChange = { nombre = it })
+            CustomTextField(value = nombre, label = stringResource(id = R.string.nombre_evento), onValueChange = { nombre = it })
 
             CategoriaDropdown(selectedCategoria = categoriaSeleccionada) {
                 categoriaSeleccionada = it
             }
 
-            DescriptionTextField(value = descripcion, onValueChange = { descripcion = it })
+            DescriptionTextField(value = descripcion, label = stringResource(id = R.string.descripcion),onValueChange = { descripcion = it })
 
-            NumericTextField(value = precio, label = "Precio", onValueChange = { precio = it }, isDecimal = true)
+            NumericTextField(value = precio, label = stringResource(id = R.string.precio), onValueChange = { precio = it }, isDecimal = true)
 
-            NumericTextField(value = aforo, label = "Aforo", onValueChange = { aforo = it })
+            NumericTextField(value = aforo, label = stringResource(id = R.string.aforo), onValueChange = { aforo = it })
 
             var fechaInicioCalendar by rememberSaveable { mutableStateOf<Calendar?>(null) }
 
             DateTimePickerField(
-                label = "Fecha y hora inicial",
+                label = stringResource(id = R.string.fecha_inicio),
                 dateTime = fechaInicio,
                 onDateTimeSelected = { selectedDate ->
                     fechaInicio = selectedDate
@@ -109,26 +110,25 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                 }
             )
 
-            // Solo mostrar el selector de fecha final cuando la fecha de inicio ya ha sido seleccionada
             if (fechaInicioCalendar != null) {
                 DateTimePickerField(
-                    label = "Fecha y hora final",
+                    label = stringResource(id = R.string.fecha_fin),
                     dateTime = fechaFin,
-                    minDate = fechaInicioCalendar ?: Calendar.getInstance(), // <- Evita el error de tipo
+                    minDate = fechaInicioCalendar ?: Calendar.getInstance(),
                     onDateTimeSelected = { selectedDate ->
                         fechaFin = selectedDate
                     }
                 )
             }
 
-            CustomTextField(value = lugar, label = "Ubicación", onValueChange = {}, enabled = false)
+            CustomTextField(value = lugar, label = stringResource(id = R.string.ubicacion), onValueChange = {}, enabled = false)
 
             Button(
                 onClick = { navController.navigate("location_picker_screen") },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Escoger ubicación", color = Color.White)
+                Text(stringResource(id = R.string.escoger_ubicacion), color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -139,7 +139,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Cancelar", color = Color.White)
+                    Text(stringResource(id = R.string.cancelar), color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -150,12 +150,12 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                             precio.isNotEmpty() && aforo.isNotEmpty()
                         ) {
                             if (descripcion.length !in 200..240) {
-                                Toast.makeText(context, "La descripción debe tener entre 200 y 240 caracteres", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, errorDescripcion, Toast.LENGTH_SHORT).show()
                                 return@Button
                             }
 
                             if (latitud == 0.0 || longitud == 0.0) {
-                                Toast.makeText(context, "Ubicación no seleccionada", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, errorUbicacion, Toast.LENGTH_SHORT).show()
                                 return@Button
                             }
 
@@ -176,13 +176,13 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                             viewModel.createEvent(event)
                             navController.popBackStack()
                         } else {
-                            Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, errorCampos, Toast.LENGTH_SHORT).show()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Crear", color = Color.White)
+                    Text(stringResource(id = R.string.crear), color = Color.White)
                 }
             }
         }

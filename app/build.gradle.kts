@@ -92,6 +92,8 @@ dependencies {
     implementation ("com.google.firebase:firebase-auth-ktx:22.1.2") // Firebase Auth
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") // Corutinas para servicios de Google
 
+    implementation("androidx.compose.material:material-icons-extended:1.5.1")
+
 
     // Dependencias de UI y Lifecycle
     implementation(libs.androidx.core.ktx)
@@ -103,6 +105,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.google.firebase.firestore.ktx)
+    implementation(libs.annotations)
 
     // Dependencias de prueba
     testImplementation(libs.junit)

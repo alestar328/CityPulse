@@ -40,7 +40,6 @@ import com.app.citypulse.presentation.screens.ProfileScreen
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 
-
 @Composable
 fun MainScreen(navController: NavController = rememberNavController(), authViewModel: AuthViewModel) {
 
@@ -89,7 +88,7 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
                 selectedIndex = selectedIndex,
                 navController = navController,
                 viewModel = viewModel,
-                authViewModel = authViewModel, // Se pasa el AuthViewModel aquí
+                authViewModel = authViewModel,
                 onMarkerClicked = { eventEntity ->
                     navController.navigate("event_details/${eventEntity.id}")
                 }
@@ -106,7 +105,6 @@ fun MainScreen(navController: NavController = rememberNavController(), authViewM
         }
     }
 }
-
 
 @Composable
 fun ContentScreen(

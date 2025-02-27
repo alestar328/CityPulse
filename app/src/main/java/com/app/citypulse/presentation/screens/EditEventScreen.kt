@@ -91,7 +91,7 @@ fun EditEventScreen(eventId: String, viewModel: EventViewModel, navController: N
 
             CustomTextField(value = nombre, label = "Nombre del evento", onValueChange = { nombre = it })
             CategoriaDropdown(selectedCategoria = categoriaSeleccionada) { categoriaSeleccionada = it }
-            DescriptionTextField(value = descripcion, onValueChange = { descripcion = it })
+            DescriptionTextField(value = descripcion, label = "Descripción", onValueChange = { descripcion = it })
             NumericTextField(value = precio, label = "Precio", onValueChange = { precio = it }, isDecimal = true)
             NumericTextField(value = aforo, label = "Aforo", onValueChange = { aforo = it })
 

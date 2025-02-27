@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.repository.AuthRepository
+import com.app.citypulse.data.repository.UserRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -63,21 +64,6 @@ class AuthViewModel : ViewModel() {
 
             if (isSuccessful) {
                 loadUserType(email)  // Cargar el tipo de usuario
-            }
-        }
-    }
-
-    fun register(email: String, password: String, onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            val result = authRepository.register(email, password)
-            val isSuccessful = result != null
-            onResult(isSuccessful)
-
-            // Si el registro es exitoso, actualizamos el estado
-            _isAuthenticated.value = isSuccessful
-
-            if (isSuccessful) {
-                loadUserType(email)
             }
         }
     }
@@ -229,6 +215,18 @@ class AuthViewModel : ViewModel() {
                 Log.e("AuthCheck", "Error al verificar el correo: ${e.message}")
                 onResult(false)  // En caso de error, devolvemos false
             }
+        }
+    }
+
+    class AuthViewModel : ViewModel() {
+        private val userRepository = UserRepository()
+
+        fun saveLanguage(language: String) {
+            userRepository.saveLanguagePreference(language)
+        }
+
+        fun getLanguage(callback: (String) -> Unit) {
+            userRepository.getLanguagePreference(callback)
         }
     }
 }

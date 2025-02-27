@@ -10,5 +10,6 @@ data class UserItem(
     val userType: AccountType = AccountType.Persona, // Tipo de usuario, con valor predeterminado "persona"
     val valoracion: Int? = null,     // Valoración, puede ser null si es un nuevo usuario
     val password: String,            // Contraseña del usuario
-    val gender: String? = null       // Género del usuario, puede ser null
+    val gender: String? = null,       // Género del usuario, puede ser null
+    val language: String = "es"  // Nuevo campo para el idioma con valor por defecto "es"
 )
