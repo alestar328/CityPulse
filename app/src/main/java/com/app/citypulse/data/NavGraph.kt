@@ -84,11 +84,14 @@ fun NavigationGraph(
                     }
                     navController.popBackStack()
                 },
-                onMarkerClicked = { eventUi  ->
-                    navController.navigate("event_details/${eventUi.id}")
-                }
+                onMarkerClicked = { eventEntity ->
+                    navController.navigate("event_details/${eventEntity.id}")
+                },
+                navController = navController,
+                authViewModel = authViewModel
             )
         }
+
 
         // Detalles del evento
         composable("event_details/{eventId}") { backStackEntry ->

@@ -30,6 +30,9 @@ class AuthViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
+    private val _userType = MutableStateFlow<String?>(null)
+    val userType: StateFlow<String?> = _userType
+
     fun loadUserData(onResult: (UserItem?) -> Unit) {
         viewModelScope.launch {
             try {
@@ -70,6 +73,25 @@ class AuthViewModel : ViewModel() {
 
             // Si el login es exitoso, actualizamos el estado
             _isAuthenticated.value = isSuccessful
+            if (isSuccessful) {
+                loadUserType(email)
+            }
+        }
+    }
+
+    private fun loadUserType(email: String) {
+        viewModelScope.launch {
+            try {
+                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                val userRef = firestore.collection("users").document(uid)
+                userRef.get().addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val type = document.getString("userType")
+                        _userType.value = type
+                    }
+                }
+            } catch (e: Exception) {
+            }
         }
     }
 
