@@ -15,8 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.app.citypulse.data.NavItem
-import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.FriendsViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -24,7 +22,6 @@ import com.google.firebase.auth.FirebaseAuth
 fun FriendsScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    authViewModel: AuthViewModel,
     viewModel: FriendsViewModel
 ) {
     val friends by viewModel.friends.collectAsState()

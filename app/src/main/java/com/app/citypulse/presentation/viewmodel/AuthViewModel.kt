@@ -215,6 +215,7 @@ class AuthViewModel : ViewModel() {
     fun getCurrentUserUid(): String {
         return auth.currentUser?.uid ?: "" // Retorna el UID o una cadena vacía si no hay usuario
     }
+
     // Marca esta función como 'suspend' para permitir que use 'await'
     suspend fun getCurrentUser(): UserItem? {
         val currentUser = auth.currentUser
