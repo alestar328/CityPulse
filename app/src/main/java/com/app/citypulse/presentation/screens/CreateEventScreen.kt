@@ -2,6 +2,7 @@ package com.app.citypulse.presentation.screens
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -22,14 +23,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventEntity
-import com.app.citypulse.data.model.TipoCategoria
+import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.presentation.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
+fun CreateEventScreen(
+    viewModel: EventViewModel,
+    navController: NavController,
+    innerPadding: PaddingValues
+) {
     var nombre by rememberSaveable { mutableStateOf("") }
     var categoriaSeleccionada by rememberSaveable { mutableStateOf(TipoCategoria.CULTURAL) }
     var descripcion by rememberSaveable { mutableStateOf("") }
@@ -65,7 +71,8 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                 Brush.verticalGradient(
                     colors = listOf(Color.DarkGray, Color.Black)
                 )
-            ),
+            )
+            .padding(innerPadding),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -122,7 +129,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
 
             Button(
                 onClick = { navController.navigate("location_picker_screen") },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
+                colors = ButtonDefaults.buttonColors(containerColor = YellowLight),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Escoger ubicación", color = Color.White)
@@ -169,7 +176,6 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                                 aforo = aforo.toInt(),
                                 idRealizador = currentUserId ?: ""
                             )
-
                             viewModel.createEvent(event)
                             navController.popBackStack()
                         } else {
@@ -198,7 +204,7 @@ fun CategoriaDropdown(selectedCategoria: TipoCategoria, onCategoriaSelected: (Ti
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Gray.copy(alpha = 0.2f))
             ) {
-                Text(selectedCategoria.displayName, color = Color.White)
+                Text(selectedCategoria.displayName ?: "Sin categoría", color = Color.White)
             }
 
             DropdownMenu(
@@ -208,7 +214,7 @@ fun CategoriaDropdown(selectedCategoria: TipoCategoria, onCategoriaSelected: (Ti
             ) {
                 TipoCategoria.values().forEach { categoria ->
                     DropdownMenuItem(
-                        text = { Text(categoria.displayName, color = Color.White) },
+                        text = { Text(categoria.displayName ?: "", color = Color.White) },
                         onClick = {
                             onCategoriaSelected(categoria)
                             expanded = false
@@ -284,7 +290,7 @@ fun DateTimePickerField(
     ) {
         Text(
             text = if (dateTime.isEmpty()) label else dateTime,
-            color = Color.Blue
+            color = YellowLight
         )
     }
 }

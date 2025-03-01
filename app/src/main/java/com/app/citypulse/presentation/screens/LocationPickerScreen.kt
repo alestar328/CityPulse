@@ -18,7 +18,10 @@ import java.io.IOException
 import java.util.*
 
 @Composable
-fun LocationPickerScreen(navController: NavController) {
+fun LocationPickerScreen(
+    navController: NavController,
+    innerPadding: PaddingValues
+) {
     val context = LocalContext.current
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) }
     var selectedAddress by remember { mutableStateOf("Selecciona una ubicación") }
@@ -43,7 +46,9 @@ fun LocationPickerScreen(navController: NavController) {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(innerPadding)) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,

@@ -4,6 +4,7 @@ import com.app.citypulse.data.dataUsers.UserItem
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
+
 class UserRepository {
     private val db = FirebaseFirestore.getInstance()
     private  val collectionRef = db.collection("Usuarios")

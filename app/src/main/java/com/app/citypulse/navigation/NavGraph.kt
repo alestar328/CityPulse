@@ -8,7 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,61 +21,81 @@ import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.FriendsViewModel
 
 @Composable
-fun NavigationGraph(
+fun NavGraph(
     navController: NavHostController,
-    eventViewModel: EventViewModel,
-    authViewModel: AuthViewModel,
-    friendsViewModel: FriendsViewModel
+    innerPadding: PaddingValues
 ) {
+    val authViewModel: AuthViewModel = viewModel()
+    val eventViewModel: EventViewModel = viewModel()
+    val friendsViewModel: FriendsViewModel = viewModel(factory = FriendsViewModelFactory(authViewModel))
+
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
     val context = LocalContext.current
 
     NavHost(
         navController = navController,
-        startDestination = if (isAuthenticated) "main_screen" else "login"
+        startDestination = if (isAuthenticated) "map_screen" else "login"
     ) {
         // Autenticación
         composable("login") {
-            LoginScreen(navController = navController, viewModel = authViewModel)
+            LoginScreen(navController = navController, viewModel = authViewModel,innerPadding = innerPadding)
         }
         composable("register") {
-            RegisterScreen(navController = navController, viewModel = authViewModel)
+            RegisterScreen(navController = navController, viewModel = authViewModel, innerPadding = innerPadding)
         }
         composable("register2") {
-            RegisterScreen2(navController = navController, viewModel = authViewModel)
+            RegisterScreen2(navController = navController, viewModel = authViewModel, innerPadding = innerPadding)
         }
 
         // Pantalla Principal
-        composable("main_screen") {
-            MainScreen(navController, authViewModel)
-        }
+      /*  composable("main_screen") {
+            MainScreen()
+        }*/
+
 
         composable("friends") {
-            // Llamamos directamente a la pantalla de amigos sin verificar el usuario
-            FriendsScreen(
-                navController = navController,
-                viewModel = friendsViewModel,
-            )
+            // Usamos un estado para almacenar el usuario actual
+            var currentUser by remember { mutableStateOf<UserItem?>(null) }
+
+            // Ejecutamos la corutina al momento de la composición
+            LaunchedEffect(Unit) {
+                // Dentro de LaunchedEffect podemos llamar a funciones suspensivas
+                currentUser = authViewModel.getCurrentUser() // Llamada suspensiva dentro de la corutina
+            }
+
+            // Llamamos a la pantalla de amigos solo cuando currentUser no sea null
+            if (currentUser != null) {
+                FriendsScreen(
+                    navController = navController,
+                    viewModel = authViewModel,
+                    currentUser = currentUser!!,
+                    innerPadding = innerPadding
+                )
+            }
         }
 
+        // Ruta para la pantalla de añadir amigo
         composable("addfriend") {
             AddFriendScreen(
                 navController = navController,
-                friendsViewModel = friendsViewModel, // Usa la instancia ya creada
-                authViewModel = authViewModel // Usa la instancia ya creada
+                FriendsviewModel = friendsViewModel,
+                AuthviewModel = authViewModel
             )
         }
 
+
+
         // Eventos
         composable("create_event") {
-            CreateEventScreen(eventViewModel, navController)
+            CreateEventScreen(eventViewModel, navController, innerPadding)
         }
         composable("location_picker_screen") {
-            LocationPickerScreen(navController)
+            LocationPickerScreen(navController, innerPadding = innerPadding)
         }
         composable("map_screen") {
             MapScreen(
                 viewModel = eventViewModel,
+                selectedCategory = TipoCategoria.NONE, // Se pasa el valor por defecto o el que corresponda
                 onLocationSelected = { latLng ->
                     navController.previousBackStackEntry?.savedStateHandle?.apply {
                         set("latitud", latLng.latitude)
@@ -88,23 +107,24 @@ fun NavigationGraph(
                     navController.navigate("event_details/${eventEntity.id}")
                 },
                 navController = navController,
-                authViewModel = authViewModel
+                authViewModel = authViewModel,
+                innerPadding = innerPadding
             )
         }
-
 
         // Detalles del evento
         composable("event_details/{eventId}") { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
-            EventDetailsScreen(eventId = eventId, viewModel = eventViewModel, navController = navController)
+            EventDetailsScreen(eventId = eventId, viewModel = eventViewModel, navController = navController, innerPadding = innerPadding)
         }
+
 
         // Otras pantallas
         composable("profile") {
-            ProfileScreen(navController = navController, viewModel = authViewModel)
+            ProfileScreen(navController = navController, viewModel = authViewModel, innerPadding = innerPadding)
         }
         composable("settings") {
-            SettingsScreen()
+            SettingsScreen( navController, innerPadding = innerPadding)
         }
     }
 }

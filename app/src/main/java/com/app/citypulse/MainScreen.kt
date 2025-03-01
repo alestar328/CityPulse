@@ -32,106 +32,56 @@ import com.app.citypulse.presentation.screens.MapScreen
 import com.app.citypulse.presentation.screens.SettingsScreen
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.runtime.mutableStateOf
+import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.presentation.screens.ProfileScreen
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
-import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
 fun MainScreen(navController: NavController = rememberNavController(), authViewModel: AuthViewModel) {
 
-    val firebaseUser = FirebaseAuth.getInstance().currentUser
-    val uid = firebaseUser?.uid
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val authRoutes = listOf("login", "register", "register2")
+    val showBottomBar = currentRoute !in authRoutes
+    var selectedCategory by remember { mutableStateOf(TipoCategoria.NONE) }
 
-    // Creamos instancia para manejar logica eventos en el mapa.
-    val viewModel = EventViewModel(EventRepository())
 
-    val navitemList = listOf(
-        NavItem("Perfil", Icons.Default.Person, 5),
-        NavItem("Mapa", Icons.Default.LocationOn, 0),
-        NavItem("Config", Icons.Default.Settings, 0)
-    )
-
-    var selectedIndex by remember { mutableIntStateOf(1) }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = Color.Transparent,
-        contentWindowInsets = WindowInsets(0.dp),
+        topBar = {
+            if (currentRoute == "mapScreen") {
+                // Solo en la pantalla de mapa
+                SearchTopbar(
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { newCategory ->
+                        selectedCategory = newCategory
+                    }
+                )
+            }
+        },
         bottomBar = {
-            NavigationBar {
-                navitemList.forEachIndexed { index, navItem ->
-                    NavigationBarItem(
-                        selected = selectedIndex == index,
-                        onClick = { selectedIndex = index },
-                        icon = {
-                            BadgedBox(badge = {
-                                if (navItem.badgeCount > 0)
-                                    Badge { Text(text = navItem.badgeCount.toString()) }
-                            }) {
-                                Icon(imageVector = navItem.icon, contentDescription = "Icon")
-                            }
-                        },
-                        label = { Text(text = navItem.label) }
-                    )
+            if (showBottomBar) {
+                BottomNavBar(
+                    items = bottomNavigationItemsList,
+                    currentRoute = currentRoute
+                ) { currentNavigationItem ->
+                    navController.navigate(currentNavigationItem.route) {
+                        navController.graph.startDestinationRoute?.let { startDestinationRoute ->
+                            popUpTo(startDestinationRoute) { saveState = true }
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             }
         }
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            ContentScreen(
-                modifier = Modifier.fillMaxSize(),
-                selectedIndex = selectedIndex,
-                navController = navController,
-                viewModel = viewModel,
-                authViewModel = authViewModel, // Se pasa el AuthViewModel aquí
-                onMarkerClicked = { eventEntity ->
-                    navController.navigate("event_details/${eventEntity.id}")
-                }
-            )
-            if (selectedIndex == 1) {
-                SearchTopbar(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .align(Alignment.TopCenter)
-                        .background(Color.Transparent)
-                )
-            }
-        }
+        NavGraph(navController = navController, innerPadding = innerPadding)
     }
 }
-
-
-@Composable
-fun ContentScreen(
-    modifier: Modifier = Modifier,
-    selectedIndex: Int,
-    navController: NavController,
-    viewModel: EventViewModel,
-    authViewModel: AuthViewModel,
-    onMarkerClicked: (EventUiModel) -> Unit
-) {
-    when (selectedIndex) {
-        0 -> ProfileScreen(navController = navController, viewModel = authViewModel)
-        1 -> {
-            MapScreen(
-                viewModel = viewModel,
-                onLocationSelected = { navController.navigate("create_event") },
-                onMarkerClicked = onMarkerClicked,
-                navController = navController,
-                authViewModel = authViewModel
-            )
-        }
-        2 -> SettingsScreen()
-    }
-}
-
-

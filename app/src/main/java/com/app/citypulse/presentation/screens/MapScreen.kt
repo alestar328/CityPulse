@@ -11,11 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.presentation.components.EventOrganizerMapCard
-import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -27,7 +25,9 @@ fun MapScreen(
     onLocationSelected: (LatLng) -> Unit,
     onMarkerClicked: (EventUiModel) -> Unit,
     navController: NavController,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    selectedCategory: TipoCategoria = TipoCategoria.NONE,
+    innerPadding: PaddingValues
 ) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(41.57008436408339, 1.9954403499999671), 15f)
@@ -37,9 +37,21 @@ fun MapScreen(
     val markerStates = remember { mutableStateMapOf<String, MarkerState>() }
     var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
 
+    val filteredEvents = if (selectedCategory != TipoCategoria.NONE) {
+        eventLocations.filter { event ->
+            // Compara el string de la categoría (por ejemplo, "GASTRONOMICO") con el nombre del enum
+            event.categoria.equals(selectedCategory.name, ignoreCase = true)
+        }
+    } else {
+        eventLocations
+    }
     val userType by authViewModel.userType.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+    ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
@@ -48,18 +60,20 @@ fun MapScreen(
                 selectedEvent = null
             }
         ) {
-            eventLocations.forEach { event ->
+            filteredEvents.forEach { event ->
                 val position = LatLng(event.latitud, event.longitud)
                 val markerState = markerStates.getOrPut(event.id) {
                     // Recuerda usar rememberMarkerState para cada marcador
                     rememberMarkerState(position = position)
                 }
                 Marker(
-                    state = markerState,
+                    state = rememberMarkerState(position = position),
+                    title = event.nombre,
+                    snippet = event.descripcion,
                     onClick = {
-                        // Alterna la selección del evento.
+                        // Alterna la selección del evento
                         selectedEvent = if (selectedEvent == event) null else event
-                        true
+                        true // Indicamos que el evento se ha manejado
                     }
                 )
             }
@@ -92,11 +106,13 @@ fun MapScreen(
 
         // --- Tarjeta con la información del evento seleccionado ---
         selectedEvent?.let { event ->
+            // Un contenedor para la tarjeta, alineado en la parte inferior
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .align(Alignment.BottomCenter)
+                    // Opcional: puedes darle un fondo o un padding extra
                     .background(Color.White.copy(alpha = 0.9f))
                     .padding(8.dp)
             ) {

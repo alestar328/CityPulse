@@ -1,4 +1,4 @@
-package com.app.citypulse.presentation.screens.ui.theme
+package com.app.citypulse.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -10,5 +10,8 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-
 val TurkBlue = Color(0xFF374258)
+
+val YellowLight = Color(0xFFF0CA04)
+
+val WhiteGray = Color(0xFFE5E7E9)

@@ -1,5 +1,7 @@
 package com.app.citypulse.data.model
 
+import com.google.firebase.auth.FirebaseAuth
+
 data class EventUiModel(
     val id: String,
     val nombre: String,
@@ -14,5 +16,5 @@ data class EventUiModel(
     val aforo: Int,
     val precio: Double,
     val valoracion: Int,
-    val idRealizador: String
+    val idRealizador: String = ""
 )

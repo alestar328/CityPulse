@@ -27,7 +27,11 @@ class EventRepository {
     suspend fun getEventById(eventId: String): EventEntity? {
         return try {
             val document = db.collection("Eventos").document(eventId).get().await()
-            document.toObject(EventEntity::class.java)?.copy(id = document.id)
+            document.toObject(EventEntity::class.java)?.copy(
+                id = document.id,
+                fechaInicio = document.getTimestamp("fechaInicio")?.toDate(),
+                fechaFin = document.getTimestamp("fechaFin")?.toDate()
+            )
         } catch (e: Exception) {
             null // En caso de error, retornamos null
         }

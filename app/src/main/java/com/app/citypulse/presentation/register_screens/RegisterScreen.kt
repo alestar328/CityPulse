@@ -20,7 +20,11 @@ import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 
 @Composable
-fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
+fun RegisterScreen(
+    navController: NavController,
+    viewModel: AuthViewModel,
+    innerPadding: PaddingValues
+) {
     val backgroundImage = if (isSystemInDarkTheme()) R.drawable.hotelvelabarna else R.drawable.dubai
 
     var email by remember { mutableStateOf("") }

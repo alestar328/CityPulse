@@ -1,6 +1,5 @@
 package com.app.citypulse.presentation.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -15,13 +14,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.app.citypulse.presentation.viewmodel.FriendsViewModel
-import com.google.firebase.auth.FirebaseAuth
+import com.app.citypulse.data.NavItem
+import com.app.citypulse.presentation.viewmodel.AuthViewModel
+import com.app.citypulse.data.dataUsers.UserItem
 
 @Composable
 fun FriendsScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
+    currentUser: UserItem,
+    innerPadding: PaddingValues,
     viewModel: FriendsViewModel
 ) {
     val friends by viewModel.friends.collectAsState()
@@ -117,25 +119,25 @@ fun FriendsScreen(
     }
 
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
+            .padding(innerPadding),
         bottomBar = {
-            NavigationBar(
-                modifier = Modifier.fillMaxWidth().background(Color.White)
-            ) {
-                // Implementa tu barra de navegación aquí
-            }
-        },
+
+            },
+
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("addfriend") },
+                onClick = {navController.navigate("addfriend")},
                 containerColor = Color(0xFF4CAF50),
                 contentColor = Color.White,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text("Añadir amigo")
                 }
             }
@@ -150,8 +152,6 @@ fun FriendsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(32.dp))
-
-            // Mostrar el identificador del usuario (email o UID)
             OutlinedTextField(
                 value = userIdentifier,
                 onValueChange = {},
@@ -162,7 +162,6 @@ fun FriendsScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Verificar si hay amigos en la lista
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)

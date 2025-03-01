@@ -2,6 +2,7 @@ package com.app.citypulse.presentation.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -25,6 +26,7 @@ class FriendsViewModel(private val authViewModel: AuthViewModel) : ViewModel() {
     val uid = firebaseUser?.uid  // El UID de Firebase
     val email = firebaseUser?.email  // El email de Google
 
+    // Función para obtener la lista de amigos del usuario actual
     fun loadFriends() {
         viewModelScope.launch {
             try {
@@ -88,7 +90,6 @@ class FriendsViewModel(private val authViewModel: AuthViewModel) : ViewModel() {
                 }
             } catch (e: Exception) {
                 Log.e("FriendsViewModel", "Error loading friends: $e")
-                _friends.value = emptyList() // Asegúrate de que la lista esté vacía si hay un error
             }
         }
     }
@@ -133,6 +134,8 @@ class FriendsViewModel(private val authViewModel: AuthViewModel) : ViewModel() {
             return
         }
 
+    // Función para agregar un amigo a la lista del usuario actual
+    fun addFriend(friendUid: String) {
         viewModelScope.launch {
             try {
                 // Verificar si la UID del amigo existe en la base de datos
@@ -227,5 +230,16 @@ class FriendsViewModel(private val authViewModel: AuthViewModel) : ViewModel() {
                 onResult(null)
             }
         }
+    }
+}
+class FriendsViewModelFactory(
+    private val authViewModel: AuthViewModel
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(FriendsViewModel::class.java)) {
+            return FriendsViewModel(authViewModel) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

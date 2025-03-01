@@ -24,17 +24,20 @@ import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
-import com.app.citypulse.data.dataUsers.AccountType
+import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.launch
+import com.app.citypulse.presentation.ui.theme.YellowLight
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
+fun LoginScreen(
+    navController: NavController,
+    viewModel: AuthViewModel,
+    innerPadding: PaddingValues
+) {
     val backgroundImage = if (isSystemInDarkTheme()) R.drawable.hotelvelabarna else R.drawable.dubai
 
     var email by remember { mutableStateOf("") }
@@ -92,16 +95,14 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                                                 uid = uid // 📌 Guardamos el UID del usuario
                                             )
 
-                                            // Guardamos el usuario en la base de datos
-                                            viewModel.saveUser(user) { success ->
-                                                if (success) {
-                                                    navController.navigate("main_screen") {
-                                                        popUpTo("login") { inclusive = true }
-                                                    }
-                                                } else {
-                                                    loginError = true
-                                                }
+                                    // 📌 Guardamos el usuario en la base de datos
+                                    viewModel.saveUser(user) { success ->
+                                        if (success) {
+                                            navController.navigate("map_screen") {
+                                                popUpTo("login") { inclusive = true }
                                             }
+                                        } else {
+                                            loginError = true
                                         }
                                     }
                                 } else {
@@ -119,8 +120,13 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             loginError = true
         }
     }
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxSize()) {
+
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()) {
             Image(
                 painter = painterResource(id = backgroundImage),
                 contentDescription = null,
@@ -131,7 +137,8 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 16.dp),
+                    .statusBarsPadding()
+                    .padding(top = 32.dp, bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -140,6 +147,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     contentDescription = "Logo de la app",
                     modifier = Modifier
                         .size(140.dp)
+                        .statusBarsPadding()
                 )
 
                 Text("CityPulse", color = Color.White, fontSize = 40.sp, textAlign = TextAlign.Center)
@@ -195,7 +203,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     onClick = {
                         viewModel.login(email, password) { success ->
                             if (success) {
-                                navController.navigate("main_screen") {
+                                navController.navigate("map_screen") {
                                     popUpTo("login") { inclusive = true }
                                 }
                             } else {
@@ -205,12 +213,13 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = YellowLight) // Fondo amarillo
+
                 ) {
-                    Text("Iniciar sesión")
+                    Text("Iniciar sesión", color = Color.Black)
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
 
                 // Botón para iniciar sesión con Google
                 Button(
@@ -249,7 +258,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     Text("Iniciar sesión con Google", color = Color.Black)
                 }
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(56.dp))
 
                 // Botón para ir a la pantalla de registro
                 Button(

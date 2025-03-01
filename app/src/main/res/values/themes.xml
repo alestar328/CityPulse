@@ -3,7 +3,7 @@
 
     <style name="Theme.CityPulse" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <style name = "Theme.App.SplashScreen" parent="Theme.SplashScreen">
+    <style name="Theme.App.SplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/grayblue</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_screen</item>
     </style>

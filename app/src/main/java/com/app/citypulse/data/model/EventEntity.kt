@@ -1,5 +1,6 @@
 package com.app.citypulse.data.model
 
+import com.app.citypulse.data.enums.TipoCategoria
 import java.util.Date
 
 data class EventEntity(
