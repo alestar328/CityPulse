@@ -30,7 +30,8 @@ fun FriendsScreen(
     val userId = viewModel.getCurrentUserUid()
 
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
+            .padding(innerPadding),
         bottomBar = {
 
             },

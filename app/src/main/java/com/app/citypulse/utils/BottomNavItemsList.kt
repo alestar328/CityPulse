@@ -10,21 +10,21 @@ import com.app.citypulse.presentation.screens.ProfileScreen
 val bottomNavigationItemsList = listOf(
     NavItem(
         title = "Perfil",
-        badgeCount = 0,
+        badgeCount = null,
         route = "profile",
         selectedIcon = Icons.Default.Person,
         unSelectedIcon = Icons.Default.Person
     ),
     NavItem(
         title = "Mapa",
-        badgeCount = 0,
+        badgeCount = null,
         route = "map_screen",
         selectedIcon = Icons.Default.LocationOn,
         unSelectedIcon = Icons.Default.LocationOn
     ),
     NavItem(
         title = "Config",
-        badgeCount = 0,
+        badgeCount = null,
         route = "settings",
         selectedIcon = Icons.Default.Settings,
         unSelectedIcon = Icons.Default.Settings

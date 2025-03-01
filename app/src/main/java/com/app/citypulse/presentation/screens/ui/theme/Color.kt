@@ -13,3 +13,5 @@ val Pink40 = Color(0xFF7D5260)
 val TurkBlue = Color(0xFF374258)
 
 val YellowLight = Color(0xFFF0CA04)
+
+val WhiteGray = Color(0xFFE5E7E9)

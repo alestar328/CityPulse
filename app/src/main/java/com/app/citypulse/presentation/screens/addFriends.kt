@@ -50,7 +50,8 @@ fun AddFriendScreen(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .padding(innerPadding),
         topBar = {
             TopAppBar(title = { Text("Añadir Amigo") })
         }

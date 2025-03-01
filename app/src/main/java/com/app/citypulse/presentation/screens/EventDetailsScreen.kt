@@ -48,7 +48,8 @@ fun EventDetailsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(Color.Black)
+            .padding(innerPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(

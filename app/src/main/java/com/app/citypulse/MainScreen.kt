@@ -13,6 +13,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.app.citypulse.navigation.BottomNavBar
 import com.app.citypulse.navigation.NavGraph
+import com.app.citypulse.presentation.components.SearchTopbar
 import com.app.citypulse.utils.bottomNavigationItemsList
 
 
@@ -21,29 +22,25 @@ fun MainScreen() {
 
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute by remember(navBackStackEntry) {
-        derivedStateOf {
-            navBackStackEntry?.destination?.route
-        }
-    }
-    val topBarTitle by remember(currentRoute) {
-        derivedStateOf {
-            if (currentRoute != null) {
-                bottomNavigationItemsList[bottomNavigationItemsList.indexOfFirst {
-                    it.route == currentRoute
-                }].title
-            } else {
-                bottomNavigationItemsList[0].title
-            }
-        }
-    }
+    val currentRoute = navBackStackEntry?.destination?.route
     val authRoutes = listOf("login", "register", "register2")
     val showBottomBar = currentRoute !in authRoutes
-    var selectedIndex by remember { mutableIntStateOf(1) }
     var selectedCategory by remember { mutableStateOf(TipoCategoria.NONE) }
 
 
+
     Scaffold(
+        topBar = {
+            if (currentRoute == "mapScreen") {
+                // Solo en la pantalla de mapa
+                SearchTopbar(
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { newCategory ->
+                        selectedCategory = newCategory
+                    }
+                )
+            }
+        },
         bottomBar = {
             if (showBottomBar) {
                 BottomNavBar(

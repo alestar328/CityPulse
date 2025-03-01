@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         FirebaseApp.initializeApp(this)
         FirebaseFirestore.getInstance()
 
-        enableEdgeToEdge()
+
         //Splash Screen
         Thread.sleep(2000)
         installSplashScreen()

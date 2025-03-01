@@ -135,7 +135,8 @@ fun ProfileScreen(
             modifier = modifier
                 .fillMaxSize()
                 .background(Color.White)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Encabezado integrado (antes era ProfileHeader separado)

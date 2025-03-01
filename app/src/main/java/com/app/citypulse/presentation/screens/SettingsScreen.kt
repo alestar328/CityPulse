@@ -41,7 +41,8 @@ fun SettingsScreen(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFF9C27B0))
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .padding(innerPadding),
         horizontalAlignment = Alignment.Start
     ) {
         Text(

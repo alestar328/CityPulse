@@ -71,7 +71,8 @@ fun CreateEventScreen(
                 Brush.verticalGradient(
                     colors = listOf(Color.DarkGray, Color.Black)
                 )
-            ),
+            )
+            .padding(innerPadding),
         contentAlignment = Alignment.Center
     ) {
         Column(

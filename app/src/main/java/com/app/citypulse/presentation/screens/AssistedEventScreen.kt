@@ -27,6 +27,7 @@ fun AssistedEventScreen(
             .fillMaxSize()
             .background(Color.Gray)
             .padding( 16.dp)
+            .padding(innerPadding)
     ) {
         Column {
             EventCard()
