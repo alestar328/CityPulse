@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.enums.TipoCategoria
-import com.app.citypulse.presentation.screens.ui.theme.YellowLight
+import com.app.citypulse.presentation.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat

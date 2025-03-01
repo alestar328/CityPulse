@@ -18,8 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
-import com.app.citypulse.presentation.screens.ui.theme.YellowLight
+import com.app.citypulse.presentation.ui.theme.TurkBlue
+import com.app.citypulse.presentation.ui.theme.YellowLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

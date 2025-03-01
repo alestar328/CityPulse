@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
-import com.app.citypulse.presentation.screens.ui.theme.CityPulseTheme
+import com.app.citypulse.presentation.ui.theme.CityPulseTheme
 import com.app.citypulse.navigation.NavGraph
 import com.app.citypulse.presentation.viewmodel.FriendsViewModel
 import com.google.firebase.FirebaseApp

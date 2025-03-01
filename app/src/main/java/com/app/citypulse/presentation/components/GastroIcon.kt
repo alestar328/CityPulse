@@ -15,7 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.R
-import com.app.citypulse.presentation.screens.ui.theme.YellowLight
+import com.app.citypulse.presentation.ui.theme.YellowLight
 
 @Composable
 fun GastroIcon(

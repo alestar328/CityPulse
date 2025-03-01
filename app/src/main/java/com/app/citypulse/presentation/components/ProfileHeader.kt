@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
 import com.app.citypulse.data.dataUsers.UserItem
-import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
+import com.app.citypulse.presentation.ui.theme.TurkBlue
 
 @Composable
 fun ProfileHeader(

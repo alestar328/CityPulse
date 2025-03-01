@@ -23,7 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
-import com.app.citypulse.presentation.screens.ui.theme.TurkBlue
+import com.app.citypulse.presentation.ui.theme.TurkBlue
 
 
 @Composable

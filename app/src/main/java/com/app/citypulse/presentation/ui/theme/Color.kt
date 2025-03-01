@@ -1,4 +1,4 @@
-package com.app.citypulse.presentation.screens.ui.theme
+package com.app.citypulse.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
