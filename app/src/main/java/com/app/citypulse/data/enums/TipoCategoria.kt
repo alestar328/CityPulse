@@ -5,10 +5,4 @@ enum class TipoCategoria(val displayName: String? = null) {
     CULTURAL("Cultural"),
     FIESTA("Fiesta"),
     NONE;
-
-    companion object {
-        fun fromDisplayName(name: String): TipoCategoria? {
-            return values().find { it.displayName == name }
-        }
-    }
 }

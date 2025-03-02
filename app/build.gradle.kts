@@ -9,6 +9,7 @@ plugins {
 
     // Add the Crashlytics Gradle plugin
     id("com.google.firebase.crashlytics")
+    id("com.google.dagger.hilt.android") version "2.50" apply true
 
 }
 
@@ -110,6 +111,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-auth-ktx:22.1.2") // Firebase Auth
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") // Corutinas para servicios de Google
 
+    implementation("androidx.compose.material:material-icons-extended:1.6.0")
 
     // Dependencias de UI y Lifecycle
     implementation(libs.androidx.core.ktx)
@@ -121,7 +123,10 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    // Firebase Firestore
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.50")
+    ksp("com.google.dagger:hilt-android-compiler:2.50")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 
 
     // Firebase Auth y Database

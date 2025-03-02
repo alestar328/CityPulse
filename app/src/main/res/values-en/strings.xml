@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">CityPulse</string>
+    <string name="crear_evento">Create Event</string>
+    <string name="nombre_evento">Event Name</string>
+    <string name="categoria">Category</string>
+    <string name="descripcion">Description</string>
+    <string name="precio">Price</string>
+    <string name="aforo">Capacity</string>
+    <string name="fecha_inicio">Start Date and Time</string>
+    <string name="fecha_fin">End Date and Time</string>
+    <string name="ubicacion">Location</string>
+    <string name="escoger_ubicacion">Pick Location</string>
+    <string name="cancelar">Cancel</string>
+    <string name="crear">Create</string>
+    <string name="error_descripcion">The description must be between 200 and 240 characters</string>
+    <string name="error_ubicacion">Location not selected</string>
+    <string name="error_campos">Please fill in all fields</string>
+    <string name="seleccionar_idioma">Select Language</string>
+</resources>

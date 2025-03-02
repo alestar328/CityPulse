@@ -29,10 +29,7 @@ fun NavGraph(
 ) {
     val authViewModel: AuthViewModel = viewModel()
     val eventViewModel: EventViewModel = viewModel()
-    val friendsViewModel: FriendsViewModel = viewModel(factory = FriendsViewModel.FriendsViewModelFactory(
-        authViewModel
-    )
-    )
+    val friendsViewModel: FriendsViewModel = viewModel(factory = FriendsViewModel.FriendsViewModelFactory(authViewModel))
 
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
     val context = LocalContext.current
@@ -52,11 +49,14 @@ fun NavGraph(
             RegisterScreen2(navController = navController, viewModel = authViewModel, innerPadding = innerPadding)
         }
 
+        composable("language_screen") {
+            LanguageScreen(navController)
+        }
+
         // Pantalla Principal
       /*  composable("main_screen") {
             MainScreen()
         }*/
-
 
         composable("friends") {
             // Usamos un estado para almacenar el usuario actual
@@ -89,20 +89,19 @@ fun NavGraph(
             )
         }
 
-
-
-
         // Eventos
         composable("create_event") {
-            CreateEventScreen(eventViewModel, navController, innerPadding)
+            CreateEventScreen(eventViewModel, navController)
         }
+
         composable("location_picker_screen") {
             LocationPickerScreen(navController, innerPadding = innerPadding)
         }
+
         composable("map_screen") {
             MapScreen(
                 viewModel = eventViewModel,
-                selectedCategory = TipoCategoria.NONE, // Se pasa el valor por defecto o el que corresponda
+                selectedCategory = TipoCategoria.NONE,
                 onLocationSelected = { latLng ->
                     navController.previousBackStackEntry?.savedStateHandle?.apply {
                         set("latitud", latLng.latitude)
@@ -125,6 +124,10 @@ fun NavGraph(
             EventDetailsScreen(eventId = eventId, viewModel = eventViewModel, navController = navController, innerPadding = innerPadding)
         }
 
+        composable("edit_event/{eventId}") { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+            EditEventScreen(eventId = eventId, viewModel = eventViewModel, navController = navController)
+        }
 
         // Otras pantallas
         composable("profile") {

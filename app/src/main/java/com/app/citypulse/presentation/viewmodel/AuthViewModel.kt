@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.data.repository.AuthRepository
+import com.app.citypulse.data.repository.UserRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -73,13 +74,32 @@ class AuthViewModel : ViewModel() {
 
             // Si el login es exitoso, actualizamos el estado
             _isAuthenticated.value = isSuccessful
+
+            if (isSuccessful) {
+                loadUserType(email)  // Cargar el tipo de usuario
+            }
         }
     }
+
+    private fun loadUserType(email: String) {
+        viewModelScope.launch {
+            try {
+                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                val userRef = firestore.collection("users").document(uid)
+                userRef.get().addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val type = document.getString("userType")
+                        _userType.value = type
+                    }
+                }
+            } catch (e: Exception) {
+            }
+        }
+    }
+
     fun addTempPhotoUrl(url: String) {
         tempPhotoUrls.add(url)
     }
-
-
 
     fun logout() {
         authRepository.logout()
@@ -103,7 +123,6 @@ class AuthViewModel : ViewModel() {
         tempEmail = email
         tempPassword = password
     }
-
 
     fun saveUser(user: UserItem, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -183,8 +202,6 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-
-
     // Obtener los datos temporales del usuario
     fun getTempUserData(): Map<String, Any?> {
         return mapOf(
@@ -224,7 +241,6 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-
     // Marca esta función como 'suspend' para permitir que use 'await'
     suspend fun getCurrentUser(): UserItem? {
         val currentUser = auth.currentUser
@@ -247,8 +263,6 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-
-
     fun checkifGoogleUserExists(email: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
@@ -265,6 +279,16 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    class AuthViewModel : ViewModel() {
+        private val userRepository = UserRepository()
 
+        fun saveLanguage(language: String) {
+            userRepository.saveLanguagePreference(language)
+        }
+
+        fun getLanguage(callback: (String) -> Unit) {
+            userRepository.getLanguagePreference(callback)
+        }
+    }
 }
 
