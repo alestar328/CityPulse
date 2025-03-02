@@ -8,7 +8,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.app.citypulse.preferences.LocaleHelper
+import com.app.citypulse.domain.preferences.LocaleHelper
 
 @Composable
 fun LanguageSelector(context: Context, onLanguageSelected: (String) -> Unit) {

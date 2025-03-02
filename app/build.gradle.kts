@@ -113,6 +113,7 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
 
+
     // Dependencias de UI y Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -139,6 +140,7 @@ dependencies {
     // Firebase Cloud Messaging
     implementation("com.google.firebase:firebase-messaging:24.1.0")
     implementation(libs.androidx.appcompat)
+    implementation(libs.annotations)
 
     // Dependencias de prueba
     testImplementation(libs.junit)

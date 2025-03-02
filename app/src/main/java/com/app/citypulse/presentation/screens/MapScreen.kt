@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.screens
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.presentation.components.EventOrganizerMapCard
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
@@ -50,11 +52,13 @@ fun MapScreen(
             eventLocations.forEach { event ->
                 val position = LatLng(event.latitud, event.longitud)
                 val markerState = markerStates.getOrPut(event.id) {
+                    // Recuerda usar rememberMarkerState para cada marcador
                     rememberMarkerState(position = position)
                 }
                 Marker(
                     state = markerState,
                     onClick = {
+                        // Alterna la selección del evento.
                         selectedEvent = if (selectedEvent == event) null else event
                         true
                     }
@@ -94,6 +98,7 @@ fun MapScreen(
             }
         }
 
+        // --- Tarjeta con la información del evento seleccionado ---
         selectedEvent?.let { event ->
             Box(
                 modifier = Modifier
@@ -103,6 +108,7 @@ fun MapScreen(
                     .background(Color.White.copy(alpha = 0.9f))
                     .padding(8.dp)
             ) {
+                // Aquí reutilizas tu EventOrganizerMapCard
                 EventOrganizerMapCard(
                     nombre = event.nombre,
                     categoria = event.categoria,
@@ -119,3 +125,4 @@ fun MapScreen(
         }
     }
 }
+

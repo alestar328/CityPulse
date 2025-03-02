@@ -13,15 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.R
-import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.data.model.EventEntity
+import com.app.citypulse.data.model.TipoCategoria
 import com.app.citypulse.presentation.components.CustomTextField
 import com.app.citypulse.presentation.components.DescriptionTextField
 import com.app.citypulse.presentation.components.NumericTextField
@@ -68,16 +68,19 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(colors = listOf(Color.DarkGray, Color.Black))),
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color.DarkGray, Color.Black)
+                )
+            ),
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             Text(
                 text = stringResource(id = R.string.crear_evento),
                 style = TextStyle(color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
@@ -110,6 +113,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                 }
             )
 
+            // Solo mostrar el selector de fecha final cuando la fecha de inicio ya ha sido seleccionada
             if (fechaInicioCalendar != null) {
                 DateTimePickerField(
                     label = stringResource(id = R.string.fecha_fin),
@@ -291,3 +295,4 @@ fun DateTimePickerField(
         )
     }
 }
+

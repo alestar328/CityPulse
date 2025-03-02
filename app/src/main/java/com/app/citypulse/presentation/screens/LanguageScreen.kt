@@ -34,7 +34,7 @@ fun LanguageScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         LanguageSelector(context) {
-            navController.popBackStack()
+            navController.popBackStack() // Volver a la pantalla anterior después de cambiar idioma
         }
     }
 }

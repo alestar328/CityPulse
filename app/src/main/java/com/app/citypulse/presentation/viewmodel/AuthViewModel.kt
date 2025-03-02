@@ -1,9 +1,12 @@
 package com.app.citypulse.presentation.viewmodel
 
+import android.accounts.Account
 import android.app.Activity
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.data.repository.AuthRepository
@@ -29,32 +32,22 @@ class AuthViewModel : ViewModel() {
     private val _isAuthenticated = MutableStateFlow(false)  // Inicialmente no está autenticado
     val isAuthenticated: StateFlow<Boolean> get() = _isAuthenticated  // Exponemos el estado
 
-    private val _userType = MutableStateFlow<String?>(null)
-    val userType: StateFlow<String?> = _userType
-
-
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+
+    private val _userType = MutableStateFlow<String?>(null)
+    val userType: StateFlow<String?> = _userType
 
     fun loadUserData(onResult: (UserItem?) -> Unit) {
         viewModelScope.launch {
             try {
                 val currentUser = auth.currentUser
-                if (currentUser != null) {
-                    // Si el usuario se autenticó con Google, usamos el email
-                    val docSnapshot = if (currentUser.providerData.any { it.providerId == "google.com" }) {
-                        firestore.collection("users")
-                            .document(currentUser.email!!)  // Usamos el email para Google Sign-In
-                            .get()
-                            .await()
-                    } else {
-                        // Si el usuario no es de Google, usamos el UID
-                        firestore.collection("users")
-                            .document(currentUser.uid)  // Usamos UID para otros tipos de autenticación
-                            .get()
-                            .await()
-                    }
-
+                if (currentUser != null && currentUser.email != null) {
+                    // Se asume que en Firestore se guarda el usuario con el ID igual a su email.
+                    val docSnapshot = firestore.collection("users")
+                        .document(currentUser.email!!)
+                        .get()
+                        .await()
                     val userData = docSnapshot.toObject(UserItem::class.java)
                     onResult(userData)
                 } else {
@@ -66,6 +59,7 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val result = authRepository.login(email, password)
@@ -165,6 +159,7 @@ class AuthViewModel : ViewModel() {
     fun registerCompleteUser(
         userItem: UserItem,  // Aquí recibimos el objeto completo con todos los campos
         fiscalAddress: String?,
+        userType: AccountType,
         onResult: (Boolean) -> Unit
     ) {
         viewModelScope.launch {
@@ -219,6 +214,7 @@ class AuthViewModel : ViewModel() {
         )
     }
 
+    // Obtener el cliente de inicio de sesión de Google
     fun getGoogleSignInClient(activity: Activity): GoogleSignInClient {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("79725582630-2mn226j2pnrpcn7ljg07j6o7hish6p3s.apps.googleusercontent.com")
@@ -238,6 +234,18 @@ class AuthViewModel : ViewModel() {
                 Log.e("AuthCheck", "Error al verificar el correo: ${e.message}")
                 onResult(false)  // En caso de error, devolvemos false
             }
+        }
+    }
+
+    class AuthViewModel : ViewModel() {
+        private val userRepository = UserRepository()
+
+        fun saveLanguage(language: String) {
+            userRepository.saveLanguagePreference(language)
+        }
+
+        fun getLanguage(callback: (String) -> Unit) {
+            userRepository.getLanguagePreference(callback)
         }
     }
 

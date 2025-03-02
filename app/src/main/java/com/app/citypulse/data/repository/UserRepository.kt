@@ -5,12 +5,31 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-
 class UserRepository {
     private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
     private  val collectionRef = db.collection("users")
     private val auth = FirebaseAuth.getInstance()
 
+    fun getLanguagePreference(callback: (String) -> Unit) {
+        val userId = auth.currentUser?.uid
+        userId?.let {
+            db.collection("users").document(it)
+                .get()
+                .addOnSuccessListener { document ->
+                    val language = document.getString("language") ?: "es"
+                    callback(language)
+                }
+        }
+    }
+
+    fun saveLanguagePreference(language: String) {
+        val userId = auth.currentUser?.uid
+        userId?.let {
+            db.collection("users").document(it)
+                .update("language", language)
+        }
+    }
     suspend fun addUser (User: UserItem){
         collectionRef.add(User).await()
     }
@@ -27,23 +46,5 @@ class UserRepository {
         collectionRef.document(id).delete().await()
     }
 
-    fun saveLanguagePreference(language: String) {
-        val userId = auth.currentUser?.uid
-        userId?.let {
-            db.collection("users").document(it)
-                .update("language", language)
-        }
-    }
 
-    fun getLanguagePreference(callback: (String) -> Unit) {
-        val userId = auth.currentUser?.uid
-        userId?.let {
-            db.collection("users").document(it)
-                .get()
-                .addOnSuccessListener { document ->
-                    val language = document.getString("language") ?: "es"
-                    callback(language)
-                }
-        }
-    }
 }
