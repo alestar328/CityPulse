@@ -25,7 +25,7 @@ fun CulturalIcon(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) YellowLight else Color.Gray
+    val backgroundColor = if (isSelected) YellowLight else TurkBlue
     Box(
         modifier = modifier
             .background(color = backgroundColor, shape = RoundedCornerShape(24.dp))

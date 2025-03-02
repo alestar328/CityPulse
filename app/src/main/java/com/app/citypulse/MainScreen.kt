@@ -1,5 +1,9 @@
 package com.app.citypulse
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -8,6 +12,10 @@ import androidx.compose.runtime.setValue
 import com.app.citypulse.presentation.components.SearchTopbar
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.app.citypulse.navigation.NavGraph
 import com.app.citypulse.data.enums.TipoCategoria
@@ -28,17 +36,8 @@ fun MainScreen() {
 
 
     Scaffold(
-        topBar = {
-            if (currentRoute == "mapScreen") {
-                // Solo en la pantalla de mapa
-                SearchTopbar(
-                    selectedCategory = selectedCategory,
-                    onCategorySelected = { newCategory ->
-                        selectedCategory = newCategory
-                    }
-                )
-            }
-        },
+        containerColor = Color.Transparent,
+
         bottomBar = {
             if (showBottomBar) {
                 BottomNavBar(
@@ -56,6 +55,29 @@ fun MainScreen() {
             }
         }
     ) { innerPadding ->
-        NavGraph(navController = navController, innerPadding = innerPadding)
+        // Usamos un Box para superponer la barra encima del contenido
+        Box(modifier = Modifier.fillMaxSize()) {
+            // 1) Contenido principal (NavGraph) donde se muestra el mapa
+            NavGraph(navController = navController, innerPadding = innerPadding)
+
+            // 2) Si estamos en la pantalla de mapa, superponemos la SearchTopbar
+            if (currentRoute == "map_screen") {
+                Box(
+                    modifier = Modifier
+                        // Ajusta el padding lateral y superior para separarlo de los bordes
+                        .padding(horizontal = 16.dp)
+                        .align(Alignment.TopCenter)  // Lo fijamos arriba centrado
+                ) {
+                    SearchTopbar(
+                        modifier = Modifier
+                            .background(Color.Transparent), // Asegura transparencia
+                        selectedCategory = selectedCategory,
+                        onCategorySelected = { newCategory ->
+                            selectedCategory = newCategory
+                        }
+                    )
+                }
+            }
+        }
     }
 }

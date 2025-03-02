@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -31,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.citypulse.R
-
+import com.app.citypulse.presentation.ui.theme.TurkBlue
 
 
 @Composable
@@ -44,26 +45,21 @@ fun SearcherBar(
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
-            .background(color = Color.Gray, shape = RoundedCornerShape(24.dp))
+            .background(color = TurkBlue, shape = RoundedCornerShape(24.dp))
             .padding(horizontal = 16.dp)
     ){
         Row(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.filtericon),
-                contentDescription = "Filtro",
-                tint = Color.White,
-                modifier = Modifier.size(25.dp)
-            )
 
             Spacer(modifier = Modifier.width(12.dp)) // Espaciado entre el icono y el campo de texto
 
             TextField(
                 value = searchText,
                 onValueChange = {searchText = it},
-                placeholder = { Text("Buscar evento", color = Color.Black, fontSize = 18.sp)},
+                textStyle = LocalTextStyle.current.copy(color = Color.White), //Esto hace que el color sea blanco
+                placeholder = { Text("Buscar evento", color = Color.White, fontSize = 18.sp)},
                 singleLine = true,
                 modifier = Modifier.weight(1f),
                 colors = TextFieldDefaults.colors(
@@ -80,7 +76,7 @@ fun SearcherBar(
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Buscar",
-                tint = Color.Black,
+                tint = Color.White,
                 modifier = Modifier.size(25.dp)
 
             )

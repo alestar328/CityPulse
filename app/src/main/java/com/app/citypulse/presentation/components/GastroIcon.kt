@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.R
+import com.app.citypulse.presentation.ui.theme.TurkBlue
 import com.app.citypulse.presentation.ui.theme.YellowLight
 
 @Composable
@@ -23,7 +24,7 @@ fun GastroIcon(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) YellowLight else Color.Gray
+    val backgroundColor = if (isSelected) YellowLight else TurkBlue
     Box(
         modifier = modifier
             .background(color = backgroundColor, shape = RoundedCornerShape(24.dp))
