@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
@@ -32,7 +33,10 @@ fun RegisterScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = Modifier
+        .fillMaxSize()
+        .padding(innerPadding)
+    ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = painterResource(id = backgroundImage),
@@ -42,26 +46,25 @@ fun RegisterScreen(
             )
 
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .padding(top = 32.dp, bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.splash_screen),
                     contentDescription = "Logo de la app",
                     modifier = Modifier
-                        .width(230.dp)
-                        .height(230.dp)
-                        .padding(top = 20.dp)
+                        .size(140.dp)
+                        .statusBarsPadding()
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Text(
-                    "CityPulse",
+                Text("CityPulse",
                     color = Color.White,
-                    style = MaterialTheme.typography.displayLarge
-                )
+                    fontSize = 40.sp,
+                    textAlign = TextAlign.Center)
 
                 Text(
                     "¡Una aplicación que te ayudará a encontrar eventos cerca de ti!",
@@ -71,7 +74,6 @@ fun RegisterScreen(
                     modifier = Modifier.padding(16.dp)
                 )
 
-                Spacer(modifier = Modifier.height(40.dp))
 
                 Card(
                     modifier = Modifier
@@ -90,7 +92,7 @@ fun RegisterScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         TextField(
                             value = password,
@@ -101,7 +103,7 @@ fun RegisterScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         TextField(
                             value = confirmPassword,
@@ -126,7 +128,7 @@ fun RegisterScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Button(
                     onClick = {

@@ -25,7 +25,8 @@ import java.util.Locale
 fun EventDetailsScreen(
     eventId: String,
     viewModel: EventViewModel,
-    navController: NavController
+    navController: NavController,
+    innerPadding: PaddingValues
 ) {
     val event by viewModel.eventFlow.collectAsState()
 
@@ -48,11 +49,12 @@ fun EventDetailsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(Color.Black)
+            .padding(innerPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.barnaw),
+            painter = painterResource(id = R.drawable.dubai),
             contentDescription = "Imagen del evento",
             modifier = Modifier
                 .fillMaxWidth()

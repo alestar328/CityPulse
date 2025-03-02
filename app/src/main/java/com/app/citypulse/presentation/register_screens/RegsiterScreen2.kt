@@ -49,7 +49,10 @@ fun RegisterScreen2(
 
     var errorMessage by remember { mutableStateOf("") }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = Modifier
+        .fillMaxSize()
+        .padding(innerPadding)
+    ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = painterResource(id = backgroundImage),
@@ -220,13 +223,12 @@ fun RegisterScreen2(
                                     friends = mutableListOf() // Asegúrate de tener el campo 'friends' definido
                                 )
 
-
                                 viewModel.registerCompleteUser(
                                     userItem = userItem,  // Pasar el objeto completo
-                                    fiscalAddress = fiscalAddress  // Asegúrate de que 'fiscalAddress' también se esté pasando correctamente
+                                    fiscalAddress = fiscalAddress
                                 ) { isRegistered ->
                                     if (isRegistered) {
-                                        navController.navigate("main_screen")  // Navegar a la siguiente pantalla si es exitoso
+                                        navController.navigate("map_screen")  // Navegar a la siguiente pantalla si es exitoso
                                     } else {
                                         errorMessage = "Ocurrió un error al registrar el usuario."
                                     }

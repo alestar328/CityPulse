@@ -20,7 +20,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Brush
-import com.app.citypulse.data.model.TipoCategoria
+import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.components.CustomTextField
 import com.app.citypulse.presentation.components.DescriptionTextField
 import com.app.citypulse.presentation.components.NumericTextField

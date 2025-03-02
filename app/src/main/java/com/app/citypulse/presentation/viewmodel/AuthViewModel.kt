@@ -1,12 +1,9 @@
 package com.app.citypulse.presentation.viewmodel
 
-import android.accounts.Account
 import android.app.Activity
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.data.repository.AuthRepository
@@ -15,9 +12,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -159,7 +154,6 @@ class AuthViewModel : ViewModel() {
     fun registerCompleteUser(
         userItem: UserItem,  // Aquí recibimos el objeto completo con todos los campos
         fiscalAddress: String?,
-        userType: AccountType,
         onResult: (Boolean) -> Unit
     ) {
         viewModelScope.launch {
@@ -237,17 +231,7 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    class AuthViewModel : ViewModel() {
-        private val userRepository = UserRepository()
 
-        fun saveLanguage(language: String) {
-            userRepository.saveLanguagePreference(language)
-        }
-
-        fun getLanguage(callback: (String) -> Unit) {
-            userRepository.getLanguagePreference(callback)
-        }
-    }
 
     // Marca esta función como 'suspend' para permitir que use 'await'
     suspend fun getCurrentUser(): UserItem? {

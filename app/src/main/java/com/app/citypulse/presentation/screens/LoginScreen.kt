@@ -149,10 +149,14 @@ fun LoginScreen(
                         .statusBarsPadding()
                 )
 
-                Text("CityPulse", color = Color.White, fontSize = 40.sp, textAlign = TextAlign.Center)
+                Text("CityPulse",
+                    color = Color.White,
+                    fontSize = 40.sp,
+                    textAlign = TextAlign.Center)
 
 
-                Text("¡Encuentra eventos cerca de ti!", color = Color.White, fontSize = 22.sp, textAlign = TextAlign.Center)
+                Text("¡Encuentra eventos cerca de ti!",
+                    color = Color.White, fontSize = 22.sp, textAlign = TextAlign.Center)
 
 
 
