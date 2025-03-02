@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -14,9 +15,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.app.citypulse.data.NavItem
-import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.data.dataUsers.UserItem
+import com.app.citypulse.presentation.viewmodel.FriendsViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun FriendsScreen(

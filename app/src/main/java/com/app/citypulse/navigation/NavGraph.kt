@@ -1,5 +1,6 @@
-package com.app.citypulse.data
+package com.app.citypulse.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -8,11 +9,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.app.citypulse.MainScreen
 import com.app.citypulse.data.dataUsers.UserItem
+import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.screens.*
 import com.app.citypulse.presentation.register_screens.RegisterScreen
@@ -27,7 +29,10 @@ fun NavGraph(
 ) {
     val authViewModel: AuthViewModel = viewModel()
     val eventViewModel: EventViewModel = viewModel()
-    val friendsViewModel: FriendsViewModel = viewModel(factory = FriendsViewModelFactory(authViewModel))
+    val friendsViewModel: FriendsViewModel = viewModel(factory = FriendsViewModel.FriendsViewModelFactory(
+        authViewModel
+    )
+    )
 
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
     val context = LocalContext.current
@@ -67,7 +72,7 @@ fun NavGraph(
             if (currentUser != null) {
                 FriendsScreen(
                     navController = navController,
-                    viewModel = authViewModel,
+                    viewModel = friendsViewModel,
                     currentUser = currentUser!!,
                     innerPadding = innerPadding
                 )
@@ -78,10 +83,12 @@ fun NavGraph(
         composable("addfriend") {
             AddFriendScreen(
                 navController = navController,
-                FriendsviewModel = friendsViewModel,
-                AuthviewModel = authViewModel
+                friendsViewModel = friendsViewModel,
+                authViewModel = authViewModel,
+                innerPadding = innerPadding,
             )
         }
+
 
 
 

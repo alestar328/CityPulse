@@ -20,7 +20,7 @@ class AuthRepository {
     }
 
     suspend fun checkIfUserExists(email: String): Boolean {
-        return try {
+         try {
             // Referencia a la colección de 'users' en Firestore
             val db = FirebaseFirestore.getInstance()
             val usersCollection = db.collection("users")

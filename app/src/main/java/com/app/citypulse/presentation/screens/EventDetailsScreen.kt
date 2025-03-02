@@ -1,12 +1,24 @@
 package com.app.citypulse.presentation.screens
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.app.citypulse.R
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun EventDetailsScreen(
@@ -16,14 +28,15 @@ fun EventDetailsScreen(
     innerPadding: PaddingValues
 ) {
     val event by viewModel.eventFlow.collectAsState()
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+    val isCreator = event?.idRealizador == currentUserId
 
     LaunchedEffect(Unit) {
         viewModel.getEventById(eventId)
     }
 
-    val event = viewModel.eventDetails.value
-    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
-    val isCreator = event?.idRealizador == currentUserId
+
 
     event?.let {
         Column(
@@ -33,7 +46,7 @@ fun EventDetailsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.barnaw),
+                painter = painterResource(id = R.drawable.dubai),
                 contentDescription = "Imagen del evento",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -43,37 +56,52 @@ fun EventDetailsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(horizontal = 12.dp)) {
-
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(horizontal = 12.dp)
+            ) {
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    EventDetailBox("Nombre", it.nombre, Modifier.weight(1f))
+                    EventDetailBox("Nombre", event!!.nombre, Modifier.weight(1f))
                     Spacer(modifier = Modifier.width(8.dp))
-                    EventDetailBox("Hora Inicial", it.fechaInicio, Modifier.weight(1f))
+                    EventDetailBox(
+                        "Hora Inicial",
+                        event!!.fechaInicio?.let { dateFormat.format(it) } ?: "Sin fecha",
+                        Modifier.weight(1f))
                     Spacer(modifier = Modifier.width(8.dp))
-                    EventDetailBox("Hora Final", it.fechaFin, Modifier.weight(1f))
+                    EventDetailBox(
+                        "Hora Final",
+                        event!!.fechaFin?.let { dateFormat.format(it) } ?: "Sin fecha",
+                        Modifier.weight(1f))
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    EventDetailBox("Lugar", it.lugar, Modifier.weight(1f))
+                    EventDetailBox("Lugar", event!!.lugar, Modifier.weight(1f))
                     Spacer(modifier = Modifier.width(8.dp))
-                    EventDetailBox("Categoría", it.categoria, Modifier.weight(1f))
+                    EventDetailBox(
+                        "Categoría",
+                        event!!.categoria?.toString() ?: "Sin categoría",
+                        Modifier.weight(1f)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                EventDetailBox("Descripción", it.descripcion, Modifier.fillMaxWidth().weight(1f))
+                EventDetailBox(
+                    "Descripción",
+                    event!!.descripcion,
+                    Modifier.fillMaxWidth().weight(1f)
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    EventDetailBox("Precio", it.precio.toString(), Modifier.weight(1f))
+                    EventDetailBox("Precio", event!!.precio.toString(), Modifier.weight(1f))
                     Spacer(modifier = Modifier.width(8.dp))
-                    EventDetailBox("Aforo", it.aforo.toString(), Modifier.weight(1f))
+                    EventDetailBox("Aforo", event!!.aforo.toString(), Modifier.weight(1f))
                     Spacer(modifier = Modifier.width(8.dp))
                     EventDetailBox("Subcategoría", "Mediterránea", Modifier.weight(1f))
                 }
@@ -87,7 +115,7 @@ fun EventDetailsScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(
-                        onClick = { /* Navegar a la pantalla de edición */ },
+                        onClick = { navController.navigate("edit_event/$eventId") },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
                     ) {
                         Text("Editar", color = Color.White)
@@ -112,33 +140,23 @@ fun EventDetailsScreen(
                 Text("Volver", color = Color.White)
             }
         }
-
-        Button(
-            onClick = { navController.popBackStack() },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6A1B9A)),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text("Volver", color = Color.White)
-        }
     }
 }
 
-@Composable
-fun EventDetailBox(label: String, value: String, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .padding(4.dp)
-    ) {
-        Text(label, color = Color.White, fontSize = 14.sp)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White, RoundedCornerShape(8.dp))
-                .padding(12.dp) // Más padding para que se vea mejor
+    @Composable
+    fun EventDetailBox(label: String, value: String, modifier: Modifier = Modifier) {
+        Column(
+            modifier = modifier
+                .padding(4.dp)
         ) {
-            Text(value, color = Color.Blue, fontSize = 16.sp)
+            Text(label, color = Color.White, fontSize = 14.sp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White, RoundedCornerShape(8.dp))
+                    .padding(12.dp) // Más padding para que se vea mejor
+            ) {
+                Text(value, color = Color.Blue, fontSize = 16.sp)
+            }
         }
     }
-}

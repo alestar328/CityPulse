@@ -1,13 +1,11 @@
 package com.app.citypulse.presentation.viewmodel
 
-import android.accounts.Account
 import android.app.Activity
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.app.citypulse.data.dataUsers.AccountType
 import com.app.citypulse.data.dataUsers.UserItem
+import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.data.repository.AuthRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -15,7 +13,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +22,7 @@ import kotlinx.coroutines.tasks.await
 
 class AuthViewModel : ViewModel() {
     private val authRepository = AuthRepository()
-
-
+    private var tempPhotoUrls: MutableList<String> = mutableListOf()
 
     // Estado de autenticación
     private val _isAuthenticated = MutableStateFlow(false)  // Inicialmente no está autenticado
@@ -34,6 +30,7 @@ class AuthViewModel : ViewModel() {
 
     private val _userType = MutableStateFlow<String?>(null)
     val userType: StateFlow<String?> = _userType
+
 
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -78,17 +75,11 @@ class AuthViewModel : ViewModel() {
             _isAuthenticated.value = isSuccessful
         }
     }
-
-    fun register(email: String, password: String, onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            val result = authRepository.register(email, password)
-            val isSuccessful = result != null
-            onResult(isSuccessful)
-
-            // Si el registro es exitoso, actualizamos el estado
-            _isAuthenticated.value = isSuccessful
-        }
+    fun addTempPhotoUrl(url: String) {
+        tempPhotoUrls.add(url)
     }
+
+
 
     fun logout() {
         authRepository.logout()
@@ -193,9 +184,6 @@ class AuthViewModel : ViewModel() {
     }
 
 
-    fun addTempPhotoUrl(url: String) {
-        tempPhotoUrls.add(url)
-    }
 
     // Obtener los datos temporales del usuario
     fun getTempUserData(): Map<String, Any?> {
@@ -236,9 +224,7 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun getCurrentUserUid(): String {
-        return auth.currentUser?.uid ?: "" // Retorna el UID o una cadena vacía si no hay usuario
-    }
+
     // Marca esta función como 'suspend' para permitir que use 'await'
     suspend fun getCurrentUser(): UserItem? {
         val currentUser = auth.currentUser
@@ -262,52 +248,21 @@ class AuthViewModel : ViewModel() {
     }
 
 
-    fun signInWithGoogle(account: GoogleSignInAccount, onResult: (Boolean) -> Unit) {
-        val idToken = account.idToken
-        if (idToken != null) {
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
 
-            viewModelScope.launch {
-                try {
-                    val authResult: AuthResult = auth.signInWithCredential(credential).await()
+    fun checkifGoogleUserExists(email: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val docSnapshot = firestore.collection("users")
+                    .document(email) // Usamos el correo como ID del documento
+                    .get()
+                    .await()
 
-                    val user = auth.currentUser
-                    if (user != null) {
-                        val userData = UserItem(
-                            name = user.displayName ?: "",
-                            surname = "",
-                            age = 0,
-                            email = user.email ?: "",
-                            documentId = null,
-                            userType = AccountType.Persona,
-                            valoracion = null,
-                            password = "",
-                            gender = null,
-                            uid = user.uid,
-                            friends = mutableListOf()
-                        )
-
-                        firestore.collection("users").document(user.uid).set(userData).await()
-
-                        // 🔹 Guardamos el usuario en FirebaseAuth para que mantenga la sesión
-                        _isAuthenticated.value = true
-                        onResult(true)
-                    } else {
-                        onResult(false)
-                    }
-                } catch (e: Exception) {
-                    Log.e("AuthViewModel", "Error al autenticar usuario con Google", e)
-                    onResult(false)
-                }
+                onResult(docSnapshot.exists())
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Error checking user existence", e)
+                onResult(false)
             }
-        } else {
-            onResult(false)
         }
-    }
-
-    fun checkUserSession(onResult: (Boolean) -> Unit) {
-        val currentUser = auth.currentUser
-        onResult(currentUser != null)
     }
 
 

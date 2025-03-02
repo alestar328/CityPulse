@@ -1,10 +1,10 @@
 package com.app.citypulse.presentation.viewmodel
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
@@ -21,7 +21,8 @@ sealed class UiState<out T> {
     data class Error(val message: String) : UiState<Nothing>()
 }
 
-class EventViewModel(private val repository: EventRepository) : ViewModel() {
+class EventViewModel() : ViewModel() {
+    private val repository: EventRepository = EventRepository()
 
     private val _eventUiList = MutableStateFlow<List<EventUiModel>>(emptyList())
     val eventUiList: StateFlow<List<EventUiModel>> = _eventUiList
@@ -78,13 +79,17 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
     private val _eventDetails = mutableStateOf<EventUiModel?>(null)
     val eventDetails: State<EventUiModel?> = _eventDetails
 
+
+    private val _eventFlow = MutableStateFlow<EventEntity?>(null)
+    val eventFlow: StateFlow<EventEntity?> = _eventFlow // Exponer correctamente
+
     fun getEventById(eventId: String) {
         viewModelScope.launch {
-            // Aquí debes implementar la lógica para obtener el evento filtrado de eventUiList o desde el repositorio.
-            val event = eventUiList.value.find { it.id == eventId }
-            _eventDetails.value = event
+            val event = repository.getEventById(eventId)
+            _eventFlow.value = event
         }
     }
+
     fun loadEvents() {
         _uiState.value = UiState.Loading
         repository.getEvents { events ->

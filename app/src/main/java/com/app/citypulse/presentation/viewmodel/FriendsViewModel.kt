@@ -134,8 +134,6 @@ class FriendsViewModel(private val authViewModel: AuthViewModel) : ViewModel() {
             return
         }
 
-    // Función para agregar un amigo a la lista del usuario actual
-    fun addFriend(friendUid: String) {
         viewModelScope.launch {
             try {
                 // Verificar si la UID del amigo existe en la base de datos
@@ -162,6 +160,8 @@ class FriendsViewModel(private val authViewModel: AuthViewModel) : ViewModel() {
         }
     }
 
+
+
     fun removeFriend(
         friendUid: String,
         currentUser: FirebaseUser?, // Pasamos el FirebaseUser en lugar del UID
@@ -177,7 +177,8 @@ class FriendsViewModel(private val authViewModel: AuthViewModel) : ViewModel() {
                 }
 
                 // Determinar si el usuario se autenticó con Google
-                val isGoogleUser = currentUser.providerData.any { it.providerId == "google.com" }
+                val isGoogleUser =
+                    currentUser.providerData.any { it.providerId == "google.com" }
 
                 // Usar el email si es un usuario de Google, de lo contrario usar el UID
                 val userIdentifier = if (isGoogleUser) {
@@ -196,7 +197,8 @@ class FriendsViewModel(private val authViewModel: AuthViewModel) : ViewModel() {
                 }
 
                 // Eliminar el amigo de la lista del usuario actual
-                val updatedFriendsList = _friends.value.toMutableList().apply { remove(friendUid) }
+                val updatedFriendsList =
+                    _friends.value.toMutableList().apply { remove(friendUid) }
 
                 // Actualizar Firestore
                 val userRef = firestore.collection("users").document(userIdentifier)
@@ -212,6 +214,7 @@ class FriendsViewModel(private val authViewModel: AuthViewModel) : ViewModel() {
             }
         }
     }
+
     // FriendsViewModel.kt
     fun getFriendName(friendId: String, onResult: (String?) -> Unit) {
         viewModelScope.launch {
@@ -231,15 +234,17 @@ class FriendsViewModel(private val authViewModel: AuthViewModel) : ViewModel() {
             }
         }
     }
-}
-class FriendsViewModelFactory(
-    private val authViewModel: AuthViewModel
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(FriendsViewModel::class.java)) {
-            return FriendsViewModel(authViewModel) as T
+
+
+    class FriendsViewModelFactory(
+        private val authViewModel: AuthViewModel
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(FriendsViewModel::class.java)) {
+                return FriendsViewModel(authViewModel) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
