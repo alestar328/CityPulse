@@ -15,7 +15,6 @@ class MainActivity : ComponentActivity() {
         FirebaseApp.initializeApp(this)
         FirebaseFirestore.getInstance()
 
-
         //Splash Screen
         Thread.sleep(2000)
         installSplashScreen()

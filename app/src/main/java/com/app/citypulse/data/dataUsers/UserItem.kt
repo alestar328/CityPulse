@@ -14,6 +14,7 @@ data class UserItem @JvmOverloads constructor(
     val valoracion: Int? = null,          // Valoración, puede ser null si es un nuevo usuario
     val password: String = "",            // Contraseña del usuario
     val gender: String? = null,           // Género del usuario, puede ser null
+    val language: String = "es",  // Nuevo campo para el idioma con valor por defecto "es"
     val uid: String? = null,
     val google: String? = null,
     val friends: MutableList<String> = mutableListOf(),

@@ -14,7 +14,6 @@ import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.navigation.BottomNavBar
 import com.app.citypulse.utils.bottomNavigationItemsList
 
-
 @Composable
 fun MainScreen() {
 
@@ -24,8 +23,6 @@ fun MainScreen() {
     val authRoutes = listOf("login", "register", "register2")
     val showBottomBar = currentRoute !in authRoutes
     var selectedCategory by remember { mutableStateOf(TipoCategoria.NONE) }
-
-
 
     Scaffold(
         topBar = {

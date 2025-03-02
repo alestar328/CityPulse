@@ -1,7 +1,5 @@
 package com.app.citypulse.presentation.viewmodel
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -14,32 +12,28 @@ import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-
 sealed class UiState<out T> {
     object Loading : UiState<Nothing>()
     data class Success<T>(val data: T) : UiState<T>()
-    data class Error(val message: String) : UiState<Nothing>()
 }
 
-class EventViewModel() : ViewModel() {
-    private val repository: EventRepository = EventRepository()
+class EventViewModel : ViewModel() {
+    private val repository = EventRepository()
 
     private val _eventUiList = MutableStateFlow<List<EventUiModel>>(emptyList())
     val eventUiList: StateFlow<List<EventUiModel>> = _eventUiList
 
     private val _uiState = MutableStateFlow<UiState<List<EventUiModel>>>(UiState.Loading)
-    val uiState: StateFlow<UiState<List<EventUiModel>>> = _uiState
 
     init {
         loadEvents()
     }
-    // Función que mapea de EventEntity a EventUiModel
+
     private fun mapToUiModel(event: EventEntity): EventUiModel {
-        val dateFormat = SimpleDateFormat("HH:mm (EEE)", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
         return EventUiModel(
             id = event.id,
             nombre = event.nombre,
-            // Convertimos el enum a String (puedes personalizarlo si lo deseas)
             categoria = event.categoria.name,
             subcategoria = event.subcategoria,
             descripcion = event.descripcion,
@@ -54,6 +48,7 @@ class EventViewModel() : ViewModel() {
             idRealizador = event.idRealizador
         )
     }
+
     fun createEvent(event: EventEntity) {
         viewModelScope.launch {
             try {
@@ -76,8 +71,16 @@ class EventViewModel() : ViewModel() {
         }
     }
 
-    private val _eventDetails = mutableStateOf<EventUiModel?>(null)
-    val eventDetails: State<EventUiModel?> = _eventDetails
+    fun updateEvent(event: EventEntity) {
+        viewModelScope.launch {
+            try {
+                repository.updateEvent(event)
+                loadEvents()
+            } catch (e: Exception) {
+                println("Error al actualizar evento: ${e.message}")
+            }
+        }
+    }
 
 
     private val _eventFlow = MutableStateFlow<EventEntity?>(null)
@@ -98,6 +101,4 @@ class EventViewModel() : ViewModel() {
             _uiState.value = UiState.Success(uiEvents)
         }
     }
-
-
 }

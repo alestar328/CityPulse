@@ -42,10 +42,6 @@ class AuthRepository {
         }
     }
 
-
-
-
-
     // Función para registrar un usuario con datos completos en Firestore
     suspend fun registerCompleteUser(
         email: String,
@@ -72,7 +68,7 @@ class AuthRepository {
                 "gender" to gender,
                 "fiscalAddress" to fiscalAddress.orEmpty(),
                 "userType" to userType,
-                "email" to email, // Guardar el email también en Firestore
+                "email" to email,
                 "uid" to uid,
                 "google" to google,
                 "friends" to friends
