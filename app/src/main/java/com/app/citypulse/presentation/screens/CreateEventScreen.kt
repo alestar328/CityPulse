@@ -31,7 +31,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
+fun CreateEventScreen(viewModel: EventViewModel, navController: NavController,    innerPadding: PaddingValues // Agregamos el innerPadding como parámetro
+) {
     var nombre by rememberSaveable { mutableStateOf("") }
     var categoriaSeleccionada by rememberSaveable { mutableStateOf(TipoCategoria.CULTURAL) }
     var descripcion by rememberSaveable { mutableStateOf("") }
@@ -68,6 +69,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .background(
                 Brush.verticalGradient(
                     colors = listOf(Color.DarkGray, Color.Black)
@@ -86,7 +88,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                 style = TextStyle(color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             CustomTextField(value = nombre, label = stringResource(id = R.string.nombre_evento), onValueChange = { nombre = it })
 
@@ -135,25 +137,29 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                 Text(stringResource(id = R.string.escoger_ubicacion), color = Color.White)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 Button(
-                    onClick = { navController.popBackStack() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    onClick = {
+                        navController.navigate("map_screen") {
+                            // Quita del stack todo lo que haya hasta "map_screen"
+                            popUpTo("map_screen") { inclusive = false }
+                        }
+                    },                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(stringResource(id = R.string.cancelar), color = Color.White)
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(5.dp))
 
                 Button(
                     onClick = {
                         if (nombre.isNotEmpty() && fechaInicio.isNotEmpty() && fechaFin.isNotEmpty() &&
                             precio.isNotEmpty() && aforo.isNotEmpty()
                         ) {
-                            if (descripcion.length !in 200..240) {
+                            if (descripcion.length !in 50..100) {
                                 Toast.makeText(context, errorDescripcion, Toast.LENGTH_SHORT).show()
                                 return@Button
                             }
@@ -178,7 +184,15 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController) {
                             )
 
                             viewModel.createEvent(event)
-                            navController.popBackStack()
+                            navController.navigate("map_screen") {
+                                // El popUpTo se asegura de que si existe "map_screen" en el back stack,
+                                // hagamos pop hasta ella y la dejemos como destino visible.
+                                popUpTo("map_screen") {
+                                    inclusive = false
+                                }
+                                // Si quieres evitar que se creen múltiples copias de "map_screen":
+                                launchSingleTop = true
+                            }
                         } else {
                             Toast.makeText(context, errorCampos, Toast.LENGTH_SHORT).show()
                         }

@@ -91,7 +91,7 @@ fun NavGraph(
 
         // Eventos
         composable("create_event") {
-            CreateEventScreen(eventViewModel, navController)
+            CreateEventScreen(eventViewModel, navController, innerPadding)
         }
 
         composable("location_picker_screen") {

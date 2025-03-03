@@ -12,7 +12,7 @@
     <string name="escoger_ubicacion">Escoger ubicación</string>
     <string name="cancelar">Cancelar</string>
     <string name="crear">Crear</string>
-    <string name="error_descripcion">La descripción debe tener entre 200 y 240 caracteres</string>
+    <string name="error_descripcion">La descripción debe tener entre 100 y 150 caracteres</string>
     <string name="error_ubicacion">Ubicación no seleccionada</string>
     <string name="error_campos">Completa todos los campos</string>
     <string name="seleccionar_idioma">Seleccionar idioma</string>

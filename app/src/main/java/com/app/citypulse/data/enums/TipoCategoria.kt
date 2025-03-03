@@ -1,7 +1,7 @@
 package com.app.citypulse.data.enums
 
 enum class TipoCategoria(val displayName: String? = null) {
-    GASTRONOMICO("Gastronómico"),
+    GASTRONOMICO("Gastronomico"),
     CULTURAL("Cultural"),
     FIESTA("Fiesta"),
     NONE;

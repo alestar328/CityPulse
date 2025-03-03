@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.presentation.ui.theme.TurkBlue
 
 @Composable
 fun MapScreen(
@@ -29,7 +30,7 @@ fun MapScreen(
     onMarkerClicked: (EventUiModel) -> Unit,
     navController: NavController,
     authViewModel: AuthViewModel,
-    selectedCategory: TipoCategoria = TipoCategoria.NONE,
+    selectedCategory: TipoCategoria, // ¡Ojo, ya no por defecto NONE!
     innerPadding: PaddingValues
 ) {
     val cameraPositionState = rememberCameraPositionState {
@@ -39,8 +40,23 @@ fun MapScreen(
     val eventLocations by viewModel.eventUiList.collectAsState()
     val markerStates = remember { mutableStateMapOf<String, MarkerState>() }
     var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
+    var selectedLocation by remember { mutableStateOf<LatLng?>(null) } //coge ubicacion al presionar dedo
 
     val userType by authViewModel.userType.collectAsState()
+    // 1) Aplica el filtro
+    val filteredEvents by remember(eventLocations, selectedCategory) {
+        derivedStateOf {
+            val result = if (selectedCategory != TipoCategoria.NONE) {
+                eventLocations.filter { event ->
+                    event.categoria.equals(selectedCategory.name, ignoreCase = true)
+                }
+            } else {
+                eventLocations
+            }
+            println("Filtrado: ${result.size} eventos. Filtro: ${selectedCategory.name}")
+            result
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -50,22 +66,28 @@ fun MapScreen(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            onMapClick = { selectedEvent = null }
+            onMapClick = { clickedLocation ->
+                selectedLocation = clickedLocation
+                selectedEvent = null
+            }
         ) {
-            eventLocations.forEach { event ->
+            filteredEvents.forEach { event ->
                 val position = LatLng(event.latitud, event.longitud)
                 val markerState = markerStates.getOrPut(event.id) {
                     // Recuerda usar rememberMarkerState para cada marcador
                     rememberMarkerState(position = position)
                 }
                 Marker(
-                    state = markerState,
+                    state = rememberMarkerState(position = position),
+                    title = event.nombre,
+                    snippet = event.descripcion,
                     onClick = {
                         // Alterna la selección del evento.
                         selectedEvent = if (selectedEvent == event) null else event
                         true
                     }
                 )
+
             }
         }
 
@@ -77,7 +99,7 @@ fun MapScreen(
         ) {
             FloatingActionButton(
                 onClick = { navController.navigate("language_screen") },
-                containerColor = Color.Gray
+                containerColor = TurkBlue
             ) {
                 Icon(imageVector = Icons.Default.Star, contentDescription = "Cambiar Idioma")
             }
@@ -87,9 +109,13 @@ fun MapScreen(
             FloatingActionButton(
                 onClick = {
                     if (selectedEvent == null) {
-                        onLocationSelected(cameraPositionState.position.target)
+                        val location = selectedLocation ?: cameraPositionState.position.target
+                        onLocationSelected(location)
+                        navController.navigate("create_event")
                     } else {
                         onMarkerClicked(selectedEvent!!)
+                        navController.navigate("create_event")
+
                     }
                 },
                 modifier = Modifier

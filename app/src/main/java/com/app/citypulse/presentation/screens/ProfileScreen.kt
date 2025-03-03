@@ -77,15 +77,16 @@ fun ProfileScreen(
     var selectedImageUri2 by remember { mutableStateOf<Uri?>(null) }
     var selectedImageUri3 by remember { mutableStateOf<Uri?>(null) }
 
-    val isUploading = remember{ mutableStateOf(false) }
+    val isUploading = remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val img : Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.drawable.ic_menu_report_image)
+    val img: Bitmap =
+        BitmapFactory.decodeResource(Resources.getSystem(), android.R.drawable.ic_menu_report_image)
     val bitmap = remember { mutableStateOf(img) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
     ) {
-        if(it != null){
+        if (it != null) {
             bitmap.value = it
         }
     }
@@ -94,22 +95,17 @@ fun ProfileScreen(
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) {
-        if(Build.VERSION.SDK_INT < 26){
+        if (Build.VERSION.SDK_INT < 26) {
             bitmap.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
-        } else{
-            val source = it?.let{
-                it1 -> ImageDecoder.createSource(context.contentResolver, it1)
+        } else {
+            val source = it?.let { it1 ->
+                ImageDecoder.createSource(context.contentResolver, it1)
             }
-            bitmap.value = source?.let{
-                it1 -> ImageDecoder.decodeBitmap(it1)
+            bitmap.value = source?.let { it1 ->
+                ImageDecoder.decodeBitmap(it1)
             }!!
         }
     }
-
-
-
-
-
 
 
     val launcher1 = rememberLauncherForActivityResult(
@@ -123,7 +119,6 @@ fun ProfileScreen(
     val launcher3 = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri -> selectedImageUri3 = uri }
-
 
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -140,161 +135,191 @@ fun ProfileScreen(
     if (isLoading) {
         CircularProgressIndicator(modifier = Modifier.fillMaxSize())
     } else {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .padding(horizontal = 16.dp)
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Encabezado integrado (antes era ProfileHeader separado)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ProfileHeader(
-                    user = user!!,
-                    selectedImageUri = selectedImageUri,
-                    onClick = { galleryLauncher.launch("image/*") }
-                )
-            }
-            // Reseña con 5 estrellas
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(5) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Estrella",
-                        tint = Color(0xFFFFD700),
-                        modifier = Modifier.size(26.dp)
-                    )
-                }
-            }
-            // Componente para mostrar puntaje personal (ya existente)
-            PersonalScoreBar()
-            // Botones y cajas de acción
+        if (user != null) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(Color.White)
+                    .padding(horizontal = 16.dp)
+                    .padding(innerPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Button(
-                    onClick = {
-                                navController.navigate("friends")
-                    },
+                // Encabezado integrado (antes era ProfileHeader separado)
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Mis Amigos")
+                    ProfileHeader(
+                        user = user!!,
+                        selectedImageUri = selectedImageUri,
+                        onClick = { galleryLauncher.launch("image/*") }
+                    )
                 }
-
+                // Reseña con 5 estrellas
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ActionBox(
-                        icon = Icons.Default.Check,
-                        title = "Eventos asistidos",
-                        modifier = Modifier,
-                        onClick = { navController.navigate("assisted_events") }
-                    )
-                    ActionBox(
-                        icon = Icons.Default.Favorite,
-                        title = "Eventos guardados",
-                        modifier = Modifier,
-                        onClick = { navController.navigate("assisted_events") }
-                    )
+                    repeat(5) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Estrella",
+                            tint = Color(0xFFFFD700),
+                            modifier = Modifier.size(26.dp)
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier.fillMaxWidth()
+                // Componente para mostrar puntaje personal (ya existente)
+                PersonalScoreBar()
+                // Botones y cajas de acción
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    PhotoContainer (
-                        bitmap = bitmap.value,
-                        selectedImageUri = selectedImageUri1,
-                        onClick = { launcher1.launch("image/*") },
-                        onDelete = { selectedImageUri1 = null }
+                    Button(
+                        onClick = {
+                            navController.navigate("friends")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Text("Mis Amigos")
+                    }
 
-                    )
-                    PhotoContainer (
-                        bitmap = bitmap.value,
-                        selectedImageUri = selectedImageUri2,
-                        onClick = { launcher2.launch("image/*") },
-                        onDelete = { selectedImageUri2 = null }
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        ActionBox(
+                            icon = Icons.Default.Check,
+                            title = "Eventos asistidos",
+                            modifier = Modifier,
+                            onClick = { navController.navigate("assisted_events") }
+                        )
+                        ActionBox(
+                            icon = Icons.Default.Favorite,
+                            title = "Eventos guardados",
+                            modifier = Modifier,
+                            onClick = { navController.navigate("assisted_events") }
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        PhotoContainer(
+                            bitmap = bitmap.value,
+                            selectedImageUri = selectedImageUri1,
+                            onClick = { launcher1.launch("image/*") },
+                            onDelete = { selectedImageUri1 = null }
 
-                    )
-                    PhotoContainer (
-                        bitmap = bitmap.value,
-                        selectedImageUri = selectedImageUri3,
-                        onClick = { launcher3.launch("image/*") },
-                        onDelete = { selectedImageUri3 = null }
-                    )
-                }
+                        )
+                        PhotoContainer(
+                            bitmap = bitmap.value,
+                            selectedImageUri = selectedImageUri2,
+                            onClick = { launcher2.launch("image/*") },
+                            onDelete = { selectedImageUri2 = null }
+
+                        )
+                        PhotoContainer(
+                            bitmap = bitmap.value,
+                            selectedImageUri = selectedImageUri3,
+                            onClick = { launcher3.launch("image/*") },
+                            onDelete = { selectedImageUri3 = null }
+                        )
+                    }
                 }
                 ButtonBar("Subir fotos", backgroundColor = Color.Blue,
                     onClick = {
                         isUploading.value = true
-                        user?.let { currentUser  ->
-                            uploadImageToFirebase(currentUser, bitmap.value, context) { success, url ->
+                        user?.let { currentUser ->
+                            uploadImageToFirebase(
+                                currentUser,
+                                bitmap.value,
+                                context
+                            ) { success, url ->
                                 isUploading.value = false
                                 if (success && url != null) {
                                     // Aquí, por ejemplo, se añade la URL a una lista temporal en el ViewModel:
                                     viewModel.addTempPhotoUrl(url)
-                                    Toast.makeText(context, "Subida exitosa", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, "Subida exitosa", Toast.LENGTH_LONG)
+                                        .show()
                                 } else {
-                                    Toast.makeText(context, "Fallo al cargar fotos", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Fallo al cargar fotos",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
                             }
                         }
                     }
                 )
 
-                ButtonBar("Cerrar Sesión", backgroundColor = Color.Red, onClick = { viewModel.logout() })
-
-
+                ButtonBar(
+                    "Cerrar Sesión",
+                    backgroundColor = Color.Red,
+                    onClick = { viewModel.logout() }
+                )
+            }
+        } else {
+            // En caso de que no se hayan podido cargar los datos del usuario,
+            // mostramos un mensaje de error o una UI alternativa.
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No se pudieron cargar los datos del usuario",
+                    color = Color.Red,
+                    fontSize = 18.sp
+                )
             }
         }
     }
+}
 
 
-fun uploadImageToFirebase(
-    user: UserItem,
-    bitmap: Bitmap,
-    context: Context,
-    callback: (Boolean, String?) -> Unit
-) {
-    val storageRef = Firebase.storage.reference
-    val imageName = "images/${user.uid ?: "anonymous"}_${System.currentTimeMillis()}.jpg"
-    val imageRef = storageRef.child(imageName)
 
-    val baos = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-    val imageData = baos.toByteArray()
+    fun uploadImageToFirebase(
+        user: UserItem,
+        bitmap: Bitmap,
+        context: Context,
+        callback: (Boolean, String?) -> Unit
+    ) {
+        val storageRef = Firebase.storage.reference
+        val imageName = "images/${user.uid ?: "anonymous"}_${System.currentTimeMillis()}.jpg"
+        val imageRef = storageRef.child(imageName)
 
-    imageRef.putBytes(imageData)
-        .addOnSuccessListener {
-            // Una vez la imagen se sube, obtenemos su URL de descarga
-            imageRef.downloadUrl.addOnSuccessListener { uri ->
-                // Aquí retornamos true junto con la URL
-                callback(true, uri.toString())
-            }.addOnFailureListener {
-                // Error al obtener la URL
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val imageData = baos.toByteArray()
+
+        imageRef.putBytes(imageData)
+            .addOnSuccessListener {
+                // Una vez la imagen se sube, obtenemos su URL de descarga
+                imageRef.downloadUrl.addOnSuccessListener { uri ->
+                    // Aquí retornamos true junto con la URL
+                    callback(true, uri.toString())
+                }.addOnFailureListener {
+                    // Error al obtener la URL
+                    callback(false, null)
+                }
+            }
+            .addOnFailureListener {
+                // Error al subir la imagen
                 callback(false, null)
             }
-        }
-        .addOnFailureListener {
-            // Error al subir la imagen
-            callback(false, null)
-        }
-}
-fun deleteImageFromFirebase(imageUrl: String, callback: (Boolean) -> Unit) {
-    val storageRef = Firebase.storage.getReferenceFromUrl(imageUrl)
-    storageRef.delete()
-        .addOnSuccessListener { callback(true) }
-        .addOnFailureListener { callback(false) }
-}
+    }
+
+    fun deleteImageFromFirebase(imageUrl: String, callback: (Boolean) -> Unit) {
+        val storageRef = Firebase.storage.getReferenceFromUrl(imageUrl)
+        storageRef.delete()
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
