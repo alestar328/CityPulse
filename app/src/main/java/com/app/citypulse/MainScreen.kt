@@ -57,24 +57,7 @@ fun MainScreen() {
             // 1) Contenido principal (NavGraph) donde se muestra el mapa
             NavGraph(navController = navController, innerPadding = innerPadding)
 
-            // 2) Si estamos en la pantalla de mapa, superponemos la SearchTopbar
-            if (currentRoute == "map_screen") {
-                Box(
-                    modifier = Modifier
-                        // Ajusta el padding lateral y superior para separarlo de los bordes
-                        .padding(horizontal = 16.dp)
-                        .align(Alignment.TopCenter)  // Lo fijamos arriba centrado
-                ) {
-                    SearchTopbar(
-                        modifier = Modifier
-                            .background(Color.Transparent), // Asegura transparencia
-                        selectedCategory = selectedCategory,
-                        onCategorySelected = { newCategory ->
-                            selectedCategory = newCategory
-                        }
-                    )
-                }
-            }
+
         }
     }
 }

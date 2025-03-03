@@ -159,7 +159,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController,  
                         if (nombre.isNotEmpty() && fechaInicio.isNotEmpty() && fechaFin.isNotEmpty() &&
                             precio.isNotEmpty() && aforo.isNotEmpty()
                         ) {
-                            if (descripcion.length !in 50..100) {
+                            if (descripcion.length !in 20..50) {
                                 Toast.makeText(context, errorDescripcion, Toast.LENGTH_SHORT).show()
                                 return@Button
                             }

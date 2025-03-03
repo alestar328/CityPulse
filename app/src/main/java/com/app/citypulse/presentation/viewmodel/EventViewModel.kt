@@ -34,7 +34,7 @@ class EventViewModel : ViewModel() {
         return EventUiModel(
             id = event.id,
             nombre = event.nombre,
-            categoria = event.categoria.name,
+            categoria = event.categoria, // Se asigna el valor de event
             subcategoria = event.subcategoria,
             descripcion = event.descripcion,
             lugar = event.lugar,

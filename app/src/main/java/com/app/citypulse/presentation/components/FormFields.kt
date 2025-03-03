@@ -50,7 +50,7 @@ fun DescriptionTextField(
     OutlinedTextField(
         value = value,
         onValueChange = {
-            if (it.length <= 100) onValueChange(it)
+            if (it.length <= 50) onValueChange(it)
         },
         label = { Text(label, color = Color.White) }, // Usamos el parámetro label aquí
         modifier = Modifier
@@ -69,8 +69,8 @@ fun DescriptionTextField(
         shape = RoundedCornerShape(12.dp),
         trailingIcon = {
             Text(
-                text = "${value.length}/100",
-                color = if (value.length in 50..100) Color.Green else Color.Red,
+                text = "${value.length}/50",
+                color = if (value.length in 20..50) Color.Green else Color.Red,
                 fontSize = 12.sp
             )
         }

@@ -1,9 +1,11 @@
 package com.app.citypulse.data.model
 
+import com.app.citypulse.data.enums.TipoCategoria
+
 data class EventUiModel(
     val id: String,
     val nombre: String,
-    val categoria: String,
+    val categoria: TipoCategoria, // Usamos el tipo del enum
     val subcategoria: String,
     val descripcion: String,
     val lugar: String,

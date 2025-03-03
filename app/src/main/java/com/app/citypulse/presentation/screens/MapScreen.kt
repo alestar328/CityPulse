@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.presentation.components.SearchTopbar
 import com.app.citypulse.presentation.ui.theme.TurkBlue
 
 @Composable
@@ -41,115 +42,131 @@ fun MapScreen(
     val markerStates = remember { mutableStateMapOf<String, MarkerState>() }
     var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) } //coge ubicacion al presionar dedo
+    var currentCategory by remember { mutableStateOf(selectedCategory) }
 
     val userType by authViewModel.userType.collectAsState()
     // 1) Aplica el filtro
-    val filteredEvents by remember(eventLocations, selectedCategory) {
+    val filteredEvents by remember(eventLocations, currentCategory) {
         derivedStateOf {
-            val result = if (selectedCategory != TipoCategoria.NONE) {
+            if (currentCategory != TipoCategoria.NONE) {
                 eventLocations.filter { event ->
-                    event.categoria.equals(selectedCategory.name, ignoreCase = true)
+                    event.categoria == currentCategory
                 }
             } else {
                 eventLocations
             }
-            println("Filtrado: ${result.size} eventos. Filtro: ${selectedCategory.name}")
-            result
         }
     }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
     ) {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            onMapClick = { clickedLocation ->
-                selectedLocation = clickedLocation
-                selectedEvent = null
-            }
-        ) {
-            filteredEvents.forEach { event ->
-                val position = LatLng(event.latitud, event.longitud)
-                val markerState = markerStates.getOrPut(event.id) {
-                    // Recuerda usar rememberMarkerState para cada marcador
-                    rememberMarkerState(position = position)
-                }
-                Marker(
-                    state = rememberMarkerState(position = position),
-                    title = event.nombre,
-                    snippet = event.descripcion,
-                    onClick = {
-                        // Alterna la selección del evento.
-                        selectedEvent = if (selectedEvent == event) null else event
-                        true
-                    }
-                )
-
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 16.dp, end = 16.dp),
-            contentAlignment = Alignment.TopEnd
-        ) {
-            FloatingActionButton(
-                onClick = { navController.navigate("language_screen") },
-                containerColor = TurkBlue
-            ) {
-                Icon(imageVector = Icons.Default.Star, contentDescription = "Cambiar Idioma")
-            }
-        }
-
-        if (userType == "Organizador" || userType == "Asociacion") {
-            FloatingActionButton(
-                onClick = {
-                    if (selectedEvent == null) {
-                        val location = selectedLocation ?: cameraPositionState.position.target
-                        onLocationSelected(location)
-                        navController.navigate("create_event")
-                    } else {
-                        onMarkerClicked(selectedEvent!!)
-                        navController.navigate("create_event")
-
-                    }
-                },
+        Column {
+            SearchTopbar(
                 modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp, bottom = 80.dp),
-                containerColor = if (selectedEvent == null) Color.LightGray else Color.Blue
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Crear Evento")
-            }
-        }
-
-        // --- Tarjeta con la información del evento seleccionado ---
-        selectedEvent?.let { event ->
+                    .background(Color.Transparent)
+                    .padding(horizontal = 16.dp),
+                selectedCategory = currentCategory,
+                onCategorySelected = { newCategory -> currentCategory = newCategory }
+            )
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .align(Alignment.BottomCenter)
-                    .background(Color.White.copy(alpha = 0.9f))
-                    .padding(8.dp)
+                    .fillMaxSize()
+
             ) {
-                // Aquí reutilizas tu EventOrganizerMapCard
-                EventOrganizerMapCard(
-                    nombre = event.nombre,
-                    categoria = event.categoria,
-                    subcategoria = event.subcategoria,
-                    lugar = event.lugar,
-                    fechaInicio = event.fechaInicio,
-                    fechaFin = event.fechaFin,
-                    precio = event.precio,
-                    aforo = event.aforo,
-                    eventId = event.id,
-                    navController = navController
-                )
+                GoogleMap(
+                    modifier = Modifier.fillMaxSize(),
+                    cameraPositionState = cameraPositionState,
+                    onMapClick = { clickedLocation ->
+                        selectedLocation = clickedLocation
+                        selectedEvent = null
+                    }
+                ) {
+                    filteredEvents.forEach { event ->
+                        val position = LatLng(event.latitud, event.longitud)
+                        val markerState = markerStates.getOrPut(event.id) {
+                            rememberMarkerState(position = position)
+                        }
+                        Marker(
+                            state = markerState,
+                            title = event.nombre,
+                            snippet = event.descripcion,
+                            onClick = {
+                                // Alterna la selección del evento.
+                                selectedEvent = if (selectedEvent == event) null else event
+                                true
+                            }
+                        )
+
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 16.dp, end = 16.dp),
+                    contentAlignment = Alignment.TopEnd
+                ) {
+                    FloatingActionButton(
+                        onClick = { navController.navigate("language_screen") },
+                        containerColor = TurkBlue
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Cambiar Idioma"
+                        )
+                    }
+                }
+
+                if (userType == "Organizador" || userType == "Asociacion") {
+                    FloatingActionButton(
+                        onClick = {
+                            if (selectedEvent == null) {
+                                val location =
+                                    selectedLocation ?: cameraPositionState.position.target
+                                onLocationSelected(location)
+                                navController.navigate("create_event")
+                            } else {
+                                onMarkerClicked(selectedEvent!!)
+                                navController.navigate("create_event")
+
+                            }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(16.dp, bottom = 80.dp),
+                        containerColor = if (selectedEvent == null) Color.LightGray else Color.Blue
+                    ) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "Crear Evento")
+                    }
+                }
+
+                // --- Tarjeta con la información del evento seleccionado ---
+                selectedEvent?.let { event ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .align(Alignment.BottomCenter)
+                            .background(Color.White.copy(alpha = 0.9f))
+                            .padding(8.dp)
+                    ) {
+                        // Aquí reutilizas tu EventOrganizerMapCard
+                        EventOrganizerMapCard(
+                            nombre = event.nombre,
+                            categoria = event.categoria.name, // Convertimos el enum a String
+                            subcategoria = event.subcategoria,
+                            lugar = event.lugar,
+                            fechaInicio = event.fechaInicio,
+                            fechaFin = event.fechaFin,
+                            precio = event.precio,
+                            aforo = event.aforo,
+                            eventId = event.id,
+                            navController = navController
+                        )
+                    }
+                }
             }
         }
     }
