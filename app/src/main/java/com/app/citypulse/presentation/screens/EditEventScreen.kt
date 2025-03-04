@@ -114,9 +114,6 @@ fun EditEventScreen(eventId: String, viewModel: EventViewModel, navController: N
             }
 
             CustomTextField(value = lugar, label = "Ubicación", onValueChange = {}, enabled = false)
-            Button(onClick = { navController.navigate("location_picker_screen") }) {
-                Text("Escoger ubicación")
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
