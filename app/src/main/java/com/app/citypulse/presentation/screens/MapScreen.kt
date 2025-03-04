@@ -64,6 +64,7 @@ fun MapScreen(
         Column {
             SearchTopbar(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .background(Color.Transparent)
                     .padding(horizontal = 16.dp),
                 selectedCategory = currentCategory,

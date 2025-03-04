@@ -7,9 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.enums.AccountType
 import com.app.citypulse.data.repository.AuthRepository
-import com.app.citypulse.data.repository.UserRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.Firebase
@@ -98,13 +96,10 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun addTempPhotoUrl(url: String) {
-        tempPhotoUrls.add(url)
-    }
     fun updateProfilePictureUrl(newUrl: String, onResult: (Boolean) -> Unit) {
         val currentUser = auth.currentUser
-        if (currentUser != null && currentUser.email != null) {
-            val userRef = firestore.collection("users").document(currentUser.email!!)
+        if (currentUser != null) {
+            val userRef = firestore.collection("users").document(currentUser.uid)
             userRef.update("profilePictureUrl", newUrl)
                 .addOnSuccessListener { onResult(true) }
                 .addOnFailureListener { onResult(false) }
@@ -114,9 +109,9 @@ class AuthViewModel : ViewModel() {
     }
     fun addGalleryPictureUrl(newUrl: String, onResult: (Boolean) -> Unit) {
         val currentUser = auth.currentUser
-        if (currentUser != null && currentUser.email != null) {
-            val userRef = firestore.collection("users").document(currentUser.email!!)
-            // Leer la lista actual, añadir la nueva URL y actualizar
+        if (currentUser != null) {
+            val userRef = firestore.collection("users").document(currentUser.uid)
+
             userRef.get().addOnSuccessListener { snapshot ->
                 val userItem = snapshot.toObject(UserItem::class.java)
                 if (userItem != null) {
@@ -136,11 +131,7 @@ class AuthViewModel : ViewModel() {
             onResult(false)
         }
     }
-    fun logout() {
-        authRepository.logout()
-        _isAuthenticated.value =
-            false  // Actualizamos el estado cuando el usuario cierra sesión
-    }
+
 
     // Variables temporales para almacenar datos antes del registro final
     private var tempEmail: String? = null
@@ -317,17 +308,7 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    class AuthViewModel : ViewModel() {
-        private val userRepository = UserRepository()
 
-        fun saveLanguage(language: String) {
-            userRepository.saveLanguagePreference(language)
-        }
-
-        fun getLanguage(callback: (String) -> Unit) {
-            userRepository.getLanguagePreference(callback)
-        }
-    }
 
     fun logout(onLogoutComplete: () -> Unit) {
         // Lógica para cerrar la sesión (por ejemplo, usando Firebase Auth)

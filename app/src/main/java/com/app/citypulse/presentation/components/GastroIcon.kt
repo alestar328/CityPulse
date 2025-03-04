@@ -23,8 +23,9 @@ fun GastroIcon(
     modifier: Modifier = Modifier,
     isSelected: Boolean,
     onClick: () -> Unit
-) {
-    val backgroundColor = if (isSelected) YellowLight else TurkBlue
+) {    val backgroundColor = if (isSelected) YellowLight else TurkBlue
+    val iconTint = if (isSelected) Color.Black else Color.White
+
     Box(
         modifier = modifier
             .background(color = backgroundColor, shape = RoundedCornerShape(24.dp))
@@ -36,11 +37,12 @@ fun GastroIcon(
         Icon(
             painter = painterResource(id = R.drawable.gastroicon),
             contentDescription = "Fiesta",
-            tint = Color.Black,
+            tint = iconTint,
             modifier = Modifier.size(25.dp)
         )
 
     }
+
 
 }
 

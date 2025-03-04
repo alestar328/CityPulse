@@ -25,6 +25,7 @@ fun PartyIcon(
     onClick: () -> Unit
 ){
     val backgroundColor = if (isSelected) YellowLight /* YellowLight */ else TurkBlue
+    val iconTint = if (isSelected) Color.Black else Color.White
 
     Box(
         modifier = modifier
@@ -37,7 +38,7 @@ fun PartyIcon(
         Icon(
             painter  = painterResource(id = R.drawable.party_icon),
             contentDescription = "Fiesta",
-            tint = Color.Black,
+            tint = iconTint,
             modifier = Modifier.size(25.dp)
         )
 
