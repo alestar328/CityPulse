@@ -1,11 +1,12 @@
 package com.app.citypulse.data.model
 
+import com.app.citypulse.data.enums.TipoCategoria
 import java.util.Date
 
-data class EventEntity (
-    val id: Int = 0,
+data class EventEntity(
+    val id: String = "",
     val nombre: String = "",
-    val categoria: String = "",
+    val categoria: TipoCategoria = TipoCategoria.CULTURAL,
     val subcategoria: String = "",
     val descripcion: String = "",
     val lugar: String = "",
@@ -16,5 +17,7 @@ data class EventEntity (
     val aforo: Int = 0,
     val precio: Double = 0.0,
     val valoracion: Int = 0,
-    val idRealizador: Int = 0
+    val idRealizador: String = "",
+    var galleryPictureUrls: MutableList<String> = mutableListOf()
+
 )

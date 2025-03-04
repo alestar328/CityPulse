@@ -55,7 +55,7 @@ fun EventCard(
                         color = Color.Black,
                         textAlign = TextAlign.Center,
 
-                    )
+                        )
                     Text(
                         text = "FEB",
                         fontSize = 20.sp,
@@ -63,7 +63,7 @@ fun EventCard(
                         color = Color.Black,
                         textAlign = TextAlign.Center,
 
-                    )
+                        )
                 }
             }
             Spacer(modifier = Modifier.width(16.dp)) // Espacio entre el cuadro y el texto

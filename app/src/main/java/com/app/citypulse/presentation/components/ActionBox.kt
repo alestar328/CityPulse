@@ -29,16 +29,16 @@ fun ActionBox(icon: ImageVector,
               onClick: () -> Unit) {
     Box(
         modifier = modifier
-            .width(165.dp)
-            .height(110.dp)
+            .width(160.dp)
+            .height(100.dp)
             .shadow(4.dp, RoundedCornerShape(12.dp))
             .background(Color.White, RoundedCornerShape(12.dp))
-            .padding(16.dp)
+            .padding(10.dp)
     ) {
         Column {
             Icon(imageVector = icon, contentDescription = "Action Icon", tint = Color(0xFF6200EE))
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E1E1E))
+            Spacer(modifier = Modifier.height(5.dp))
+            Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E1E1E))
         }
     }
 }
@@ -48,3 +48,4 @@ fun ActionBox(icon: ImageVector,
 fun ActionBoxPreview() {
     ActionBox(icon = Icons.Default.Star, title = "Astro-psychological report", onClick = {})
 }
+

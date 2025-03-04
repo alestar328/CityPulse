@@ -2,6 +2,7 @@ package com.app.citypulse.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,13 +19,15 @@ import com.app.citypulse.presentation.components.EventCard
 @Composable
 fun AssistedEventScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    innerPadding: PaddingValues
 ){
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Gray)
             .padding( 16.dp)
+            .padding(innerPadding)
     ) {
         Column {
             EventCard()
@@ -37,8 +40,3 @@ fun AssistedEventScreen(
 
 }
 
-@Preview
-@Composable
-fun AssistedEventScreenPreview(){
-    AssistedEventScreen(navController = NavController(LocalContext.current))
-}
