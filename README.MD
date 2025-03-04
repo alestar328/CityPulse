@@ -17,19 +17,32 @@ Los usuarios también dispondrán de varios filtros para poder encontrar el even
 
 ### **1. Autenticación y Gestión de Usuarios**
 - **RF01**: "Login": Se podrá logear cualquier usuario.
+
 ![Login Screen](https://drive.google.com/uc?export=view&id=1aEK6xUqxdZHFbHrP2sIqLTzpOb71xlR-)
 
 - **RF02**: "Registro": Mediante redes sociales o correo electrónico.
+![Register Screen 1](https://drive.google.com/uc?export=view&id=1wfIin2QSDH0EONqwx4FOyZHKwq9dZrUe)
+
+![Register Screen 2](https://drive.google.com/uc?export=view&id=1Co4h9_cLI85iLUt4TAZYXTOs2NFj12ET)
+
+![Register Screen 3](https://drive.google.com/uc?export=view&id=1wL7yB5HFa9r8vqouOMk4TsqzVvoe7hOE)
 - **RF03**: "Recuperar contraseña": Redirección a cuenta de email.
+![RecuperarContraseña](https://drive.google.com/uc?export=view&id=14BRuSe1Iayq9inL19NLKau_f9r5DI4h-)
 - **RF26**: "Login y Register con Google Sign In".
+![Image Description](https://drive.google.com/uc?export=view&id=1BtPon-qQ3YgNV5NyVT3OF1V5bqZrU1vu)
 - **RF30**: "Editar perfil de usuario": El usuario podrá modificar sus datos.
+![Profile Screen](https://drive.google.com/uc?export=view&id=1BtPon-qQ3YgNV5NyVT3OF1V5bqZrU1vu)
 - **RF32 propio**: El usuario podrá acceder y gestionar una "Friends List".
+![Friends List Screen](https://drive.google.com/uc?export=view&id=1j8jeEgebzq90YJ5AzAPKen72up9nel0I)
 ---
 
 ### **2. Eventos (Ítems)**
 - **RF10**: "Crear nuevo ítem": El usuario podrá crear un nuevo evento.
+![Create Event Screen](https://drive.google.com/uc?export=view&id=1F0p163t8v_7na9jv2HfF4K8TxaroRk2K)
 - **RF11**: "Listar ítems": Se podrá listar los eventos en función de la zona.
+![List Events Screen](https://drive.google.com/uc?export=view&id=1kSNKK50ow1WZW6SnQQu-Jqo3TrTdbAgb)
 - **RF12**: "Filtrar ítems por categoría": Tenemos 3 categorías: Fiesta, cultura y juegos.
+![Filter by Category Screen](https://drive.google.com/uc?export=view&id=1EgyE7VNvQUYK2g3btwbhiNurSpVO4Inu)
 - **RF13**: "Filtrar ítems por nombre": Filtrado por coincidencia de palabras.
 - **RF14**: "Filtrar ítems por distancia": Filtramos por ubicación del usuario.
 - **RF15**: "Filtrar por el número de estrellas de valoración": El usuario podrá puntuar los eventos.
@@ -37,10 +50,13 @@ Los usuarios también dispondrán de varios filtros para poder encontrar el even
 - **RF17**: "Ordenar ítems por distancia": Ordenar por distancia en km.
 - **RF18**: "Ordenar ítems por fecha de creación reciente": Usuario administrador podrá ordenar su lista de eventos creados.
 - **RF19**: "Ampliar información del ítem": Todos los usuarios podrán ampliar la información del evento seleccionado.
+![Additional Information Screen](https://drive.google.com/uc?export=view&id=1NL7rIjY_pjvRa3kFVIKfbhmbnr8AalAm)
 - **RF20**: "Crear valoración del ítem": Los usuarios podrán valorar los eventos.
 - **RF21**: "Mostrar valoración del ítem": Los usuarios podrán ver la valoración de los eventos.
 - **RF22**: "Modificar ítem": El usuario podrá modificar su evento creado.
+
 - **RF23**: "Eliminar ítem": El usuario podrá eliminar su evento creado.
+
 - **RF24**: "Eliminar valoración": El usuario podrá eliminar la valoración que ha hecho a un evento.
 - **RF33 propio**: El usuario podrá marcar algunos eventos a una lista de favoritos.
 
