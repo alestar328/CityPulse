@@ -12,7 +12,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +32,10 @@ class AuthViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
+    private val _currentUser = MutableStateFlow<UserItem?>(null)
+    // Propiedad pública para exponer el usuario actual
+    val currentUser: StateFlow<UserItem?> get() = _currentUser
+
     private val _userType = MutableStateFlow<String?>(null)
     val userType: StateFlow<String?> = _userType
 
@@ -37,12 +43,18 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val currentUser = auth.currentUser
-                if (currentUser != null && currentUser.email != null) {
-                    // Se asume que en Firestore se guarda el usuario con el ID igual a su email.
-                    val docSnapshot = firestore.collection("users")
-                        .document(currentUser.email!!)
-                        .get()
-                        .await()
+                if (currentUser != null) {
+                    val docSnapshot = if (currentUser.providerData.any { it.providerId == "google.com" }) {
+                        firestore.collection("users")
+                            .document(currentUser.email!!)
+                            .get()
+                            .await()
+                    } else {
+                        firestore.collection("users")
+                            .document(currentUser.uid)
+                            .get()
+                            .await()
+                    }
                     val userData = docSnapshot.toObject(UserItem::class.java)
                     onResult(userData)
                 } else {
@@ -90,11 +102,6 @@ class AuthViewModel : ViewModel() {
         tempPhotoUrls.add(url)
     }
 
-    fun logout() {
-        authRepository.logout()
-        _isAuthenticated.value =
-            false  // Actualizamos el estado cuando el usuario cierra sesión
-    }
 
     // Variables temporales para almacenar datos antes del registro final
     private var tempEmail: String? = null
@@ -281,6 +288,23 @@ class AuthViewModel : ViewModel() {
         fun getLanguage(callback: (String) -> Unit) {
             userRepository.getLanguagePreference(callback)
         }
+    }
+
+    fun logout(onLogoutComplete: () -> Unit) {
+        // Lógica para cerrar la sesión (por ejemplo, usando Firebase Auth)
+        Firebase.auth.signOut()
+
+        // Limpiar cualquier dato de usuario en el ViewModel
+        clearUserData()
+
+        // Llamar al callback para notificar que el logout ha sido completado
+        onLogoutComplete()
+    }
+
+    private fun clearUserData() {
+        // Limpiar cualquier dato de usuario en el ViewModel
+        // Por ejemplo, establecer el usuario actual a null
+        _currentUser.value = null
     }
 }
 

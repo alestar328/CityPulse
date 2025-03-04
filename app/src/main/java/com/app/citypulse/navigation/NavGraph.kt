@@ -57,27 +57,14 @@ fun NavGraph(
       /*  composable("main_screen") {
             MainScreen()
         }*/
-
         composable("friends") {
-            // Usamos un estado para almacenar el usuario actual
-            var currentUser by remember { mutableStateOf<UserItem?>(null) }
-
-            // Ejecutamos la corutina al momento de la composición
-            LaunchedEffect(Unit) {
-                // Dentro de LaunchedEffect podemos llamar a funciones suspensivas
-                currentUser = authViewModel.getCurrentUser() // Llamada suspensiva dentro de la corutina
-            }
-
-            // Llamamos a la pantalla de amigos solo cuando currentUser no sea null
-            if (currentUser != null) {
-                FriendsScreen(
-                    navController = navController,
-                    viewModel = friendsViewModel,
-                    currentUser = currentUser!!,
-                    innerPadding = innerPadding
-                )
-            }
+            // Llamamos directamente a la pantalla de amigos sin verificar el usuario
+            FriendsScreen(
+                navController = navController,
+                viewModel = friendsViewModel,
+            )
         }
+
 
         // Ruta para la pantalla de añadir amigo
         composable("addfriend") {

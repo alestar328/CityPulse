@@ -259,11 +259,24 @@ fun ProfileScreen(
                     }
                 )
 
-                ButtonBar(
-                    "Cerrar Sesión",
-                    backgroundColor = Color.Red,
-                    onClick = { viewModel.logout() }
-                )
+                Button(
+                    onClick = {
+                        viewModel.logout {
+                            // Redirigir al usuario a la pantalla de inicio de sesión o a la pantalla principal
+                            navController.navigate("login") {
+                                // Limpiar la pila de navegación para que el usuario no pueda volver atrás
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text("Cerrar Sesión")
+                }
             }
         } else {
             // En caso de que no se hayan podido cargar los datos del usuario,
