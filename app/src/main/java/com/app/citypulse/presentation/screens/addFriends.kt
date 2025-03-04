@@ -1,6 +1,8 @@
 package com.app.citypulse.presentation.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,9 +28,6 @@ fun AddFriendScreen(
     var successMessage by remember { mutableStateOf<String?>(null) } // Mensaje de éxito
     val friendsList by friendsViewModel.friends.collectAsState(initial = emptyList())
 
-
-    var selectedIndex by remember { mutableStateOf(0) }
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -36,8 +35,8 @@ fun AddFriendScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("addfriend") },
-                containerColor = Color(0xFF4CAF50),
+                onClick = { navController.navigate("friends") }, // Navegar a la pantalla "friends"
+                containerColor = Color(0xFF2196F3), // Color azul
                 contentColor = Color.White,
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
@@ -45,8 +44,12 @@ fun AddFriendScreen(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack, // Ícono de flecha hacia atrás
+                        contentDescription = "Volver a amigos"
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Añadir amigo")
+                    Text("Volver a amigos")
                 }
             }
         }

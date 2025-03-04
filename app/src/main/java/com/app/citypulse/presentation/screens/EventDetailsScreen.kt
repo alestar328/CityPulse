@@ -13,12 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.app.citypulse.R
 import com.google.firebase.auth.FirebaseAuth
+
 import java.text.SimpleDateFormat
 import java.util.Locale
 

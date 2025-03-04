@@ -35,7 +35,7 @@ fun LoginScreen(
     viewModel: AuthViewModel,
     innerPadding: PaddingValues
 ) {
-    val backgroundImage = if (isSystemInDarkTheme()) R.drawable.hotelvelabarna else R.drawable.dubai
+    val backgroundImage = if (isSystemInDarkTheme()) R.drawable.dubai else R.drawable.hotelvelabarna
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -278,6 +278,25 @@ fun LoginScreen(
                         textAlign = TextAlign.Center
                     )
                 }
+                // Espacio para empujar el botón "¿Olvidó su contraseña?" hacia abajo
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Botón para ir a la pantalla de "Olvidó su contraseña"
+                Button(
+                    onClick = { navController.navigate("ForgotPass") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+                ) {
+                    Text(
+                        "¿Olvidó su contraseña?",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
             }
         }
     }

@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.presentation.viewmodel.FriendsViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -23,8 +22,6 @@ import com.google.firebase.auth.FirebaseAuth
 fun FriendsScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    currentUser: UserItem,
-    innerPadding: PaddingValues,
     viewModel: FriendsViewModel
 ) {
     val friends by viewModel.friends.collectAsState()
@@ -120,30 +117,39 @@ fun FriendsScreen(
     }
 
     Scaffold(
-        modifier = modifier.fillMaxSize()
-            .padding(innerPadding),
-        bottomBar = {
-
-            },
-
+        modifier = modifier.fillMaxSize(),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {navController.navigate("addfriend")},
-                containerColor = Color(0xFF4CAF50),
-                contentColor = Color.White,
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
+            Row(
+                modifier = Modifier.padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                // Botón para volver al perfil
+                FloatingActionButton(
+                    onClick = { navController.navigate("profile") },
+                    containerColor = Color(0xFF2196F3), // Color azul
+                    contentColor = Color.White
                 ) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Añadir amigo")
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Volver al perfil"
+                    )
+                }
+
+                // Botón para añadir amigo
+                FloatingActionButton(
+                    onClick = { navController.navigate("addfriend") },
+                    containerColor = Color(0xFF4CAF50), // Color verde
+                    contentColor = Color.White
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PersonAdd,
+                        contentDescription = "Añadir amigo"
+                    )
                 }
             }
         }
     ) { innerPadding ->
+        // Resto del contenido de la pantalla
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -153,6 +159,8 @@ fun FriendsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(32.dp))
+
+            // Mostrar el identificador del usuario (email o UID)
             OutlinedTextField(
                 value = userIdentifier,
                 onValueChange = {},
@@ -163,6 +171,7 @@ fun FriendsScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Verificar si hay amigos en la lista
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)

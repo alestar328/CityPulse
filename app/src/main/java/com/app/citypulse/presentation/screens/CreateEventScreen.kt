@@ -53,6 +53,8 @@ fun CreateEventScreen(
     var aforo by rememberSaveable { mutableStateOf("") }
     var eventPhotos by rememberSaveable { mutableStateOf<List<Uri>>(emptyList()) }
     val selectedPhotos = remember { mutableStateListOf<Uri?>(null, null, null) }
+    var subcategoria by rememberSaveable { mutableStateOf("") }
+
 
     val context = LocalContext.current
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
@@ -124,6 +126,7 @@ fun CreateEventScreen(
                 CategoriaDropdown(selectedCategoria = categoriaSeleccionada) {
                     categoriaSeleccionada = it
                 }
+                CustomTextField(value = subcategoria, label = stringResource(id = R.string.subcategoria), onValueChange = { subcategoria = it })
 
                 DescriptionTextField(
                     value = descripcion,
@@ -263,6 +266,7 @@ fun CreateEventScreen(
                                     val event = EventEntity(
                                         nombre = nombre,
                                         categoria = categoriaSeleccionada,
+                                        subcategoria = subcategoria,
                                         descripcion = descripcion,
                                         lugar = lugar,
                                         latitud = latitud,

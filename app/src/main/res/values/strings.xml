@@ -3,6 +3,7 @@
     <string name="crear_evento">Crear evento</string>
     <string name="nombre_evento">Nombre del evento</string>
     <string name="categoria">Categoría</string>
+    <string name="subcategoria">Subcategoria</string>
     <string name="descripcion">Descripción</string>
     <string name="precio">Precio</string>
     <string name="aforo">Aforo</string>
