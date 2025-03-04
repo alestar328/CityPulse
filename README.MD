@@ -17,6 +17,8 @@ Los usuarios también dispondrán de varios filtros para poder encontrar el even
 
 ### **1. Autenticación y Gestión de Usuarios**
 - **RF01**: "Login": Se podrá logear cualquier usuario.
+![Login Screen](https://drive.google.com/uc?export=view&id=1aEK6xUqxdZHFbHrP2sIqLTzpOb71xlR-)
+
 - **RF02**: "Registro": Mediante redes sociales o correo electrónico.
 - **RF03**: "Recuperar contraseña": Redirección a cuenta de email.
 - **RF26**: "Login y Register con Google Sign In".
