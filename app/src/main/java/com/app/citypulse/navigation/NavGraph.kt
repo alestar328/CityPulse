@@ -136,5 +136,10 @@ fun NavGraph(
         composable("settings") {
             SettingsScreen( navController, innerPadding = innerPadding)
         }
+        // Pantalla de ForgotPass
+        composable("ForgotPass") {
+            ContraseñaOlvidada(navController = navController)
+        }
+
     }
 }
