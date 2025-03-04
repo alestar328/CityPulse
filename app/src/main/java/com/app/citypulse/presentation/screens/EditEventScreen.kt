@@ -54,11 +54,13 @@ fun EditEventScreen(eventId: String, viewModel: EventViewModel, navController: N
     var fechaFin by rememberSaveable { mutableStateOf("Sin fecha") }
     var precio by rememberSaveable { mutableStateOf("") }
     var aforo by rememberSaveable { mutableStateOf("") }
+    var subcategoria by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(eventState) {
         eventState?.let {
             nombre = it.nombre
             categoriaSeleccionada = it.categoria
+            subcategoria = it.subcategoria
             descripcion = it.descripcion
             lugar = it.lugar
             latitud = it.latitud
@@ -91,6 +93,7 @@ fun EditEventScreen(eventId: String, viewModel: EventViewModel, navController: N
 
             CustomTextField(value = nombre, label = "Nombre del evento", onValueChange = { nombre = it })
             CategoriaDropdown(selectedCategoria = categoriaSeleccionada) { categoriaSeleccionada = it }
+            CustomTextField(value = subcategoria, label = "Subcategoría", onValueChange = { subcategoria = it })
             DescriptionTextField(value = descripcion, label = "Descripción", onValueChange = { descripcion = it })
             NumericTextField(value = precio, label = "Precio", onValueChange = { precio = it }, isDecimal = true)
             NumericTextField(value = aforo, label = "Aforo", onValueChange = { aforo = it })
@@ -128,14 +131,15 @@ fun EditEventScreen(eventId: String, viewModel: EventViewModel, navController: N
                         return@Button
                     }
 
-                    if (descripcion.length !in 200..240) {
-                        Toast.makeText(context, "La descripción debe tener entre 200 y 240 caracteres", Toast.LENGTH_SHORT).show()
+                    if (descripcion.length !in 20..50) {
+                        Toast.makeText(context, "La descripción debe tener entre 20 y 50 caracteres", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
 
                     val updatedEvent = eventState?.copy(
                         nombre = nombre,
                         categoria = categoriaSeleccionada,
+                        subcategoria = subcategoria,
                         descripcion = descripcion,
                         lugar = lugar,
                         latitud = latitud,

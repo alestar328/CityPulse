@@ -62,7 +62,7 @@ fun EventDetailsScreen(
             contentScale = ContentScale.Crop
         )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Column(
             modifier = Modifier
@@ -78,7 +78,7 @@ fun EventDetailsScreen(
                 EventDetailBox("Hora Final", event!!.fechaFin?.let { dateFormat.format(it) } ?: "Sin fecha", Modifier.weight(1f))
             }
 
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(modifier = Modifier.fillMaxWidth()) {
                 EventDetailBox("Lugar", event!!.lugar, Modifier.weight(1f))
@@ -86,22 +86,22 @@ fun EventDetailsScreen(
                 EventDetailBox("Categoría", event!!.categoria?.toString() ?: "Sin categoría", Modifier.weight(1f))
             }
 
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             EventDetailBox("Descripción", event!!.descripcion, Modifier.fillMaxWidth().weight(1f))
 
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(modifier = Modifier.fillMaxWidth()) {
                 EventDetailBox("Precio", event!!.precio.toString(), Modifier.weight(1f))
                 Spacer(modifier = Modifier.width(8.dp))
                 EventDetailBox("Aforo", event!!.aforo.toString(), Modifier.weight(1f))
                 Spacer(modifier = Modifier.width(8.dp))
-                EventDetailBox("Subcategoría", "Mediterránea", Modifier.weight(1f))
+                EventDetailBox("Subcategoría", event!!.subcategoria.toString(), Modifier.weight(1f))
             }
         }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         if (isCreator) {
             Row(

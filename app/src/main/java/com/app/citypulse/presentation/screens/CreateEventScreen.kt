@@ -43,6 +43,8 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController,  
     var fechaFin by rememberSaveable { mutableStateOf("") }
     var precio by rememberSaveable { mutableStateOf("") }
     var aforo by rememberSaveable { mutableStateOf("") }
+    var subcategoria by rememberSaveable { mutableStateOf("") }
+
 
     val context = LocalContext.current
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
@@ -95,6 +97,8 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController,  
             CategoriaDropdown(selectedCategoria = categoriaSeleccionada) {
                 categoriaSeleccionada = it
             }
+
+            CustomTextField(value = subcategoria, label = stringResource(id = R.string.subcategoria), onValueChange = { subcategoria = it })
 
             DescriptionTextField(value = descripcion, label = stringResource(id = R.string.descripcion),onValueChange = { descripcion = it })
 
@@ -172,6 +176,7 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController,  
                             val event = EventEntity(
                                 nombre = nombre,
                                 categoria = categoriaSeleccionada,
+                                subcategoria = subcategoria,
                                 descripcion = descripcion,
                                 lugar = lugar,
                                 latitud = latitud,
