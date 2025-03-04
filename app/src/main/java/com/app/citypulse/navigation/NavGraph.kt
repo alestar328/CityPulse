@@ -69,9 +69,7 @@ fun NavGraph(
             if (currentUser != null) {
                 FriendsScreen(
                     navController = navController,
-                    viewModel = friendsViewModel,
-                    currentUser = currentUser!!,
-                    innerPadding = innerPadding
+                    viewModel = friendsViewModel
                 )
             }
         }

@@ -288,7 +288,7 @@ fun ProfileScreen(
                     ButtonBar(
                         "Cerrar Sesión",
                         backgroundColor = Color.Red,
-                        onClick = { viewModel.logout() }
+                        onClick = { viewModel.logout { navController.navigate("login") } }
                     )
                 }
             }

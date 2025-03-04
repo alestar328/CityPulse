@@ -67,20 +67,21 @@ class EventRepository{
                 callback(events)
             }
     }
-    suspend fun uploadEventImages(eventId: String, uris: List<Uri>, onComplete: (List<String>) -> Unit) {
+    suspend fun uploadEventImages(eventId: String, uris: List<Uri>): List<String> {
         val folderRef = storageRef.child("event_images/$eventId")
-        val newImageUrls = mutableListOf<String>()
+        val uploadedImageUrls = mutableListOf<String>()
 
         try {
-            // 🔹 Obtener las imágenes actuales en Firestore
             val eventRef = db.collection("Eventos").document(eventId)
-            val existingImages = eventRef.get().await().get("galleryPictureUrls") as? MutableList<String> ?: mutableListOf()
+            val existingImages =
+                eventRef.get().await().get("galleryPictureUrls") as? MutableList<String>
+                    ?: mutableListOf()
 
-            withContext(Dispatchers.IO) {
-                uris.map { uri ->
+            val newImages = withContext(Dispatchers.IO) {
+                uris.mapIndexed { index, uri ->
                     async {
                         try {
-                            val fileName = "${System.currentTimeMillis()}.jpg"
+                            val fileName = "image_${index}_${System.currentTimeMillis()}.jpg"
                             val fileRef = folderRef.child(fileName)
 
                             println("📤 Subiendo imagen: $fileName")
@@ -88,7 +89,7 @@ class EventRepository{
                             val downloadUri = fileRef.downloadUrl.await()
                             println("✅ Imagen subida: $downloadUri")
 
-                            newImageUrls.add(downloadUri.toString())
+                            synchronized(uploadedImageUrls) { uploadedImageUrls.add(downloadUri.toString()) }
                         } catch (e: Exception) {
                             println("⚠️ Error al subir imagen: ${e.message}")
                         }
@@ -96,22 +97,20 @@ class EventRepository{
                 }.awaitAll()
             }
 
-            // 🔹 Agregar las nuevas imágenes a las ya existentes
-            val allImages = (existingImages + newImageUrls).distinct()
+            val finalImageList = (existingImages + uploadedImageUrls).distinct()
 
-            // 🔹 Guardar en Firestore solo si hay nuevas imágenes
-            if (newImageUrls.isNotEmpty()) {
-                eventRef.update("galleryPictureUrls", allImages).await()
-                println("✅ Imágenes guardadas en Firestore correctamente")
+            // Guardamos en Firestore solo si se subieron nuevas imágenes
+            if (uploadedImageUrls.isNotEmpty()) {
+                eventRef.update("galleryPictureUrls", finalImageList).await()
+                println("✅ Imágenes guardadas correctamente en Firestore")
             }
 
-            onComplete(allImages)
+            return finalImageList
         } catch (e: Exception) {
             println("⚠️ Error subiendo imágenes: ${e.message}")
-            onComplete(emptyList())
+            return emptyList()
         }
     }
-
 
 
 }

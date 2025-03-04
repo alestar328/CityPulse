@@ -33,7 +33,6 @@ class EventViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState<List<EventUiModel>>>(UiState.Loading)
     private val _uploadState = MutableStateFlow<UiState<List<String>>>(UiState.Loading)
-    val uploadState: StateFlow<UiState<List<String>>> = _uploadState
     init {
         loadEvents()
     }
@@ -63,26 +62,27 @@ class EventViewModel : ViewModel() {
     fun createEvent(event: EventEntity, images: List<Uri>, onComplete: (String) -> Unit) {
         viewModelScope.launch {
             try {
-                val eventId = repository.addEvent(event) // 🔹 Guardar evento y obtener su ID
+                val eventId = repository.addEvent(event) // Guardar evento y obtener su ID
                 println("📌 Evento creado con ID: $eventId")
 
-                if (images.isNotEmpty()) {
-                    repository.uploadEventImages(eventId, images) { imageUrls ->
-                        println("✅ Imágenes subidas correctamente: $imageUrls")
-
-                        // 🔹 Asegurar que el evento también guarda las imágenes sin sobrescribirlas
-                        event.galleryPictureUrls = (event.galleryPictureUrls + imageUrls).distinct().toMutableList()
-
-                        onComplete(eventId) // 🔹 Ejecutamos el callback una vez que todo está listo
-                    }
+                val imageUrls = if (images.isNotEmpty()) {
+                    repository.uploadEventImages(eventId, images) // Esperar subida de imágenes
                 } else {
-                    onComplete(eventId) // 🔹 Si no hay imágenes, devolvemos el ID directamente
+                    emptyList()
                 }
+
+                if (imageUrls.isNotEmpty()) {
+                    val updatedEvent = event.copy(galleryPictureUrls = imageUrls.toMutableList())
+                    repository.updateEvent(updatedEvent) // Guardar correctamente en Firestore
+                }
+
+                onComplete(eventId)
             } catch (e: Exception) {
                 println("⚠️ Error creando evento: ${e.message}")
             }
         }
     }
+
 
     fun deleteEvent(eventId: String, navController: NavController) {
         viewModelScope.launch {
@@ -132,48 +132,4 @@ class EventViewModel : ViewModel() {
         }
     }
 
-
-
-    fun uploadSelectedImagesToFirebase(
-        uris: List<Uri>,
-        eventId: String,
-        onComplete: (List<String>) -> Unit
-    ) {
-        viewModelScope.launch {
-            val storageRef = Firebase.storage.reference.child("event_images/$eventId")
-            val imageUrls = mutableListOf<String>()
-
-            try {
-                withContext(Dispatchers.IO) {
-                    uris.map { uri ->
-                        async {
-                            val fileName = "${System.currentTimeMillis()}.jpg"
-                            val fileRef = storageRef.child(fileName)
-
-                            fileRef.putFile(uri).await()
-                            val downloadUri = fileRef.downloadUrl.await()
-                            imageUrls.add(downloadUri.toString())
-                        }
-                    }.awaitAll()
-                }
-
-                _uploadState.value = UiState.Success(imageUrls)
-                onComplete(imageUrls) // 🔹 Correcto: ahora devolvemos una lista de Strings
-            } catch (e: Exception) {
-                _uploadState.value = UiState.Loading
-                println("Error al subir imagen: ${e.message}")
-                onComplete(emptyList()) // 🔹 Evitamos un error si falla la subida
-            }
-        }
-    }
-    fun uploadEventImages(eventId: String, uris: List<Uri>, onComplete: (List<String>) -> Unit) {
-        viewModelScope.launch {
-            try {
-                repository.uploadEventImages(eventId, uris, onComplete) // 🔹 Llamamos al repositorio correctamente
-            } catch (e: Exception) {
-                println("⚠️ Error al subir imágenes desde ViewModel: ${e.message}")
-                onComplete(emptyList()) // 🔹 En caso de error, devolvemos una lista vacía
-            }
-        }
-    }
 }

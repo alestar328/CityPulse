@@ -142,7 +142,7 @@ fun FriendsScreen(
                     contentColor = Color.White
                 ) {
                     Icon(
-                        imageVector = Icons.Default.PersonAdd,
+                        imageVector = Icons.Default.AddCircle,
                         contentDescription = "Añadir amigo"
                     )
                 }
