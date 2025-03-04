@@ -35,7 +35,7 @@ fun LoginScreen(
     viewModel: AuthViewModel,
     innerPadding: PaddingValues
 ) {
-    val backgroundImage = if (isSystemInDarkTheme()) R.drawable.hotelvelabarna else R.drawable.dubai
+    val backgroundImage = if (isSystemInDarkTheme()) R.drawable.dubai else R.drawable.hotelvelabarna
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
