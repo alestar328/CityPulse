@@ -82,7 +82,6 @@ class EventViewModel : ViewModel() {
         }
     }
 
-
     private val _eventFlow = MutableStateFlow<EventEntity?>(null)
     val eventFlow: StateFlow<EventEntity?> = _eventFlow // Exponer correctamente
 

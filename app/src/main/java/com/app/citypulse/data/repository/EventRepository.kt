@@ -34,7 +34,6 @@ class EventRepository{
         }
     }
 
-
     suspend fun getEventById(eventId: String): EventEntity? {
         return try {
             val document = db.collection("Eventos").document(eventId).get().await()

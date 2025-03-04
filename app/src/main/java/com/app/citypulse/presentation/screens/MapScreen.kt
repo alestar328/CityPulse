@@ -1,6 +1,5 @@
 package com.app.citypulse.presentation.screens
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -31,7 +30,7 @@ fun MapScreen(
     onMarkerClicked: (EventUiModel) -> Unit,
     navController: NavController,
     authViewModel: AuthViewModel,
-    selectedCategory: TipoCategoria, // ¡Ojo, ya no por defecto NONE!
+    selectedCategory: TipoCategoria,
     innerPadding: PaddingValues
 ) {
     val cameraPositionState = rememberCameraPositionState {
@@ -99,23 +98,6 @@ fun MapScreen(
                             }
                         )
 
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 16.dp, end = 16.dp),
-                    contentAlignment = Alignment.TopEnd
-                ) {
-                    FloatingActionButton(
-                        onClick = { navController.navigate("language_screen") },
-                        containerColor = TurkBlue
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Cambiar Idioma"
-                        )
                     }
                 }
 
