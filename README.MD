@@ -70,28 +70,41 @@ Los usuarios también dispondrán de varios filtros para poder encontrar el even
 
 - **RF20**: "Crear valoración del ítem": Los usuarios podrán valorar los eventos.
 - **RF21**: "Mostrar valoración del ítem": Los usuarios podrán ver la valoración de los eventos.
+
 - **RF22**: "Modificar ítem": El usuario podrá modificar su evento creado.
+
+![Edit Event Screen](https://drive.google.com/uc?export=view&id=1lzwPAPeMDuctXdKQ5W8boSby_-83Bk0A)
 
 - **RF23**: "Eliminar ítem": El usuario podrá eliminar su evento creado.
 
+![Delete Event Screen](https://drive.google.com/uc?export=view&id=1NBDoBpys23Qj6enDJc_h8ZeolT7GLoCE)
+
 - **RF24**: "Eliminar valoración": El usuario podrá eliminar la valoración que ha hecho a un evento.
-- **RF33 propio**: El usuario podrá marcar algunos eventos a una lista de favoritos.
+- **RF33 propio**: El usuario podrá marcar algunos eventos a una lista de favoritos.--> **Falta por realizar**
 
 ---
 
 ### **3. Filtros y Búsquedas**
 - **RF04**: "Crear nueva subcategoría": Crear nueva categoría de evento.
-- **RF05**: "Listar categorías": Listar categoría de eventos por orden alfabético/puntuación.
-- **RF06**: "Filtrar categorías": Filtrar por palabra, puntuación y categoría.
-- **RF07**: "Ampliar información de categoría": Al seleccionar categoría o evento.
+- **RF05**: "Listar categorías": Listar categoría de eventos por orden alfabético/puntuación. 
+
+![List categorias Screen](https://drive.google.com/uc?export=view&id=1pgoYExjwWDb6zAADaGOUWDZCGBUy-LUN)
+
+- **RF06**: "Filtrar categorías": Filtrar por palabra, puntuación y categoría. 
+- **RF07**: "Ampliar información de categoría": Al seleccionar categoría o evento. --> **Falta por realizar**
+
 - **RF08**: "Modificar categoría": El usuario deberá de poder cambiar la categoría de su evento.
 
 ---
 
 ### **4. Comentarios **
-- **RF25**: "Censurar comentario": Los usuarios podrán ocultar comentarios. --> Falta por realizar
-
+- **RF25**: "Censurar comentario": Los usuarios podrán ocultar comentarios. --> **Falta por realizar**
 ---
+
+### ** Extras **
+- **Extra** : El fondo de Login cambia dependiendo de si el tema oscuro esta activo o no
+---
+
 
 ### **5. Requerimientos No Funcionales**
 - **RN01**: La app debe estar en catalán, castellano e inglés.
