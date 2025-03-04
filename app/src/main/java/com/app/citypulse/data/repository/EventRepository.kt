@@ -16,9 +16,11 @@ class EventRepository{
 
     suspend fun addEvent(event: EventEntity): String {
         return try {
-            val documentRef = db.collection("Eventos").add(event).await()
-            documentRef.update("id", documentRef.id).await()
-            documentRef.id // 🔹 Retorna el ID generado para usarlo en la subida de fotos
+            val newEventRef = db.collection("Eventos").document() // Genera una referencia de documento válida
+            val eventWithId = event.copy(id = newEventRef.id) // Copia el evento con el nuevo ID
+
+            newEventRef.set(eventWithId).await() // Guarda el evento en Firestore
+            newEventRef.id
         } catch (e: Exception) {
             throw e
         }

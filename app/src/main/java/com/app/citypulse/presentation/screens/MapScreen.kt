@@ -22,6 +22,7 @@ import com.google.maps.android.compose.*
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.components.SearchTopbar
 import com.app.citypulse.presentation.ui.theme.TurkBlue
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 @Composable
 fun MapScreen(
@@ -38,14 +39,14 @@ fun MapScreen(
     }
 
     val eventLocations by viewModel.eventUiList.collectAsState()
-    val markerStates = remember { mutableStateMapOf<String, MarkerState>() }
     var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) } //coge ubicacion al presionar dedo
     var currentCategory by remember { mutableStateOf(selectedCategory) }
 
     val userType by authViewModel.userType.collectAsState()
-    // 1) Aplica el filtro
-    val filteredEvents by remember(eventLocations, currentCategory) {
+
+
+ /*   val filteredEvents by remember(eventLocations, currentCategory) {
         derivedStateOf {
             if (currentCategory != TipoCategoria.NONE) {
                 eventLocations.filter { event ->
@@ -55,7 +56,22 @@ fun MapScreen(
                 eventLocations
             }
         }
+    }*/
+    var filteredEvents by remember { mutableStateOf<List<EventUiModel>>(emptyList()) }
+    LaunchedEffect(currentCategory, eventLocations) {
+        filteredEvents = if (currentCategory != TipoCategoria.NONE) {
+            eventLocations.filter { event ->
+                event.categoria == currentCategory
+            }
+        } else {
+            eventLocations
+        }
     }
+    val categoryColors = mapOf(
+        TipoCategoria.GASTRONOMICO to 30f,  // 🍊 Naranja
+        TipoCategoria.FIESTA to 0f,        // ⚫ Negro
+        TipoCategoria.CULTURAL to 120f     // 🟢 Verde
+    )
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -86,11 +102,13 @@ fun MapScreen(
                     filteredEvents.forEach { event ->
                         val position = LatLng(event.latitud, event.longitud)
                         val markerState = rememberMarkerState(position = position)
+                        val markerColor = categoryColors[event.categoria] ?: BitmapDescriptorFactory.HUE_RED
 
                         Marker(
                             state = markerState,
                             title = event.nombre,
                             snippet = event.descripcion,
+                            icon = BitmapDescriptorFactory.defaultMarker(markerColor),
                             onClick = {
                                 // Alterna la selección del evento.
                                 selectedEvent = if (selectedEvent == event) null else event
