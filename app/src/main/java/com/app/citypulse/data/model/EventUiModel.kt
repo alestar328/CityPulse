@@ -16,5 +16,7 @@ data class EventUiModel(
     val aforo: Int,
     val precio: Double,
     val valoracion: Int,
-    val idRealizador: String = ""
+    val idRealizador: String = "",
+    val galleryPictureUrls: List<String> = emptyList() // 🔹 Nueva propiedad para imágenes
+
 )

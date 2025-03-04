@@ -83,7 +83,7 @@ fun RegisterScreen(
                     shape = MaterialTheme.shapes.medium,
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(10.dp)) {
                         TextField(
                             value = email,
                             onValueChange = { email = it },
@@ -92,7 +92,7 @@ fun RegisterScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
 
                         TextField(
                             value = password,
@@ -103,7 +103,7 @@ fun RegisterScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
 
                         TextField(
                             value = confirmPassword,
@@ -128,7 +128,7 @@ fun RegisterScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Button(
                     onClick = {
@@ -163,7 +163,7 @@ fun RegisterScreen(
                     Text("Siguiente")
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // Aquí agregamos el botón "¿Ya tienes cuenta? Inicia sesión"
                 TextButton(

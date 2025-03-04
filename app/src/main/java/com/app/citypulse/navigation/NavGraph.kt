@@ -53,10 +53,7 @@ fun NavGraph(
             LanguageScreen(navController)
         }
 
-        // Pantalla Principal
-      /*  composable("main_screen") {
-            MainScreen()
-        }*/
+
 
         composable("friends") {
             // Usamos un estado para almacenar el usuario actual

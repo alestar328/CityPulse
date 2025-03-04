@@ -89,7 +89,41 @@ class AuthViewModel : ViewModel() {
     fun addTempPhotoUrl(url: String) {
         tempPhotoUrls.add(url)
     }
-
+    fun updateProfilePictureUrl(newUrl: String, onResult: (Boolean) -> Unit) {
+        val currentUser = auth.currentUser
+        if (currentUser != null && currentUser.email != null) {
+            val userRef = firestore.collection("users").document(currentUser.email!!)
+            userRef.update("profilePictureUrl", newUrl)
+                .addOnSuccessListener { onResult(true) }
+                .addOnFailureListener { onResult(false) }
+        } else {
+            onResult(false)
+        }
+    }
+    fun addGalleryPictureUrl(newUrl: String, onResult: (Boolean) -> Unit) {
+        val currentUser = auth.currentUser
+        if (currentUser != null && currentUser.email != null) {
+            val userRef = firestore.collection("users").document(currentUser.email!!)
+            // Leer la lista actual, añadir la nueva URL y actualizar
+            userRef.get().addOnSuccessListener { snapshot ->
+                val userItem = snapshot.toObject(UserItem::class.java)
+                if (userItem != null) {
+                    val updatedList = userItem.galleryPictureUrls.toMutableList().apply {
+                        add(newUrl)
+                    }
+                    userRef.update("galleryPictureUrls", updatedList)
+                        .addOnSuccessListener { onResult(true) }
+                        .addOnFailureListener { onResult(false) }
+                } else {
+                    onResult(false)
+                }
+            }.addOnFailureListener {
+                onResult(false)
+            }
+        } else {
+            onResult(false)
+        }
+    }
     fun logout() {
         authRepository.logout()
         _isAuthenticated.value =

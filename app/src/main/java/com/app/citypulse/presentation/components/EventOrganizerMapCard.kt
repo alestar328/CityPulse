@@ -44,11 +44,7 @@ fun EventOrganizerMapCard(
     aforo: Int,
     eventId: String,
     navController: NavController,
-    images: List<Int> = listOf(
-        R.drawable.sample_party,
-        R.drawable.sample_cena,
-        R.drawable.sample_cultura
-    )
+    images: List<String>
 ) {
     Column(
         modifier = Modifier
@@ -173,22 +169,5 @@ fun EventOrganizerMapCard(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun EventOrganizerMapCardPreview() {
-    val fakeNavController = rememberNavController()
 
-    EventOrganizerMapCard(
-        nombre = "Full day with your friends",
-        categoria = "Fiesta",
-        subcategoria = "Techno",
-        aforo = 666,
-        fechaInicio = "18:00 (Wed)",
-        fechaFin = "23:00 (Wed)",
-        precio = 50.5,
-        lugar = "Calle Paris 123, Barcelona",
-        eventId = "123", // 🔹 Agregamos un ID de prueba
-        navController = fakeNavController // 🔹 Pasamos un NavController de prueba
-    )
-}
 

@@ -15,12 +15,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.app.citypulse.R
 
 @Composable
 fun EventImageGallery(
-    modifier: Modifier = Modifier, // Permite personalizar el tamaño según dónde se use
-    images: List<Int> // Lista de imágenes (en un caso real, sería una URL)
+    modifier: Modifier = Modifier,
+    images: List<String> // Lista de imágenes (en un caso real, sería una URL)
 ) {
     Row(
         modifier = modifier
@@ -29,9 +30,15 @@ fun EventImageGallery(
         horizontalArrangement = Arrangement.spacedBy(8.dp) // Espaciado uniforme entre imágenes
 
     ){
-        images.forEach{ imageRes ->
+        images.take(3).forEach { imageUrl ->
+            val painter = if (imageUrl.startsWith("http")) {
+                rememberAsyncImagePainter(imageUrl)
+            } else {
+                painterResource(id = R.drawable.sample_party) // Imagen de respaldo si es local
+            }
+
             Image(
-                painter = painterResource(id = imageRes),
+                painter = painter,
                 contentDescription = "Imagen del evento",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -39,18 +46,9 @@ fun EventImageGallery(
                     .fillMaxHeight()
                     .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
             )
-
         }
-
     }
-
 }
 
 
-@Preview
-@Composable
-fun EventImageGalleryPreview() {
-    EventImageGallery(
-        images = listOf(R.drawable.sample_party,R.drawable.sample_cena,R.drawable.sample_cultura )
-    )
-}
+

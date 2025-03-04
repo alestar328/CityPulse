@@ -33,17 +33,19 @@ import coil3.compose.rememberAsyncImagePainter
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.presentation.ui.theme.TurkBlue
 
+
 @Composable
 fun ProfileHeader(
     modifier: Modifier = Modifier,
     user: UserItem,
-    selectedImageUri: Uri? = null,
+    pendingProfileUri: Uri?, // La URI local si el usuario eligió algo nuevo
     onClick: () -> Unit
-){
+) {
     Row(
-        Modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp), verticalAlignment = Alignment.CenterVertically
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
@@ -54,28 +56,42 @@ fun ProfileHeader(
             contentAlignment = Alignment.Center,
 
             ) {
-            if (selectedImageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(selectedImageUri),
-                    contentDescription = "User Photo",
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "User Icon",
-                    tint = Color.White,
-                    modifier = Modifier.size(50.dp)
-                )
-                Icon(
-                    imageVector = Icons.Default.AddCircle,
-                    contentDescription = "Add photo",
-                    tint = TurkBlue,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .size(50.dp)
-                )
+            when {
+                // 1) Si el usuario eligió una foto nueva (pendingProfileUri != null)
+                pendingProfileUri != null -> {
+                    Image(
+                        painter = rememberAsyncImagePainter(pendingProfileUri),
+                        contentDescription = "Foto de perfil local",
+                        modifier = Modifier.fillMaxWidth(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                // 2) Si en Firestore ya hay una foto de perfil
+                !user.profilePictureUrl.isNullOrEmpty() -> {
+                    Image(
+                        painter = rememberAsyncImagePainter(user.profilePictureUrl),
+                        contentDescription = "Foto de perfil",
+                        modifier = Modifier.fillMaxWidth(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                // 3) No hay nada: ícono por defecto
+                else -> {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "User Icon",
+                        tint = Color.White,
+                        modifier = Modifier.size(50.dp)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.AddCircle,
+                        contentDescription = "Add photo",
+                        tint = TurkBlue,
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .size(50.dp)
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.width(12.dp))
@@ -100,26 +116,4 @@ fun ProfileHeader(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileHeaderPreview() {
-    // Datos de ejemplo para la preview
-    val sampleUser = UserItem(
-        name = "Juan",
-        surname = "Pérez",
-        age = 28,
-        email = "juan.perez@example.com",
-        documentId = null,
-        userType = com.app.citypulse.data.enums.AccountType.Persona, // Asegúrate de tener definido este enum
-        valoracion = 5,
-        password = "********",
-        gender = "M"
-    )
-    ProfileHeader(
-        user = sampleUser,
-        selectedImageUri = null,
-        onClick = { }
-    )
 }

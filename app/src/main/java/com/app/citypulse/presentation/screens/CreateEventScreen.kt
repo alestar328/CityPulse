@@ -2,9 +2,13 @@ package com.app.citypulse.presentation.screens
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,13 +29,17 @@ import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.presentation.components.CustomTextField
 import com.app.citypulse.presentation.components.DescriptionTextField
 import com.app.citypulse.presentation.components.NumericTextField
+import com.app.citypulse.presentation.components.PhotoContainer
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun CreateEventScreen(viewModel: EventViewModel, navController: NavController,    innerPadding: PaddingValues // Agregamos el innerPadding como parámetro
+fun CreateEventScreen(
+    viewModel: EventViewModel,
+    navController: NavController,
+    innerPadding: PaddingValues
 ) {
     var nombre by rememberSaveable { mutableStateOf("") }
     var categoriaSeleccionada by rememberSaveable { mutableStateOf(TipoCategoria.CULTURAL) }
@@ -43,6 +51,8 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController,  
     var fechaFin by rememberSaveable { mutableStateOf("") }
     var precio by rememberSaveable { mutableStateOf("") }
     var aforo by rememberSaveable { mutableStateOf("") }
+    var eventPhotos by rememberSaveable { mutableStateOf<List<Uri>>(emptyList()) }
+    val selectedPhotos = remember { mutableStateListOf<Uri?>(null, null, null) }
 
     val context = LocalContext.current
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
@@ -64,6 +74,17 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController,  
         savedState?.get<String>("direccion")?.let {
             if (it.isNotEmpty()) lugar = it
         }
+
+        savedState?.get<List<Uri>>("event_photos")?.let {
+            if (it.isNotEmpty()) eventPhotos = it
+        }
+    }
+    val photoLaunchers = List(3) { index ->
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null) {
+                selectedPhotos[index] = uri
+            }
+        }
     }
 
     Box(
@@ -77,135 +98,202 @@ fun CreateEventScreen(viewModel: EventViewModel, navController: NavController,  
             ),
         contentAlignment = Alignment.Center
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(id = R.string.crear_evento),
-                style = TextStyle(color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            )
+            item {
+                Text(
+                    text = stringResource(id = R.string.crear_evento),
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
 
-            Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(5.dp))
 
-            CustomTextField(value = nombre, label = stringResource(id = R.string.nombre_evento), onValueChange = { nombre = it })
+                CustomTextField(
+                    value = nombre,
+                    label = stringResource(id = R.string.nombre_evento),
+                    onValueChange = { nombre = it })
 
-            CategoriaDropdown(selectedCategoria = categoriaSeleccionada) {
-                categoriaSeleccionada = it
-            }
-
-            DescriptionTextField(value = descripcion, label = stringResource(id = R.string.descripcion),onValueChange = { descripcion = it })
-
-            NumericTextField(value = precio, label = stringResource(id = R.string.precio), onValueChange = { precio = it }, isDecimal = true)
-
-            NumericTextField(value = aforo, label = stringResource(id = R.string.aforo), onValueChange = { aforo = it })
-
-            var fechaInicioCalendar by rememberSaveable { mutableStateOf<Calendar?>(null) }
-
-            DateTimePickerField(
-                label = stringResource(id = R.string.fecha_inicio),
-                dateTime = fechaInicio,
-                onDateTimeSelected = { selectedDate ->
-                    fechaInicio = selectedDate
-                    fechaInicioCalendar = Calendar.getInstance().apply {
-                        time = parseDate(selectedDate)
-                    }
+                CategoriaDropdown(selectedCategoria = categoriaSeleccionada) {
+                    categoriaSeleccionada = it
                 }
-            )
 
-            // Solo mostrar el selector de fecha final cuando la fecha de inicio ya ha sido seleccionada
-            if (fechaInicioCalendar != null) {
+                DescriptionTextField(
+                    value = descripcion,
+                    label = stringResource(id = R.string.descripcion),
+                    onValueChange = { descripcion = it })
+
+                NumericTextField(
+                    value = precio,
+                    label = stringResource(id = R.string.precio),
+                    onValueChange = { precio = it },
+                    isDecimal = true
+                )
+
+                NumericTextField(
+                    value = aforo,
+                    label = stringResource(id = R.string.aforo),
+                    onValueChange = { aforo = it })
+            }
+            item {
+                var fechaInicioCalendar by rememberSaveable { mutableStateOf<Calendar?>(null) }
+
                 DateTimePickerField(
-                    label = stringResource(id = R.string.fecha_fin),
-                    dateTime = fechaFin,
-                    minDate = fechaInicioCalendar ?: Calendar.getInstance(),
+                    label = stringResource(id = R.string.fecha_inicio),
+                    dateTime = fechaInicio,
                     onDateTimeSelected = { selectedDate ->
-                        fechaFin = selectedDate
+                        fechaInicio = selectedDate
+                        fechaInicioCalendar = Calendar.getInstance().apply {
+                            time = parseDate(selectedDate)
+                        }
                     }
                 )
-            }
 
-            CustomTextField(value = lugar, label = stringResource(id = R.string.ubicacion), onValueChange = {}, enabled = false)
-
-            Button(
-                onClick = { navController.navigate("location_picker_screen") },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(id = R.string.escoger_ubicacion), color = Color.White)
-            }
-
-            Spacer(modifier = Modifier.height(5.dp))
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                Button(
-                    onClick = {
-                        navController.navigate("map_screen") {
-                            // Quita del stack todo lo que haya hasta "map_screen"
-                            popUpTo("map_screen") { inclusive = false }
+                // Solo mostrar el selector de fecha final cuando la fecha de inicio ya ha sido seleccionada
+                if (fechaInicioCalendar != null) {
+                    DateTimePickerField(
+                        label = stringResource(id = R.string.fecha_fin),
+                        dateTime = fechaFin,
+                        minDate = fechaInicioCalendar ?: Calendar.getInstance(),
+                        onDateTimeSelected = { selectedDate ->
+                            fechaFin = selectedDate
                         }
-                    },                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(stringResource(id = R.string.cancelar), color = Color.White)
+                    )
                 }
 
-                Spacer(modifier = Modifier.width(5.dp))
+                CustomTextField(
+                    value = lugar,
+                    label = stringResource(id = R.string.ubicacion),
+                    onValueChange = {},
+                    enabled = false
+                )
 
                 Button(
-                    onClick = {
-                        if (nombre.isNotEmpty() && fechaInicio.isNotEmpty() && fechaFin.isNotEmpty() &&
-                            precio.isNotEmpty() && aforo.isNotEmpty()
-                        ) {
-                            if (descripcion.length !in 20..50) {
-                                Toast.makeText(context, errorDescripcion, Toast.LENGTH_SHORT).show()
-                                return@Button
-                            }
-
-                            if (latitud == 0.0 || longitud == 0.0) {
-                                Toast.makeText(context, errorUbicacion, Toast.LENGTH_SHORT).show()
-                                return@Button
-                            }
-
-                            val event = EventEntity(
-                                nombre = nombre,
-                                categoria = categoriaSeleccionada,
-                                descripcion = descripcion,
-                                lugar = lugar,
-                                latitud = latitud,
-                                longitud = longitud,
-                                fechaInicio = parseDate(fechaInicio),
-                                fechaFin = parseDate(fechaFin),
-                                precio = precio.toDouble(),
-                                aforo = aforo.toInt(),
-                                idRealizador = currentUserId ?: ""
-                            )
-
-                            viewModel.createEvent(event)
-                            navController.navigate("map_screen") {
-                                // El popUpTo se asegura de que si existe "map_screen" en el back stack,
-                                // hagamos pop hasta ella y la dejemos como destino visible.
-                                popUpTo("map_screen") {
-                                    inclusive = false
-                                }
-                                // Si quieres evitar que se creen múltiples copias de "map_screen":
-                                launchSingleTop = true
-                            }
-                        } else {
-                            Toast.makeText(context, errorCampos, Toast.LENGTH_SHORT).show()
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
-                    modifier = Modifier.weight(1f)
+                    onClick = { navController.navigate("location_picker_screen") },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(stringResource(id = R.string.crear), color = Color.White)
+                    Text(stringResource(id = R.string.escoger_ubicacion), color = Color.White)
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(5.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = {
+                            navController.navigate("map_screen") {
+                                popUpTo("map_screen") { inclusive = false }
+                            }
+                        }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(id = R.string.cancelar), color = Color.White)
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        selectedPhotos.forEachIndexed { index, uri ->
+                            PhotoContainer(
+                                url = null, // No cargamos desde URL porque la imagen aún no está en Firebase
+                                localUri = uri,
+                                onClick = { photoLaunchers[index].launch("image/*") }, // Abrir galería al hacer clic
+                                onDelete = {
+                                    selectedPhotos[index] = null
+                                } // Borrar imagen seleccionada
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                }
+            }
+
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(
+                            onClick = {
+                                navController.navigate("map_screen") {
+                                    popUpTo("map_screen") { inclusive = false }
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(stringResource(id = R.string.cancelar), color = Color.White)
+                        }
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Button(
+                            onClick = {
+                                if (nombre.isNotEmpty() && fechaInicio.isNotEmpty() && fechaFin.isNotEmpty() &&
+                                    precio.isNotEmpty() && aforo.isNotEmpty()
+                                ) {
+                                    if (descripcion.length !in 20..50) {
+                                        Toast.makeText(
+                                            context,
+                                            errorDescripcion,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        return@Button
+                                    }
+
+                                    if (latitud == 0.0 || longitud == 0.0) {
+                                        Toast.makeText(context, errorUbicacion, Toast.LENGTH_SHORT)
+                                            .show()
+                                        return@Button
+                                    }
+
+                                    val event = EventEntity(
+                                        nombre = nombre,
+                                        categoria = categoriaSeleccionada,
+                                        descripcion = descripcion,
+                                        lugar = lugar,
+                                        latitud = latitud,
+                                        longitud = longitud,
+                                        fechaInicio = parseDate(fechaInicio),
+                                        fechaFin = parseDate(fechaFin),
+                                        precio = precio.toDouble(),
+                                        aforo = aforo.toInt(),
+                                        idRealizador = currentUserId ?: ""
+                                    )
+
+                                    val photosToUpload = selectedPhotos.filterNotNull()
+                                    viewModel.createEvent(event, photosToUpload) { createdEventId ->
+                                        navController.navigate("map_screen") {
+                                            popUpTo("map_screen") { inclusive = false }
+                                        }
+                                    }
+                                } else {
+                                    Toast.makeText(context, errorCampos, Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(stringResource(id = R.string.crear), color = Color.White)
+                        }
+                    }
                 }
             }
         }
     }
-}
 
 @Composable
 fun CategoriaDropdown(selectedCategoria: TipoCategoria, onCategoriaSelected: (TipoCategoria) -> Unit) {

@@ -29,6 +29,8 @@ sealed class EventRouteScreen(val route:String){
 
     object ShowDetail : EventRouteScreen("event_details")
     object CreateEvent : EventRouteScreen("create_event")
+    object AddPhotoEvent : EventRouteScreen("add_photos_event")
+
 }
 
 sealed class ProfileRouteScreen(val route:String){

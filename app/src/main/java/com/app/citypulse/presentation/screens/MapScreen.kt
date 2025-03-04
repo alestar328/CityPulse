@@ -85,9 +85,8 @@ fun MapScreen(
                 ) {
                     filteredEvents.forEach { event ->
                         val position = LatLng(event.latitud, event.longitud)
-                        val markerState = markerStates.getOrPut(event.id) {
-                            rememberMarkerState(position = position)
-                        }
+                        val markerState = rememberMarkerState(position = position)
+
                         Marker(
                             state = markerState,
                             title = event.nombre,
@@ -163,7 +162,8 @@ fun MapScreen(
                             precio = event.precio,
                             aforo = event.aforo,
                             eventId = event.id,
-                            navController = navController
+                            navController = navController,
+                            images = event.galleryPictureUrls ?: emptyList() // 🔹 Ahora pasamos las imágenes correctas
                         )
                     }
                 }

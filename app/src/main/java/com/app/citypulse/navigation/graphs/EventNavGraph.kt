@@ -4,7 +4,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.app.citypulse.navigation.AuthRouteScreen
 import com.app.citypulse.navigation.EventRouteScreen
 import com.app.citypulse.navigation.Graph
 
@@ -15,5 +14,6 @@ fun NavGraphBuilder.eventRouteScreen(rootNavController: NavHostController) {
     ) {
         composable(route = EventRouteScreen.CreateEvent.route) {
         }
+
     }
 }
