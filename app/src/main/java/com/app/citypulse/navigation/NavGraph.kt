@@ -69,7 +69,8 @@ fun NavGraph(
             if (currentUser != null) {
                 FriendsScreen(
                     navController = navController,
-                    viewModel = friendsViewModel
+                    viewModel = friendsViewModel,
+                    innerPadding = PaddingValues()
                 )
             }
         }
@@ -135,6 +136,12 @@ fun NavGraph(
         composable("ForgotPass") {
             ContraseñaOlvidada(navController = navController)
         }
+        composable("saved_events") {
+            SavedEventsScreen(navController = navController)
+        }
 
+        composable("assisted_events") {
+            AssitedEventsScreen(navController = navController)
+        }
     }
 }

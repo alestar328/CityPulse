@@ -22,7 +22,9 @@ import com.google.firebase.auth.FirebaseAuth
 fun FriendsScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: FriendsViewModel
+    viewModel: FriendsViewModel,
+    innerPadding: PaddingValues // ✅ Se recibe el innerPadding
+
 ) {
     val friends by viewModel.friends.collectAsState()
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -120,7 +122,10 @@ fun FriendsScreen(
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {
             Row(
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .padding(innerPadding) // ✅ Se aplica el innerPadding para que no lo tape el navbar
+                ,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Botón para volver al perfil
@@ -148,13 +153,13 @@ fun FriendsScreen(
                 }
             }
         }
-    ) { innerPadding ->
+    ) { paddingValues  ->
         // Resto del contenido de la pantalla
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .background(Color.White)
-                .padding(innerPadding)
+                .padding(paddingValues )
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

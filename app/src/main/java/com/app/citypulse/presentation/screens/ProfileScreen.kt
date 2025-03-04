@@ -43,6 +43,7 @@ import com.app.citypulse.presentation.components.ButtonBar
 import com.app.citypulse.presentation.components.PersonalScoreBar
 import com.app.citypulse.presentation.components.PhotoContainer
 import com.app.citypulse.presentation.components.ProfileHeader
+import com.app.citypulse.presentation.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -225,7 +226,7 @@ fun ProfileScreen(
                             icon = Icons.Default.Favorite,
                             title = "Eventos guardados",
                             modifier = Modifier,
-                            onClick = { navController.navigate("assisted_events") }
+                            onClick = { navController.navigate("saved_events") }
                         )
                     }
                     Spacer(modifier = Modifier.height(3.dp))
@@ -255,7 +256,7 @@ fun ProfileScreen(
                     }
                     ButtonBar(
                         text = "Subir fotos",
-                        backgroundColor = Color.Blue,
+                        backgroundColor = YellowLight,
                         onClick = {
                             if (user != null) {
                                 val currentUser = user!!

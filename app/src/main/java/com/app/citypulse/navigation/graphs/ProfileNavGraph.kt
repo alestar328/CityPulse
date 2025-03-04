@@ -16,9 +16,12 @@ fun NavGraphBuilder.profileRouteScreen(rootNavController: NavHostController) {
         composable(route = AuthRouteScreen.Login.route) {
         }
         composable(route = ProfileRouteScreen.AddFriend.route) {
-
         }
         composable(route = AuthRouteScreen.Register2.route) {
+        }
+        composable(route = ProfileRouteScreen.SavedEvents.route) {
+        }
+        composable(route = ProfileRouteScreen.AssitedEvents.route) {
         }
     }
 }

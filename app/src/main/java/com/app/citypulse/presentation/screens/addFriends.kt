@@ -38,7 +38,10 @@ fun AddFriendScreen(
                 onClick = { navController.navigate("friends") }, // Navegar a la pantalla "friends"
                 containerColor = Color(0xFF2196F3), // Color azul
                 contentColor = Color.White,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .padding(innerPadding)
+
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -53,11 +56,11 @@ fun AddFriendScreen(
                 }
             }
         }
-    ) { innerPadding ->
+    ) { paddingValues  ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(paddingValues )
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

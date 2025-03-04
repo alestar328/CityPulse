@@ -1,6 +1,7 @@
 package com.app.citypulse.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,6 +34,7 @@ fun ActionBox(icon: ImageVector,
             .height(100.dp)
             .shadow(4.dp, RoundedCornerShape(12.dp))
             .background(Color.White, RoundedCornerShape(12.dp))
+            .clickable { onClick() } // 🔹 Ahora detecta clics correctamente
             .padding(10.dp)
     ) {
         Column {
