@@ -60,9 +60,7 @@ fun MapScreen(
     var filteredEvents by remember { mutableStateOf<List<EventUiModel>>(emptyList()) }
     LaunchedEffect(currentCategory, eventLocations) {
         filteredEvents = if (currentCategory != TipoCategoria.NONE) {
-            eventLocations.filter { event ->
-                event.categoria == currentCategory
-            }
+            eventLocations.filter { it.categoria == currentCategory }
         } else {
             eventLocations
         }
@@ -100,11 +98,14 @@ fun MapScreen(
                     }
                 ) {
                     filteredEvents.forEach { event ->
-                        val position = LatLng(event.latitud, event.longitud)
-                        val markerState = rememberMarkerState(position = position)
-                        val markerColor = categoryColors[event.categoria] ?: BitmapDescriptorFactory.HUE_RED
+                        key(event.id) {
+                            val position = LatLng(event.latitud, event.longitud)
+                            /*  val markerState = rememberMarkerState(position = position)
+                        val markerColor = categoryColors[event.categoria] ?: BitmapDescriptorFactory.HUE_RED*/
+                            val markerColor =
+                                categoryColors[event.categoria] ?: BitmapDescriptorFactory.HUE_RED
 
-                        Marker(
+                            /*     Marker(
                             state = markerState,
                             title = event.nombre,
                             snippet = event.descripcion,
@@ -114,7 +115,19 @@ fun MapScreen(
                                 selectedEvent = if (selectedEvent == event) null else event
                                 true
                             }
-                        )
+                        )*/
+                            Marker(
+                                state = remember { MarkerState(position = position) },
+                                title = event.nombre,
+                                snippet = event.descripcion,
+                                icon = BitmapDescriptorFactory.defaultMarker(markerColor),
+                                onClick = {
+                                    // Alterna la selección del evento.
+                                    selectedEvent = if (selectedEvent == event) null else event
+                                    true
+                                }
+                            )
+                        }
 
                     }
                 }
