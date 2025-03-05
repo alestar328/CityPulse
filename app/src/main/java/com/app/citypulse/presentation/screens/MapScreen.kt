@@ -81,8 +81,15 @@ fun MapScreen(
                     .fillMaxWidth()
                     .background(Color.Transparent)
                     .padding(horizontal = 16.dp),
+                events = eventLocations, // 🔹 Pasamos la lista de eventos desde ViewModel
                 selectedCategory = currentCategory,
-                onCategorySelected = { newCategory -> currentCategory = newCategory }
+                onCategorySelected = { newCategory -> currentCategory = newCategory },
+                onEventSelected = { selectedEvent ->
+                    // 🔹 Centrar mapa en la ubicación del evento seleccionado
+                    cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                        LatLng(selectedEvent.latitud, selectedEvent.longitud), 15f
+                    )
+                }
             )
             Box(
                 modifier = Modifier

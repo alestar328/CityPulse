@@ -15,12 +15,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.data.model.EventUiModel
 
 @Composable
 fun SearchTopbar(
     modifier: Modifier = Modifier,
+    events: List<EventUiModel>, // 🔹 Pasamos eventos desde ViewModel
     selectedCategory: TipoCategoria,
-    onCategorySelected: (TipoCategoria) -> Unit
+    onCategorySelected: (TipoCategoria) -> Unit,
+    onEventSelected: (EventUiModel) -> Unit // 🔹 Maneja la selección del evento
 ){
 
     Column(
@@ -31,7 +34,10 @@ fun SearchTopbar(
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        SearcherBar()
+        SearcherBar(
+            events = events,
+            onEventSelected = onEventSelected
+        )
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),

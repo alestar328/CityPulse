@@ -45,6 +45,7 @@ fun EventCard(
             )
             {
                 Column(
+                    //Fecha
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
@@ -72,18 +73,22 @@ fun EventCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
+                    //Nombre evento
                     text = "Fiesta de disfraces",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
                 Text(
+
+                    //Creador evento
                     text = "Razzmatazz",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White
                 )
                 Text(
+                    //Categoria evento
                     text = "Reggaeton",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
