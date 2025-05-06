@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "79725582630",
-    "project_id": "citypulse-aa229",
-    "storage_bucket": "citypulse-aa229.firebasestorage.app"
+    "project_number": "276829590899",
+    "project_id": "citypulse-a6b0a",
+    "storage_bucket": "citypulse-a6b0a.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:79725582630:android:9cc53270696c0c765b09e7",
+        "mobilesdk_app_id": "1:276829590899:android:1d543350dd1d17539a6106",
         "android_client_info": {
           "package_name": "com.app.citypulse"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "276829590899-u7nh4o5ua7pjjnc5gdk56hf13n0svuk3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.citypulse",
+            "certificate_hash": "9a8929d49c2c125265589f1d073c54c9ffdc495b"
+          }
+        },
+        {
+          "client_id": "276829590899-b57qecnv0f414u2l3ss2kfgg6vdn99ik.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyD2dEbscmWE_5FbbZ_b6qrTQ4JZOHiA5fA"
+          "current_key": "AIzaSyDzVkM2qwT1lXYCZZ1WyCtwBplk7JpECOs"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "276829590899-b57qecnv0f414u2l3ss2kfgg6vdn99ik.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

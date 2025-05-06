@@ -3,6 +3,7 @@ package com.app.citypulse
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -30,6 +31,8 @@ fun MainScreen() {
     val currentRoute = navBackStackEntry?.destination?.route
     val authRoutes = listOf("login", "register", "register2")
     val showBottomBar = currentRoute !in authRoutes
+    val showSearchTopBar = currentRoute == "map_screen" // Solo visible en MapScreen
+
     var selectedCategory by remember { mutableStateOf(TipoCategoria.NONE) }
 
     Scaffold(
@@ -57,7 +60,21 @@ fun MainScreen() {
             // 1) Contenido principal (NavGraph) donde se muestra el mapa
             NavGraph(navController = navController, innerPadding = innerPadding)
 
-
+            if (showSearchTopBar) {
+                SearchTopbar(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .background(Color.Transparent)
+                        .padding(horizontal = 16.dp),
+                    events = emptyList(), // Obtén los eventos desde un ViewModel compartido o usando un StateHolder compartido
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { newCategory -> selectedCategory = newCategory },
+                    onEventSelected = { event ->
+                        // Maneja esto con un ViewModel compartido o savedStateHandle
+                    }
+                )
+            }
         }
     }
 }

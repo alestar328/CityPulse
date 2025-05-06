@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventUiModel
@@ -22,6 +23,7 @@ import com.google.maps.android.compose.*
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.components.SearchTopbar
 import com.app.citypulse.presentation.ui.theme.TurkBlue
+import com.app.citypulse.presentation.ui.theme.YellowLight
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 @Composable
@@ -46,17 +48,6 @@ fun MapScreen(
     val userType by authViewModel.userType.collectAsState()
 
 
- /*   val filteredEvents by remember(eventLocations, currentCategory) {
-        derivedStateOf {
-            if (currentCategory != TipoCategoria.NONE) {
-                eventLocations.filter { event ->
-                    event.categoria == currentCategory
-                }
-            } else {
-                eventLocations
-            }
-        }
-    }*/
     var filteredEvents by remember { mutableStateOf<List<EventUiModel>>(emptyList()) }
     LaunchedEffect(currentCategory, eventLocations) {
         filteredEvents = if (currentCategory != TipoCategoria.NONE) {
@@ -76,21 +67,6 @@ fun MapScreen(
             .padding(innerPadding)
     ) {
         Column {
-            SearchTopbar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-                    .padding(horizontal = 16.dp),
-                events = eventLocations, // 🔹 Pasamos la lista de eventos desde ViewModel
-                selectedCategory = currentCategory,
-                onCategorySelected = { newCategory -> currentCategory = newCategory },
-                onEventSelected = { selectedEvent ->
-                    // 🔹 Centrar mapa en la ubicación del evento seleccionado
-                    cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                        LatLng(selectedEvent.latitud, selectedEvent.longitud), 15f
-                    )
-                }
-            )
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -107,22 +83,8 @@ fun MapScreen(
                     filteredEvents.forEach { event ->
                         key(event.id) {
                             val position = LatLng(event.latitud, event.longitud)
-                            /*  val markerState = rememberMarkerState(position = position)
-                        val markerColor = categoryColors[event.categoria] ?: BitmapDescriptorFactory.HUE_RED*/
                             val markerColor =
                                 categoryColors[event.categoria] ?: BitmapDescriptorFactory.HUE_RED
-
-                            /*     Marker(
-                            state = markerState,
-                            title = event.nombre,
-                            snippet = event.descripcion,
-                            icon = BitmapDescriptorFactory.defaultMarker(markerColor),
-                            onClick = {
-                                // Alterna la selección del evento.
-                                selectedEvent = if (selectedEvent == event) null else event
-                                true
-                            }
-                        )*/
                             Marker(
                                 state = remember { MarkerState(position = position) },
                                 title = event.nombre,
@@ -156,9 +118,13 @@ fun MapScreen(
                         modifier = Modifier
                             .align(Alignment.BottomStart)
                             .padding(16.dp, bottom = 80.dp),
-                        containerColor = if (selectedEvent == null) Color.LightGray else Color.Blue
+                        containerColor = TurkBlue
                     ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "Crear Evento")
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Crear Evento",
+                            tint = Color.White,
+                        )
                     }
                 }
 
@@ -184,7 +150,8 @@ fun MapScreen(
                             aforo = event.aforo,
                             eventId = event.id,
                             navController = navController,
-                            images = event.galleryPictureUrls ?: emptyList() // 🔹 Ahora pasamos las imágenes correctas
+                            images = event.galleryPictureUrls
+                                ?: emptyList() // 🔹 Ahora pasamos las imágenes correctas
                         )
                     }
                 }

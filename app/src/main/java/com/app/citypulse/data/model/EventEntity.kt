@@ -19,5 +19,4 @@ data class EventEntity(
     val valoracion: Int = 0,
     val idRealizador: String = "",
     var galleryPictureUrls: MutableList<String> = mutableListOf()
-
 )

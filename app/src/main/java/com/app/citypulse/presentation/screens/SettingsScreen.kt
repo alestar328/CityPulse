@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
@@ -35,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.presentation.components.SettingButton
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.Star
 
 
 @Composable
@@ -65,7 +65,7 @@ fun SettingsScreen(
             SettingButton(icon = Icons.Default.Notifications, text = "Modo de visualización")
             SettingButton(icon = Icons.Default.Lock, text = "Contraseña")
             SettingButton(
-                icon = Icons.Default.Language,
+                icon = Icons.Default.Star,
                 text = "Cambiar idioma",
                 onClick = { navController.navigate("language_screen") }
             )

@@ -248,7 +248,7 @@ class AuthViewModel : ViewModel() {
     // Obtener el cliente de inicio de sesión de Google
     fun getGoogleSignInClient(activity: Activity): GoogleSignInClient {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("79725582630-2mn226j2pnrpcn7ljg07j6o7hish6p3s.apps.googleusercontent.com")
+            .requestIdToken("276829590899-b57qecnv0f414u2l3ss2kfgg6vdn99ik.apps.googleusercontent.com")
             .requestEmail()
             .build()
 

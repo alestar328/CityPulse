@@ -30,6 +30,8 @@ import com.app.citypulse.presentation.components.CustomTextField
 import com.app.citypulse.presentation.components.DescriptionTextField
 import com.app.citypulse.presentation.components.NumericTextField
 import com.app.citypulse.presentation.components.PhotoContainer
+import com.app.citypulse.presentation.ui.theme.TurkBlue
+import com.app.citypulse.presentation.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
@@ -126,7 +128,11 @@ fun CreateEventScreen(
                 CategoriaDropdown(selectedCategoria = categoriaSeleccionada) {
                     categoriaSeleccionada = it
                 }
-                CustomTextField(value = subcategoria, label = stringResource(id = R.string.subcategoria), onValueChange = { subcategoria = it })
+                CustomTextField(
+                    value = subcategoria,
+                    label = stringResource(id = R.string.subcategoria),
+                    onValueChange = { subcategoria = it }
+                )
 
                 DescriptionTextField(
                     value = descripcion,
@@ -180,10 +186,10 @@ fun CreateEventScreen(
 
                 Button(
                     onClick = { navController.navigate("location_picker_screen") },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
+                    colors = ButtonDefaults.buttonColors(containerColor = YellowLight),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(stringResource(id = R.string.escoger_ubicacion), color = Color.White)
+                    Text(stringResource(id = R.string.escoger_ubicacion), color = TurkBlue)
                 }
             }
             item {
@@ -201,7 +207,7 @@ fun CreateEventScreen(
                         }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(stringResource(id = R.string.cancelar), color = Color.White)
+                        Text(stringResource(id = R.string.cancelar), color = TurkBlue)
                     }
 
                     Row(
@@ -291,7 +297,7 @@ fun CreateEventScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text(stringResource(id = R.string.crear), color = Color.White)
+                            Text(stringResource(id = R.string.crear), color = TurkBlue)
                         }
                     }
                 }
@@ -397,7 +403,7 @@ fun DateTimePickerField(
     ) {
         Text(
             text = if (dateTime.isEmpty()) label else dateTime,
-            color = Color.Blue
+            color = YellowLight
         )
     }
 }

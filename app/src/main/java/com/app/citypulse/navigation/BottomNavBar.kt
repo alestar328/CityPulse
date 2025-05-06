@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.sp
 import com.app.citypulse.presentation.ui.theme.TurkBlue
 import com.app.citypulse.presentation.ui.theme.YellowLight
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavBar(
     items: List<NavItem>,

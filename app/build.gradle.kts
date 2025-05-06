@@ -93,7 +93,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     //FireBase:
-    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
 
     //Crashlitics
@@ -157,6 +157,7 @@ dependencies {
     //Dependencia para las fotos
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
 
+    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
