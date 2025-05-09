@@ -10,7 +10,7 @@ data class UserItem @JvmOverloads constructor(
     val age: Int = 0,                     // Edad del usuario
     val email: String = "",               // Correo electrónico del usuario
     val documentId: String? = null,       // DNI o NIF (puede ser null)
-    val userType: AccountType = AccountType.Persona, // Tipo de usuario, con valor predeterminado "persona"
+    val userType: AccountType = AccountType.PERSON, // Tipo de usuario, con valor predeterminado "persona"
     val valoracion: Int? = null,          // Valoración, puede ser null si es un nuevo usuario
     val password: String = "",            // Contraseña del usuario
     val gender: String? = null,           // Género del usuario, puede ser null

@@ -75,23 +75,23 @@ class AuthViewModel : ViewModel() {
             _isAuthenticated.value = isSuccessful
 
             if (isSuccessful) {
-                loadUserType(email)  // Cargar el tipo de usuario
+                loadUserType()  // Cargar el tipo de usuario
             }
         }
     }
 
-    private fun loadUserType(email: String) {
+    fun loadUserType() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         viewModelScope.launch {
             try {
-                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-                val userRef = firestore.collection("users").document(uid)
-                userRef.get().addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        val type = document.getString("userType")
-                        _userType.value = type
-                    }
-                }
+                val doc = firestore
+                    .collection("users")
+                    .document(uid)
+                    .get()
+                    .await()
+                _userType.value = doc.getString("userType")
             } catch (e: Exception) {
+                Log.e("AuthViewModel", "Couldn't load userType", e)
             }
         }
     }
@@ -152,6 +152,12 @@ class AuthViewModel : ViewModel() {
 
     fun saveUser(user: UserItem, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
+            val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+            if (currentUid == null) {
+                onResult(false)
+                return@launch
+            }
+
             // Creamos un mapa con los datos del usuario
             val userData = hashMapOf(
                 "name" to user.name,
@@ -160,7 +166,7 @@ class AuthViewModel : ViewModel() {
                 "age" to user.age,
                 "documentId" to (user.documentId ?: ""),
                 "gender" to (user.gender ?: ""),
-                "userType" to (user.userType?.name ?: "Persona"),
+                "userType" to (user.userType?.name ?: "PERSON"),
                 "valoracion" to (user.valoracion ?: 0),
                 "password" to user.password,
                 "google" to (user.google ?: "No"),
@@ -170,7 +176,7 @@ class AuthViewModel : ViewModel() {
 
 
             // Referencia a la colección "users" en Firestore
-            val userRef = firestore.collection("users").document(user.email) // Usamos el correo como ID del documento
+            val userRef = firestore.collection("users").document(currentUid)  // Usamos el correo como ID del documento
 
             try {
                 // Guardamos el usuario en Firestore
@@ -222,6 +228,8 @@ class AuthViewModel : ViewModel() {
             // Si el registro es exitoso, actualizamos el estado de autenticación
             if (isSuccessful) {
                 _isAuthenticated.value = true
+                _userType.value = userItem.userType?.name
+                loadUserType()
             } else {
                 _isAuthenticated.value = false
             }

@@ -15,7 +15,7 @@ class PersonViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.addUser(user)
-                println(" Persona añadida correctamente")
+                println(" PERSON añadida correctamente")
             } catch (e: Exception) {
                 println(" Error al añadir persona: ${e.message}")
             }
@@ -28,7 +28,7 @@ class PersonViewModel : ViewModel() {
             try {
                 val persons = repository.getUsers()
                 persons.forEach {
-                    println("Persona: ${it.name} ${it.surname}, Edad: ${it.age}")
+                    println("PERSON: ${it.name} ${it.surname}, Edad: ${it.age}")
                 }
             } catch (e: Exception) {
                 println(" Error al obtener personas: ${e.message}")
@@ -41,7 +41,7 @@ class PersonViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.updateUser(id, newUser)
-                println(" Persona actualizada correctamente")
+                println(" PERSON actualizada correctamente")
             } catch (e: Exception) {
                 println(" Error al actualizar persona: ${e.message}")
             }
@@ -53,7 +53,7 @@ class PersonViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.deleteUser(id)
-                println("Persona eliminada correctamente")
+                println("PERSON eliminada correctamente")
             } catch (e: Exception) {
                 println("Error al eliminar persona: ${e.message}")
             }

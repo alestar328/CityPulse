@@ -4,13 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventUiModel
@@ -21,9 +19,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.app.citypulse.data.enums.TipoCategoria
-import com.app.citypulse.presentation.components.SearchTopbar
 import com.app.citypulse.presentation.ui.theme.TurkBlue
-import com.app.citypulse.presentation.ui.theme.YellowLight
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 @Composable
@@ -34,7 +30,8 @@ fun MapScreen(
     navController: NavController,
     authViewModel: AuthViewModel,
     selectedCategory: TipoCategoria,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    eventLocations: List<EventUiModel>,
 ) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(41.57008436408339, 1.9954403499999671), 15f)
@@ -48,14 +45,11 @@ fun MapScreen(
     val userType by authViewModel.userType.collectAsState()
 
 
-    var filteredEvents by remember { mutableStateOf<List<EventUiModel>>(emptyList()) }
-    LaunchedEffect(currentCategory, eventLocations) {
-        filteredEvents = if (currentCategory != TipoCategoria.NONE) {
-            eventLocations.filter { it.categoria == currentCategory }
-        } else {
-            eventLocations
-        }
+    val filteredEvents = remember(selectedCategory, eventLocations) {
+        if (selectedCategory == TipoCategoria.NONE) eventLocations
+        else eventLocations.filter { it.categoria == selectedCategory }
     }
+
     val categoryColors = mapOf(
         TipoCategoria.GASTRONOMICO to 30f,  // 🍊 Naranja
         TipoCategoria.FIESTA to 0f,        // ⚫ Negro
@@ -101,7 +95,7 @@ fun MapScreen(
                     }
                 }
 
-                if (userType == "Organizador" || userType == "Asociacion") {
+                if (userType == "COMPANY" || userType == "ONG") {
                     FloatingActionButton(
                         onClick = {
                             if (selectedEvent == null) {

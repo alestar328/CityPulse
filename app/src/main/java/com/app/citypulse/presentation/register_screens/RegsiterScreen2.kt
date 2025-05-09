@@ -95,7 +95,7 @@ fun RegisterScreen2(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Button(
                             onClick = {
-                                userType = AccountType.Persona
+                                userType = AccountType.PERSON
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -104,7 +104,7 @@ fun RegisterScreen2(
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
                             onClick = {
-                                userType = AccountType.Organizador
+                                userType = AccountType.COMPANY
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -113,7 +113,7 @@ fun RegisterScreen2(
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
                             onClick = {
-                                userType = AccountType.Asociacion
+                                userType = AccountType.ONG
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -122,7 +122,7 @@ fun RegisterScreen2(
                     }
                 } else {
                     // Formulario para "persona"
-                    if (userType == AccountType.Persona) {
+                    if (userType == AccountType.PERSON) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             TextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") })
                             Spacer(modifier = Modifier.height(8.dp))
@@ -158,7 +158,7 @@ fun RegisterScreen2(
                                 }
                             }
                         }
-                    } else if (userType == AccountType.Organizador || userType == AccountType.Asociacion) {
+                    } else if (userType == AccountType.COMPANY || userType == AccountType.ONG) {
                         // Formulario para "organizador" o "asociación"
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             TextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") })
@@ -172,15 +172,15 @@ fun RegisterScreen2(
 
                 // Validación de campos
                 val isDocumentIdValid = when (userType) {
-                    AccountType.Persona -> isValidDNI(documentId)
-                    AccountType.Organizador, AccountType.Asociacion -> isValidNIF(documentId)
+                    AccountType.PERSON -> isValidDNI(documentId)
+                    AccountType.COMPANY, AccountType.ONG -> isValidNIF(documentId)
                     else -> false
                 }
 
                 val missingFields = mutableListOf<String>()
 
                 val isFormValid = when (userType) {
-                    AccountType.Persona -> {
+                    AccountType.PERSON -> {
                         missingFields.clear()
                         if (name.isBlank()) missingFields.add("Nombre")
                         if (surname.isBlank()) missingFields.add("Apellido")
@@ -189,7 +189,7 @@ fun RegisterScreen2(
                         if (!isDocumentIdValid) missingFields.add("Documento de identidad inválido")
                         missingFields.isEmpty()
                     }
-                    AccountType.Organizador, AccountType.Asociacion -> {
+                    AccountType.COMPANY, AccountType.ONG -> {
                         missingFields.clear()
                         if (name.isBlank()) missingFields.add("Nombre")
                         if (documentId.isBlank()) missingFields.add("Documento de identidad")
@@ -216,7 +216,7 @@ fun RegisterScreen2(
                                     email = email,  // Asegúrate de tener el campo 'email' definido
                                     documentId = documentId,
                                     gender = gender,
-                                    userType = userType ?: AccountType.Persona,
+                                    userType = userType ?: AccountType.PERSON,
                                     valoracion = null,  // Si lo tienes, pasa el valor
                                     uid = uid,  // Asegúrate de tener el campo 'uid' definido
                                     google = "no",  // Asegúrate de tener el campo 'google' definido

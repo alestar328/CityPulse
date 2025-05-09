@@ -75,7 +75,7 @@ fun LoginScreen(
                                             val name = account.displayName?.split(" ")?.getOrNull(0) ?: "Nombre"
                                             val surname = account.displayName?.split(" ")?.getOrNull(1) ?: "Apellido"
                                             val documentId = null
-                                            val userType = AccountType.Persona
+                                            val userType = AccountType.PERSON
                                             val password = generatePassword()
                                             val gender = null
                                             val google = "Sí"

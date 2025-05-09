@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.screens.*
 import com.app.citypulse.presentation.register_screens.RegisterScreen
@@ -25,18 +26,21 @@ import com.app.citypulse.presentation.viewmodel.FriendsViewModel
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    eventLocations: List<EventUiModel>,
+    selectedCategory: TipoCategoria
 ) {
     val authViewModel: AuthViewModel = viewModel()
     val eventViewModel: EventViewModel = viewModel()
     val friendsViewModel: FriendsViewModel = viewModel(factory = FriendsViewModel.FriendsViewModelFactory(authViewModel))
+    val eventLocations by eventViewModel.eventUiList.collectAsState()
 
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
     val context = LocalContext.current
 
     NavHost(
         navController = navController,
-        startDestination = if (isAuthenticated) "map_screen" else "login"
+        startDestination = if (authViewModel.isAuthenticated.collectAsState().value) "map_screen" else "login"
     ) {
         // Autenticación
         composable("login") {
@@ -97,19 +101,22 @@ fun NavGraph(
         composable("map_screen") {
             MapScreen(
                 viewModel = eventViewModel,
+                authViewModel   = authViewModel,
                 selectedCategory = TipoCategoria.NONE,
-                onLocationSelected = { latLng ->
-                    navController.previousBackStackEntry?.savedStateHandle?.apply {
-                        set("latitud", latLng.latitude)
-                        set("longitud", latLng.longitude)
-                    }
+                eventLocations     = eventLocations,
+                onLocationSelected  = { latLng ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("latitud", latLng.latitude)
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("longitud", latLng.longitude)
                     navController.popBackStack()
                 },
                 onMarkerClicked = { eventEntity ->
                     navController.navigate("event_details/${eventEntity.id}")
                 },
                 navController = navController,
-                authViewModel = authViewModel,
                 innerPadding = innerPadding
             )
         }

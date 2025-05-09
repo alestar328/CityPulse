@@ -254,7 +254,7 @@ fun CreateEventScreen(
                                 if (nombre.isNotEmpty() && fechaInicio.isNotEmpty() && fechaFin.isNotEmpty() &&
                                     precio.isNotEmpty() && aforo.isNotEmpty()
                                 ) {
-                                    if (descripcion.length !in 20..50) {
+                                    if (descripcion.length !in 5..15) {
                                         Toast.makeText(
                                             context,
                                             errorDescripcion,
