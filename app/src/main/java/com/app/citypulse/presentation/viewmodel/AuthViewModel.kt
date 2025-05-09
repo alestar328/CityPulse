@@ -32,36 +32,24 @@ class AuthViewModel : ViewModel() {
 
     private val _currentUser = MutableStateFlow<UserItem?>(null)
     // Propiedad pública para exponer el usuario actual
-    val currentUser: StateFlow<UserItem?> get() = _currentUser
+    val currentUser: StateFlow<UserItem?> = _currentUser
 
     private val _userType = MutableStateFlow<String?>(null)
     val userType: StateFlow<String?> = _userType
 
-    fun loadUserData(onResult: (UserItem?) -> Unit) {
+    fun loadUserData() {
         viewModelScope.launch {
-            try {
-                val currentUser = auth.currentUser
-                if (currentUser != null) {
-                    val docSnapshot = if (currentUser.providerData.any { it.providerId == "google.com" }) {
-                        firestore.collection("users")
-                            .document(currentUser.email!!)
-                            .get()
-                            .await()
-                    } else {
-                        firestore.collection("users")
-                            .document(currentUser.uid)
-                            .get()
-                            .await()
-                    }
-                    val userData = docSnapshot.toObject(UserItem::class.java)
-                    onResult(userData)
-                } else {
-                    onResult(null)
-                }
-            } catch (e: Exception) {
-                Log.e("AuthViewModel", "Error loading user data", e)
-                onResult(null)
+            val firebaseUser = auth.currentUser
+            if (firebaseUser == null) {
+                _currentUser.value = null
+                return@launch
             }
+            // always use UID
+            val doc = firestore.collection("users")
+                .document(firebaseUser.uid)
+                .get()
+                .await()
+            _currentUser.value = if (doc.exists()) doc.toObject(UserItem::class.java) else null
         }
     }
 
@@ -97,15 +85,20 @@ class AuthViewModel : ViewModel() {
     }
 
     fun updateProfilePictureUrl(newUrl: String, onResult: (Boolean) -> Unit) {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            val userRef = firestore.collection("users").document(currentUser.uid)
-            userRef.update("profilePictureUrl", newUrl)
-                .addOnSuccessListener { onResult(true) }
-                .addOnFailureListener { onResult(false) }
-        } else {
+        val firebaseUser = auth.currentUser ?: run {
             onResult(false)
+            return
         }
+        val userRef = firestore.collection("users").document(firebaseUser.uid)
+        userRef.update("profilePictureUrl", newUrl)
+            .addOnSuccessListener {
+                // Update local StateFlow so the UI sees it
+                _currentUser.value = _currentUser.value?.copy(profilePictureUrl = newUrl)
+                onResult(true)
+            }
+            .addOnFailureListener {
+                onResult(false)
+            }
     }
     fun addGalleryPictureUrl(newUrl: String, onResult: (Boolean) -> Unit) {
         val currentUser = auth.currentUser

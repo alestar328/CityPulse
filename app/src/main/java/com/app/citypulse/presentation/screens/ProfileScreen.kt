@@ -36,6 +36,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.presentation.components.ActionBox
@@ -56,7 +57,7 @@ fun ProfileScreen(
     viewModel: AuthViewModel,
     innerPadding: PaddingValues
 ) {
-    var user by remember { mutableStateOf<UserItem?>(null) }
+    val user by viewModel.currentUser.collectAsState()
     var isLoading by remember { mutableStateOf(true) }
     val context = LocalContext.current
 
@@ -134,21 +135,9 @@ fun ProfileScreen(
 
     // Llamamos a loadUserData (asegúrate de tenerla implementada en tu AuthViewModel)
     LaunchedEffect(Unit) {
-        viewModel.loadUserData { fetchedUser ->
-            if (fetchedUser != null) {
-                user = fetchedUser
-                pendingProfileUri = null
-
-                // Si `galleryPictureUrls` está vacío, aseguramos que haya 3 espacios nulos
-                pendingGalleryUris = fetchedUser.galleryPictureUrls
-                    .map { Uri.parse(it) }
-                    .toMutableList()
-                    .apply {
-                        while (size < 3) add(null)  // Asegurar 3 elementos siempre
-                    }
-            }
-            isLoading = false
-        }
+        viewModel.loadUserData()
+        // you could also observe some `isLoading` flow in the VM instead
+        isLoading = false
     }
 
     if (isLoading) {
@@ -270,7 +259,7 @@ fun ProfileScreen(
                                     ) { url ->
                                         viewModel.updateProfilePictureUrl(url) { success ->
                                             if (success) {
-                                                user = user!!.copy(profilePictureUrl = url)
+                                                Toast.makeText(context, "Foto de perfil subida", Toast.LENGTH_SHORT).show()
                                             }
                                         }
                                         Toast.makeText(
@@ -295,8 +284,8 @@ fun ProfileScreen(
                                             viewModel.addGalleryPictureUrl(url) { success ->
                                                 if (success) {
                                                     updatedGallery.add(url)
-                                                    user =
-                                                        user!!.copy(galleryPictureUrls = updatedGallery)
+                                                    Toast.makeText(context, "Foto de perfil subida", Toast.LENGTH_SHORT).show()
+
                                                 }
                                             }
                                         }

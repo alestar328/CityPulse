@@ -33,14 +33,12 @@ fun NavGraph(
     val authViewModel: AuthViewModel = viewModel()
     val eventViewModel: EventViewModel = viewModel()
     val friendsViewModel: FriendsViewModel = viewModel(factory = FriendsViewModel.FriendsViewModelFactory(authViewModel))
-    val eventLocations by eventViewModel.eventUiList.collectAsState()
 
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
-    val context = LocalContext.current
 
     NavHost(
         navController = navController,
-        startDestination = if (authViewModel.isAuthenticated.collectAsState().value) "map_screen" else "login"
+        startDestination = if (isAuthenticated) "map_screen" else "login"
     ) {
         // Autenticación
         composable("login") {
@@ -102,7 +100,7 @@ fun NavGraph(
             MapScreen(
                 viewModel = eventViewModel,
                 authViewModel   = authViewModel,
-                selectedCategory = TipoCategoria.NONE,
+                selectedCategory = selectedCategory,
                 eventLocations     = eventLocations,
                 onLocationSelected  = { latLng ->
                     navController.previousBackStackEntry

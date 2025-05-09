@@ -29,18 +29,16 @@ fun MapScreen(
     onMarkerClicked: (EventUiModel) -> Unit,
     navController: NavController,
     authViewModel: AuthViewModel,
-    selectedCategory: TipoCategoria,
     innerPadding: PaddingValues,
+    selectedCategory: TipoCategoria,
     eventLocations: List<EventUiModel>,
 ) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(41.57008436408339, 1.9954403499999671), 15f)
     }
 
-    val eventLocations by viewModel.eventUiList.collectAsState()
     var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) } //coge ubicacion al presionar dedo
-    var currentCategory by remember { mutableStateOf(selectedCategory) }
 
     val userType by authViewModel.userType.collectAsState()
 
