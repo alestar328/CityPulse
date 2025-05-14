@@ -10,6 +10,26 @@ class UserRepository {
     private  val collectionRef = db.collection("users")
     private val auth = FirebaseAuth.getInstance()
 
+
+    suspend fun getSavedEventIdsForUser(): List<String> {
+        val uid = auth.currentUser?.uid ?: return emptyList()
+        val snaps = db.collection("users")
+            .document(uid)
+            .collection("savedEvents")
+            .get()
+            .await()
+        return snaps.documents.mapNotNull { it.id }
+    }
+    suspend fun saveEventForUser(eventId: String) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val userDoc = db.collection("users").document(uid)
+        userDoc
+            .collection("savedEvents")
+            .document(eventId)
+            .set(mapOf("eventId" to eventId))
+            .await()
+    }
+
     fun getLanguagePreference(callback: (String) -> Unit) {
         val userId = auth.currentUser?.uid
         userId?.let {

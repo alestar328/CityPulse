@@ -44,7 +44,8 @@ fun EventOrganizerMapCard(
     aforo: Int,
     eventId: String,
     navController: NavController,
-    images: List<String>
+    images: List<String>,
+    onSubscribe: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -132,13 +133,13 @@ fun EventOrganizerMapCard(
         ) {
             ActionButton(
                 text = "Inscribirse",
+                onClick = onSubscribe,
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = "Asistencia"
                     )
                 },
-                onClick = {},
                 modifier = Modifier.weight(1f)
             )
             ActionButton(

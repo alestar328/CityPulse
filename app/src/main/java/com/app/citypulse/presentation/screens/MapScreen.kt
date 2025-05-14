@@ -20,10 +20,12 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.ui.theme.TurkBlue
+import com.app.citypulse.presentation.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 @Composable
 fun MapScreen(
+    userViewModel: UserViewModel,
     viewModel: EventViewModel,
     onLocationSelected: (LatLng) -> Unit,
     onMarkerClicked: (EventUiModel) -> Unit,
@@ -142,6 +144,10 @@ fun MapScreen(
                             aforo = event.aforo,
                             eventId = event.id,
                             navController = navController,
+                            onSubscribe = {
+                                userViewModel.saveEventForUser(event.id)
+                                navController.navigate("saved_events")
+                            },
                             images = event.galleryPictureUrls
                                 ?: emptyList() // 🔹 Ahora pasamos las imágenes correctas
                         )

@@ -4,11 +4,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.repository.UserRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class PersonViewModel : ViewModel() {
+class UserViewModel : ViewModel() {
 
     private val repository = UserRepository()
+    private val _savedEvents = MutableStateFlow<List<String>>(emptyList())
+    val savedEvents: StateFlow<List<String>> = _savedEvents.asStateFlow()
+
+    fun saveEventForUser(eventId: String) = viewModelScope.launch {
+        repository.saveEventForUser(eventId)
+        _savedEvents.value = repository.getSavedEventIdsForUser()
+    }
+    init {
+        viewModelScope.launch {
+            _savedEvents.value = repository.getSavedEventIdsForUser()
+        }
+    }
 
     // 🔹 Agregar una persona a Firestore
     fun addPerson(user: UserItem) {
