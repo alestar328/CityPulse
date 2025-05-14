@@ -16,33 +16,42 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-sealed class UiState<out T> {
-    object Loading : UiState<Nothing>()
-    data class Success<T>(val data: T) : UiState<T>()
+sealed class EventDetailsUiState {
+    object Loading : EventDetailsUiState()
+    data class Success(val event: EventUiModel, val isCreator: Boolean) : EventDetailsUiState()
+    object Error : EventDetailsUiState() // O podrías incluir un mensaje de error
+    object NotFound : EventDetailsUiState() // Para cuando el evento no existe
 }
 
 class EventViewModel : ViewModel() {
     private val repository = EventRepository()
-    private val _eventUiList = MutableStateFlow<List<EventUiModel>>(emptyList())
-    val eventUiList: StateFlow<List<EventUiModel>> = _eventUiList
 
-    private val _uiState = MutableStateFlow<UiState<List<EventUiModel>>>(UiState.Loading)
-    private val _uploadState = MutableStateFlow<UiState<List<String>>>(UiState.Loading)
+    // Estado para la LISTA de eventos (para una pantalla de lista, si existe)
+    private val _eventUiList = MutableStateFlow<List<EventUiModel>>(emptyList())
+    val eventUiList: StateFlow<List<EventUiModel>> = _eventUiList.asStateFlow()
+
+    // Estado para los DETALLES de un SOLO evento
+    private val _eventDetailsUiState = MutableStateFlow<EventDetailsUiState>(EventDetailsUiState.Loading)
+    val eventDetailsUiState: StateFlow<EventDetailsUiState> = _eventDetailsUiState.asStateFlow() // Exponer como StateFlow de solo lectura
+
     init {
+        // Si la lista de eventos se carga al inicio para otra pantalla, mantén esto
         loadEvents()
     }
 
+
     private fun mapToUiModel(event: EventEntity): EventUiModel {
-        val dateFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
         return EventUiModel(
             id = event.id,
             nombre = event.nombre,
-            categoria = event.categoria, // Se asigna el valor de event
+            categoria = event.categoria,
             subcategoria = event.subcategoria,
             descripcion = event.descripcion,
             lugar = event.lugar,
@@ -54,31 +63,31 @@ class EventViewModel : ViewModel() {
             precio = event.precio,
             valoracion = event.valoracion,
             idRealizador = event.idRealizador,
-            galleryPictureUrls = event.galleryPictureUrls // 🔹 Ahora cargamos la lista de imágenes
-
+            galleryPictureUrls = event.galleryPictureUrls ?: emptyList()
         )
     }
 
     fun createEvent(event: EventEntity, images: List<Uri>, onComplete: (String) -> Unit) {
         viewModelScope.launch {
             try {
-                val eventId = repository.addEvent(event) // Guardar evento y obtener su ID
+                val eventId = repository.addEvent(event)
                 println("📌 Evento creado con ID: $eventId")
 
                 val imageUrls = if (images.isNotEmpty()) {
-                    repository.uploadEventImages(eventId, images) // Esperar subida de imágenes
+                    repository.uploadEventImages(eventId, images)
                 } else {
                     emptyList()
                 }
 
                 if (imageUrls.isNotEmpty()) {
                     val updatedEvent = event.copy(galleryPictureUrls = imageUrls.toMutableList())
-                    repository.updateEvent(updatedEvent) // Guardar correctamente en Firestore
+                    repository.updateEvent(updatedEvent)
                 }
 
                 onComplete(eventId)
             } catch (e: Exception) {
                 println("⚠️ Error creando evento: ${e.message}")
+                // Considerar emitir un estado de error o usar un canal de eventos para errores
             }
         }
     }
@@ -88,9 +97,11 @@ class EventViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.deleteEvent(eventId)
-                navController.popBackStack()
+                navController.popBackStack() // Navegación en el ViewModel (mejorable)
+                println("✅ Evento $eventId eliminado.")
             } catch (e: Exception) {
-                println("Error al eliminar evento: ${e.message}")
+                println("⚠️ Error al eliminar evento: ${e.message}")
+                // Considerar emitir un estado de error
             }
         }
     }
@@ -99,9 +110,14 @@ class EventViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.updateEvent(event)
-                loadEvents()
+                // Después de actualizar, podrías querer recargar los detalles
+                getEventById(event.id) // Recargar el evento específico
+                // O recargar la lista si fuera necesario para otra pantalla
+                // loadEvents()
+                println("✅ Evento ${event.id} actualizado.")
             } catch (e: Exception) {
-                println("Error al actualizar evento: ${e.message}")
+                println("⚠️ Error al actualizar evento: ${e.message}")
+                // Considerar emitir un estado de error
             }
         }
     }
@@ -111,24 +127,40 @@ class EventViewModel : ViewModel() {
 
     fun getEventById(eventId: String) {
         viewModelScope.launch {
-            val event = repository.getEventById(eventId)
-            if (event != null) {
-                println("🔹 Evento encontrado: ${event.nombre} con imágenes: ${event.galleryPictureUrls}")
-            } else {
-                println("⚠️ No se encontró el evento con ID: $eventId")
+            _eventDetailsUiState.value = EventDetailsUiState.Loading // Indica carga al inicio
+            try {
+                val event = repository.getEventById(eventId)
+                if (event != null) {
+                    // Aquí se determina si es el creador y se crea el estado Success
+                    val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+                    val isCreator = currentUser != null && currentUser == event.idRealizador
+
+                    // Mapeamos EventEntity a EventUiModel Y creamos el estado Success
+                    val eventUiModel = mapToUiModel(event) // Usamos el mapeo original para obtener el UiModel
+                    _eventDetailsUiState.value = EventDetailsUiState.Success(eventUiModel, isCreator)
+
+                    println("🔹 Evento encontrado: ${event.nombre} con imágenes: ${event.galleryPictureUrls}")
+                } else {
+                    _eventDetailsUiState.value = EventDetailsUiState.NotFound // Indica que no se encontró
+                    println("⚠️ No se encontró el evento con ID: $eventId")
+                }
+            } catch (e: Exception) {
+                _eventDetailsUiState.value = EventDetailsUiState.Error // Indica error
+                println("⚠️ Error al obtener evento: ${e.message}")
             }
-            _eventFlow.value = event?.copy(
-                galleryPictureUrls = event.galleryPictureUrls ?: mutableListOf()
-            )
         }
     }
 
     fun loadEvents() {
-        _uiState.value = UiState.Loading
+        // Podrías tener un estado de carga para la lista si la UI lo necesita
+        // _uiState.value = UiState.Loading // Si usas UiState para la lista
         repository.getEvents { events ->
+            // Mapear la lista de EventEntity a una lista de EventUiModel
             val uiEvents = events.map { mapToUiModel(it) }
-            _eventUiList.value = uiEvents
-            _uiState.value = UiState.Success(uiEvents)
+            _eventUiList.value = uiEvents // Actualizar el StateFlow de la LISTA
+
+            // Si tuvieras un estado UiState para la lista, lo actualizarías aquí:
+            // _uiState.value = UiState.Success(uiEvents)
         }
     }
 
