@@ -22,6 +22,7 @@ import com.app.citypulse.presentation.register_screens.RegisterScreen
 import com.app.citypulse.presentation.register_screens.RegisterScreen2
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.FriendsViewModel
+import com.app.citypulse.presentation.viewmodel.UserViewModel
 
 @Composable
 fun NavGraph(
@@ -32,6 +33,7 @@ fun NavGraph(
 ) {
     val authViewModel: AuthViewModel = viewModel()
     val eventViewModel: EventViewModel = viewModel()
+    val userViewModel: UserViewModel = viewModel()
     val friendsViewModel: FriendsViewModel = viewModel(factory = FriendsViewModel.FriendsViewModelFactory(authViewModel))
 
     val isAuthenticated = authViewModel.isAuthenticated.collectAsState().value
@@ -99,6 +101,7 @@ fun NavGraph(
         composable("map_screen") {
             MapScreen(
                 viewModel = eventViewModel,
+                userViewModel = userViewModel,
                 authViewModel   = authViewModel,
                 selectedCategory = selectedCategory,
                 eventLocations     = eventLocations,
@@ -142,7 +145,7 @@ fun NavGraph(
             ContraseñaOlvidada(navController = navController)
         }
         composable("saved_events") {
-            SavedEventsScreen(navController = navController)
+            SavedEventsScreen(navController = navController, userViewModel = userViewModel)
         }
 
         composable("assisted_events") {

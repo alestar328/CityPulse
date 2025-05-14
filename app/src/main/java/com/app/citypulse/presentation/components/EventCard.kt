@@ -1,6 +1,7 @@
 package com.app.citypulse.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,21 +22,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.data.model.EventUiModel
 
 @Composable
 fun EventCard(
-    modifier: Modifier = Modifier
+    event: EventUiModel,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
+    val parts = event.fechaInicio.split(" ")
+    val day = parts.getOrNull(0) ?: ""
+    val mon = parts.getOrNull(1)?.uppercase() ?: ""
     Box(
         modifier = modifier
             .fillMaxWidth()
             .background(color = Color.Black, shape = RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
             .padding(8.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
-
         ) {
             Box(
                 modifier = Modifier
@@ -49,16 +57,18 @@ fun EventCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
+                    //Dia
                     Text(
-                        text = "12",
+                        day,
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
                         textAlign = TextAlign.Center,
 
                         )
+                    //Mes
                     Text(
-                        text = "FEB",
+                        mon,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.Black,
@@ -74,7 +84,7 @@ fun EventCard(
             ) {
                 Text(
                     //Nombre evento
-                    text = "Fiesta de disfraces",
+                    text = event.nombre,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -82,14 +92,14 @@ fun EventCard(
                 Text(
 
                     //Creador evento
-                    text = "Razzmatazz",
+                    text = event.idRealizador,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White
                 )
                 Text(
                     //Categoria evento
-                    text = "Reggaeton",
+                    text = event.categoria.displayName ?: event.categoria.name,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.Gray
@@ -104,5 +114,22 @@ fun EventCard(
 @Preview
 @Composable
 fun EventCardPreview() {
-    EventCard()
+    val sample = EventUiModel(
+        id              = "1",
+        nombre          = "Carnaval Catalán",
+        categoria       = TipoCategoria.FIESTA,
+        subcategoria    = "Disfraces",
+        descripcion     = "",
+        lugar           = "C. Mónaco 196",
+        latitud         = 0.0,
+        longitud        = 0.0,
+        fechaInicio     = "22 Feb 2025, 19:00",
+        fechaFin        = "22 Feb 2025, 23:30",
+        aforo           = 500,
+        precio          = 20.0,
+        valoracion      = 4,
+        idRealizador    = "Razzmatazz",
+        galleryPictureUrls = emptyList()
+    )
+    EventCard(event = sample)
 }

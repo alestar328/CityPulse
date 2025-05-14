@@ -3,28 +3,60 @@ package com.app.citypulse.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.UserItem
+import com.app.citypulse.data.model.EventUiModel
+import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-class UserViewModel : ViewModel() {
-
+class UserViewModel(
+    private val userRepo: UserRepository = UserRepository(),
+    private val eventRepo: EventRepository = EventRepository()
+) : ViewModel() {
     private val repository = UserRepository()
-    private val _savedEvents = MutableStateFlow<List<String>>(emptyList())
-    val savedEvents: StateFlow<List<String>> = _savedEvents.asStateFlow()
+    private val _savedEvents = MutableStateFlow<List<EventUiModel>>(emptyList())
+    val savedEvents: StateFlow<List<EventUiModel>> = _savedEvents.asStateFlow()
 
     fun saveEventForUser(eventId: String) = viewModelScope.launch {
-        repository.saveEventForUser(eventId)
-        _savedEvents.value = repository.getSavedEventIdsForUser()
+        userRepo.saveEventForUser(eventId)
+        loadSavedEvents() // recarga tras guardar
     }
     init {
-        viewModelScope.launch {
-            _savedEvents.value = repository.getSavedEventIdsForUser()
-        }
+        loadSavedEvents()
     }
-
+    private fun loadSavedEvents() = viewModelScope.launch {
+        // 1) IDs guardados
+        val ids = userRepo.getSavedEventIdsForUser()
+        // 2) por cada ID, recuperar entidad y mapear a UI
+        val models = ids.mapNotNull { id ->
+            eventRepo.getEventById(id)?.let { entity ->
+                // aquí copias tu mapToUiModel
+                val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+                EventUiModel(
+                    id               = entity.id,
+                    nombre           = entity.nombre,
+                    categoria        = entity.categoria,
+                    subcategoria     = entity.subcategoria,
+                    descripcion      = entity.descripcion,
+                    lugar            = entity.lugar,
+                    latitud          = entity.latitud,
+                    longitud         = entity.longitud,
+                    fechaInicio      = entity.fechaInicio?.let { dateFormat.format(it) } ?: "Sin fecha",
+                    fechaFin         = entity.fechaFin?.let { dateFormat.format(it) } ?: "Sin fecha",
+                    aforo            = entity.aforo,
+                    precio           = entity.precio,
+                    valoracion       = entity.valoracion,
+                    idRealizador     = entity.idRealizador,
+                    galleryPictureUrls = entity.galleryPictureUrls ?: emptyList()
+                )
+            }
+        }
+        _savedEvents.value = models
+    }
     // 🔹 Agregar una persona a Firestore
     fun addPerson(user: UserItem) {
         viewModelScope.launch {

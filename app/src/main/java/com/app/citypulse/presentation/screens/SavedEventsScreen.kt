@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,6 +28,9 @@ fun SavedEventsScreen(
     navController: NavController,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
+    val savedEvents by userViewModel.savedEvents.collectAsState()
+    Log.d("SavedEventsScreen", "savedEvents changed: $savedEvents")
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -49,7 +53,6 @@ fun SavedEventsScreen(
             )
         }
     ) { innerPadding ->
-        val savedEvents by userViewModel.savedEvents.collectAsState()
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -57,7 +60,10 @@ fun SavedEventsScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(savedEvents) { event ->
-                    EventCard(modifier = Modifier.padding(vertical = 8.dp),
+                    EventCard(
+                        event    = event,
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        onClick  = {navController.navigate("event_details/${event.id}")}
                     )
                 }
 
