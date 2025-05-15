@@ -15,6 +15,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
@@ -29,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +40,7 @@ import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.presentation.ui.theme.TurkBlue
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearcherBar(
     modifier: Modifier = Modifier,
@@ -44,61 +49,54 @@ fun SearcherBar(
 ) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     var filteredEvents by remember { mutableStateOf<List<EventUiModel>>(emptyList()) }
-    var expanded by remember { mutableStateOf(false) } // 🔹
+    var expanded by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-    LaunchedEffect(searchText) {
-        // 🔹 Filtra eventos mientras el usuario escribe
-        filteredEvents = if (searchText.text.isNotEmpty()) {
-            events.filter { event ->
-                event.nombre.contains(searchText.text, ignoreCase = true) ||
-                        event.lugar.contains(searchText.text, ignoreCase = true)
-            }
-        } else emptyList()
-        expanded = filteredEvents.isNotEmpty() // 🔹 Muestra sugerencias solo si hay resultados
-    }
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .background(color = TurkBlue, shape = RoundedCornerShape(24.dp))
-            .padding(horizontal = 16.dp)
-    ){
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
 
-            Spacer(modifier = Modifier.width(12.dp)) // Espaciado entre el icono y el campo de texto
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = {
+            expanded = it
+            if (it) keyboardController?.show()
+        },
+        modifier = modifier.fillMaxWidth()
+    ) {
+        TextField(
+            value = searchText,
+            onValueChange = { tfv ->
+                searchText = tfv
+                val query = tfv.text.trim()
+                if (query.isNotEmpty()) {
+                    val tokens = query.split("\\s+".toRegex()).filter { it.isNotBlank() }
+                    filteredEvents = events.filter { event ->
+                        tokens.all { token ->
+                            listOf(
+                                event.nombre,
+                                event.nomOrg,
+                                event.descripcion,
+                                event.subcategoria,
+                                event.categoria.displayName.orEmpty()
+                            ).any { field ->
+                                field.contains(token, ignoreCase = true)
+                            }
+                        }
+                    }
+                    expanded = filteredEvents.isNotEmpty()
+                } else {
+                    filteredEvents = emptyList()
+                    expanded = false
+                }
+            },
+            placeholder = { Text("Buscar evento") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+            },
+            modifier = Modifier
+                .menuAnchor() // <— ancla correctamente el menú
+                .fillMaxWidth()
+        )
 
-            TextField(
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                },
-                textStyle = LocalTextStyle.current.copy(color = Color.White),
-                placeholder = { Text("Buscar evento", color = Color.White, fontSize = 18.sp) },
-                singleLine = true,
-                modifier = Modifier.weight(1f),
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                )
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Buscar",
-                tint = Color.White,
-                modifier = Modifier.size(25.dp)
-            )
-        }
-
-        // 🔹 Dropdown para mostrar sugerencias en tiempo real
-        DropdownMenu(
+        ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier.background(Color.White)
@@ -107,9 +105,9 @@ fun SearcherBar(
                 DropdownMenuItem(
                     text = { Text(event.nombre, color = Color.Black) },
                     onClick = {
-                        searchText = TextFieldValue(event.nombre) // 🔹 Muestra el evento seleccionado
-                        expanded = false
-                        onEventSelected(event) // 🔹 Llama al callback para manejar la selección
+                        searchText = TextFieldValue(event.nombre)
+                        expanded   = false
+                        onEventSelected(event)
                     }
                 )
             }
