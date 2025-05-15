@@ -22,13 +22,13 @@ import kotlinx.coroutines.tasks.await
 class AuthViewModel : ViewModel() {
     private val authRepository = AuthRepository()
     private var tempPhotoUrls: MutableList<String> = mutableListOf()
+    private val auth = FirebaseAuth.getInstance()
 
     // Estado de autenticación
-    private val _isAuthenticated = MutableStateFlow(false)  // Inicialmente no está autenticado
+    private val _isAuthenticated = MutableStateFlow(auth.currentUser != null)
     val isAuthenticated: StateFlow<Boolean> get() = _isAuthenticated  // Exponemos el estado
 
     private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
 
     private val _currentUser = MutableStateFlow<UserItem?>(null)
     // Propiedad pública para exponer el usuario actual
@@ -36,6 +36,13 @@ class AuthViewModel : ViewModel() {
 
     private val _userType = MutableStateFlow<String?>(null)
     val userType: StateFlow<String?> = _userType
+
+    init{
+        auth.addAuthStateListener { firebaseAuth ->
+            _isAuthenticated.value = firebaseAuth.currentUser != null
+            if(_isAuthenticated.value)loadUserData()
+        }
+    }
 
     fun loadUserData() {
         viewModelScope.launch {

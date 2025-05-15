@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.data.model.EventUiModel
@@ -27,11 +28,11 @@ import com.app.citypulse.presentation.viewmodel.UserViewModel
 @Composable
 fun NavGraph(
     navController: NavHostController,
+    authViewModel: AuthViewModel = viewModel(),
     innerPadding: PaddingValues,
     eventLocations: List<EventUiModel>,
     selectedCategory: TipoCategoria
 ) {
-    val authViewModel: AuthViewModel = viewModel()
     val eventViewModel: EventViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
     val friendsViewModel: FriendsViewModel = viewModel(factory = FriendsViewModel.FriendsViewModelFactory(authViewModel))
