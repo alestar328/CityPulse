@@ -92,7 +92,7 @@ fun EventCard(
                 Text(
 
                     //Creador evento
-                    text = event.idRealizador,
+                    text = event.nomOrg,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White
@@ -117,6 +117,7 @@ fun EventCardPreview() {
     val sample = EventUiModel(
         id              = "1",
         nombre          = "Carnaval Catalán",
+        nomOrg          = "Razzmatazz",
         categoria       = TipoCategoria.FIESTA,
         subcategoria    = "Disfraces",
         descripcion     = "",
@@ -128,7 +129,7 @@ fun EventCardPreview() {
         aforo           = 500,
         precio          = 20.0,
         valoracion      = 4,
-        idRealizador    = "Razzmatazz",
+        idRealizador    = "333333",
         galleryPictureUrls = emptyList()
     )
     EventCard(event = sample)

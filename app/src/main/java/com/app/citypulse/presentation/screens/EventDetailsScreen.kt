@@ -1,6 +1,5 @@
 package com.app.citypulse.presentation.screens
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,153 +14,197 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.citypulse.data.model.EventUiModel
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.R
 import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.presentation.ui.theme.TurkBlue
+import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventDetailsScreen(event: EventUiModel) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding()
-            .background(Color(0xFFFFF59D)),
-        contentPadding = PaddingValues(
-            bottom = 60.dp
-        ),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        // 1️⃣ Imagen de portada
-        item {
-            Box(
-                modifier = Modifier
-                    .height(500.dp)
-                    .fillMaxWidth()
-                    .background(Color(0xFFA1887F))
-                    .padding(horizontal = 45.dp),
-                contentAlignment = Alignment.Center // Para centrar la imagen
+fun EventDetailsScreen(
+    event: EventUiModel,
+    navController: NavController
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
 
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.eventimagecard),
-                    contentDescription = "Event Image",
+        TopAppBar(
+            title = { Text("Detalles del evento") },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Volver",
+                        tint = Color.White
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = TurkBlue,
+                navigationIconContentColor = Color.White,
+                titleContentColor = Color.White
+            )
+        )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding()
+                .background(Color(0xFFFFF59D)),
+            contentPadding = PaddingValues(
+                bottom = 60.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // 1️⃣ Imagen de portada
+            item {
+                Box(
                     modifier = Modifier
-                        .fillMaxSize(),
-                    contentScale = ContentScale.Crop // Recorta la imagen si sobrepasa el contenedor
-                )
-            }
-        }
-        item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFFFF59D)),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(5.dp),
-                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                        .height(500.dp)
+                        .fillMaxWidth()
+                        .background(Color(0xFFA1887F))
+                        .padding(horizontal = 45.dp),
+                    contentAlignment = Alignment.Center // Para centrar la imagen
+
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                    Image(
+                        painter = painterResource(id = R.drawable.eventimagecard),
+                        contentDescription = "Event Image",
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentScale = ContentScale.Crop // Recorta la imagen si sobrepasa el contenedor
+                    )
+                }
+            }
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFFFF59D)),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(5.dp),
+                        verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
-                        Text(
-                            text = "${event.fechaInicio} - ${event.fechaFin}",
-                            fontSize = 15.sp
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Text(
+                                text = "${event.fechaInicio} - ${event.fechaFin}",
+                                fontSize = 15.sp
+                            )
+                        }
                     }
                 }
             }
-        }
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text(
-                    text = event.nombre,
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = event.categoria.displayName ?: event.categoria.name,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    text = event.subcategoria,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Light
-                )
-            }
-        }
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.LocationOn,
-                    contentDescription = "Location",
-                    modifier = Modifier.size(24.dp),
-                    tint = Color.Gray // Ajusta el color según tus necesidades
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "La Fira Villarroel",
-                    fontSize = 20.sp
-                )
-            }
-        }
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text(text = event.lugar, fontSize = 18.sp)
-            }
-        }
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
                 ) {
-                    Text(text = "Aforo:", fontSize = 20.sp) //Organizador
-                    Text(text = "250", fontSize = 20.sp) //Organizador
-
-                }
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "Precio:", fontSize = 18.sp) //Organizador
-                    Text(text = "10 €", fontSize = 18.sp)
-
+                    Text(
+                        text = event.nombre,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
-        }
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text(text = event.descripcion, fontSize = 20.sp)
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = event.nomOrg,
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = event.categoria.displayName ?: event.categoria.name,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = event.subcategoria,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.LocationOn,
+                        contentDescription = "Location",
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Gray // Ajusta el color según tus necesidades
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "La Fira Villarroel",
+                        fontSize = 20.sp
+                    )
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(text = event.lugar, fontSize = 18.sp)
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+
+                    ) {
+                        Text(text = "Aforo:", fontSize = 20.sp) //Organizador
+                        Text(text = event.aforo.toString(), fontSize = 20.sp)
+
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "Precio:", fontSize = 18.sp) //Organizador
+                        Text(
+                            text = String.format(Locale.getDefault(), "%.2f €", event.precio),
+                            fontSize = 18.sp
+                        )
+
+                    }
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(text = event.descripcion, fontSize = 20.sp)
+                }
             }
         }
     }
@@ -174,6 +217,7 @@ fun EventDetailsScreenPreview() {
     val sampleEvent = EventUiModel(
         id = "1",
         nombre = "Carnaval Catalán",
+        nomOrg = "Razzmatazz",
         categoria = TipoCategoria.FIESTA,
         subcategoria = "Disfraces",
         descripcion = "Un concierto de prueba para el instituto jajajajja",
@@ -187,5 +231,9 @@ fun EventDetailsScreenPreview() {
         valoracion = 4
     )
 
-    EventDetailsScreen(event = sampleEvent)
+    val navController = rememberNavController()
+    EventDetailsScreen(
+        event = sampleEvent,
+        navController = navController
+    )
 }

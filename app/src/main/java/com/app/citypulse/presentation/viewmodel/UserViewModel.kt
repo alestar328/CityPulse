@@ -39,6 +39,7 @@ class UserViewModel(
                 EventUiModel(
                     id               = entity.id,
                     nombre           = entity.nombre,
+                    nomOrg           = entity.nombreOrg,
                     categoria        = entity.categoria,
                     subcategoria     = entity.subcategoria,
                     descripcion      = entity.descripcion,

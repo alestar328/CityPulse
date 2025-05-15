@@ -6,6 +6,7 @@ import java.util.Date
 data class EventEntity(
     val id: String = "",
     val nombre: String = "",
+    val nombreOrg: String = "",
     val categoria: TipoCategoria = TipoCategoria.CULTURAL,
     val subcategoria: String = "",
     val descripcion: String = "",

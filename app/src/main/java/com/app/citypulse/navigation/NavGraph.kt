@@ -8,12 +8,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.data.model.EventUiModel
@@ -92,7 +90,7 @@ fun NavGraph(
 
         // Eventos
         composable("create_event") {
-            CreateEventScreen(eventViewModel, navController, innerPadding)
+            CreateEventScreen(eventViewModel, authViewModel,navController, innerPadding)
         }
 
         composable("location_picker_screen") {

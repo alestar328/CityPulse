@@ -78,7 +78,7 @@ fun EventDetailsContent(
             val isCreator = success.isCreator
 
             // Llamada al componente UI “tonto”, sólo datos + callbacks
-            EventDetailsScreen(event = event)
+            EventDetailsScreen(event = event, navController = navController)
 
         }
     }

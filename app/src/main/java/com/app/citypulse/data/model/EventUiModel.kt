@@ -4,6 +4,7 @@ import com.app.citypulse.data.enums.TipoCategoria
 
 data class EventUiModel(
     val id: String,
+    val nomOrg : String,
     val nombre: String,
     val categoria: TipoCategoria, // Usamos el tipo del enum
     val subcategoria: String,

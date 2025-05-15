@@ -51,6 +51,7 @@ class EventViewModel : ViewModel() {
         return EventUiModel(
             id = event.id,
             nombre = event.nombre,
+            nomOrg = event.nombreOrg,
             categoria = event.categoria,
             subcategoria = event.subcategoria,
             descripcion = event.descripcion,

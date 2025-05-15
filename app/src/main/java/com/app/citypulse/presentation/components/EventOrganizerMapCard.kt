@@ -35,6 +35,7 @@ import java.util.Locale
 @Composable
 fun EventOrganizerMapCard(
     nombre: String,
+    nomOrg : String,
     categoria: String,
     subcategoria: String?,
     lugar: String,
@@ -59,7 +60,8 @@ fun EventOrganizerMapCard(
         Column {
             Text(text = nombre, fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(1.dp))
+            Text(text = nomOrg, fontSize = 14.sp, fontWeight = FontWeight.Bold)
 
             Row(
                 verticalAlignment = Alignment.CenterVertically

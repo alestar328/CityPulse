@@ -32,6 +32,7 @@ import com.app.citypulse.presentation.components.NumericTextField
 import com.app.citypulse.presentation.components.PhotoContainer
 import com.app.citypulse.presentation.ui.theme.TurkBlue
 import com.app.citypulse.presentation.ui.theme.YellowLight
+import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
@@ -40,6 +41,7 @@ import java.util.*
 @Composable
 fun CreateEventScreen(
     viewModel: EventViewModel,
+    authViewModel: AuthViewModel,
     navController: NavController,
     innerPadding: PaddingValues
 ) {
@@ -56,6 +58,7 @@ fun CreateEventScreen(
     var eventPhotos by rememberSaveable { mutableStateOf<List<Uri>>(emptyList()) }
     val selectedPhotos = remember { mutableStateListOf<Uri?>(null, null, null) }
     var subcategoria by rememberSaveable { mutableStateOf("") }
+    val currentUser by authViewModel.currentUser.collectAsState()
 
 
     val context = LocalContext.current
@@ -66,6 +69,11 @@ fun CreateEventScreen(
     val errorUbicacion = stringResource(id = R.string.error_ubicacion)
     val errorCampos = stringResource(id = R.string.error_campos)
 
+    var nomOrg by rememberSaveable {
+        mutableStateOf(
+            currentUser?.let { "${it.name} ${it.surname}" }.orEmpty()
+        )
+    }
     LaunchedEffect(navController.currentBackStackEntry) {
         val savedState = navController.currentBackStackEntry?.savedStateHandle
 
@@ -271,6 +279,7 @@ fun CreateEventScreen(
 
                                     val event = EventEntity(
                                         nombre = nombre,
+                                        nombreOrg = nomOrg,
                                         categoria = categoriaSeleccionada,
                                         subcategoria = subcategoria,
                                         descripcion = descripcion,

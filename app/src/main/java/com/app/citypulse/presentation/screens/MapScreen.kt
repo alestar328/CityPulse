@@ -135,6 +135,7 @@ fun MapScreen(
                         // Aquí reutilizas tu EventOrganizerMapCard
                         EventOrganizerMapCard(
                             nombre = event.nombre,
+                            nomOrg = event.nomOrg,
                             categoria = event.categoria.name, // Convertimos el enum a String
                             subcategoria = event.subcategoria,
                             lugar = event.lugar,
