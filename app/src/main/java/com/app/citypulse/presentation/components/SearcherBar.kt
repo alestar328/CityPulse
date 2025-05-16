@@ -2,12 +2,16 @@ package com.app.citypulse.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,7 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import com.app.citypulse.data.model.EventUiModel
+import com.app.citypulse.presentation.ui.theme.TurkBlue
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +47,8 @@ fun SearcherBar(
             expanded = it
             if (it) keyboardController?.show()
         },
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
     ) {
         TextField(
             value = searchText,
@@ -69,30 +76,58 @@ fun SearcherBar(
                     expanded = false
                 }
             },
-            placeholder = { Text("Buscar evento") },
+            placeholder  = { Text("Buscar evento", color = Color.White.copy(alpha = 0.6f)) },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded)
             },
             modifier = Modifier
                 .menuAnchor() // <— ancla correctamente el menú
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor    = TurkBlue, // Use focused/unfocused prefixes in M3
+                unfocusedContainerColor  = TurkBlue,
+                disabledContainerColor   = TurkBlue,
+                focusedTextColor         = Color.White,
+                unfocusedTextColor       = Color.White,
+                disabledTextColor        = Color.White,
+                cursorColor              = Color.White,
+                focusedPlaceholderColor  = Color.White.copy(alpha = 0.6f),
+                unfocusedPlaceholderColor = Color.White.copy(alpha = 0.6f),
+                disabledPlaceholderColor = Color.White.copy(alpha = 0.6f),
+                focusedIndicatorColor   = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor  = Color.Transparent,
+                errorIndicatorColor     = Color.Transparent
+            )
         )
 
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.background(Color.White)
+            modifier = Modifier
+                .background(
+                    color = TurkBlue,
+                    shape = RoundedCornerShape(12.dp)
+                )
         ) {
             filteredEvents.forEach { event ->
                 DropdownMenuItem(
-                    text = { Text(event.nombre, color = Color.Black) },
+                    text = { Text(event.nombre, color = Color.White) },
                     onClick = {
                         focusManager.clearFocus()
                         keyboardController?.hide()
                         searchText = TextFieldValue(event.nombre)
                         expanded   = false
                         onEventSelected(event)
-                    }
+                    },
+                    colors = MenuItemColors(
+                        textColor                = Color.White,
+                        leadingIconColor         = Color.White,
+                        trailingIconColor        = Color.White,
+                        disabledTextColor        = Color.White,
+                        disabledLeadingIconColor = Color.White,
+                        disabledTrailingIconColor= Color.White
+                    )
                 )
             }
         }
