@@ -1,6 +1,9 @@
 package com.app.citypulse.presentation.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -10,25 +13,31 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.presentation.components.EventOrganizerMapCard
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.ui.theme.TurkBlue
+import com.app.citypulse.presentation.viewmodel.LocationViewModel
 import com.app.citypulse.presentation.viewmodel.UserViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 
+@SuppressLint("MissingPermission")
 @Composable
 fun MapScreen(
     userViewModel: UserViewModel,
     viewModel: EventViewModel,
+    locationViewModel: LocationViewModel,
     onLocationSelected: (LatLng) -> Unit,
     onMarkerClicked: (EventUiModel) -> Unit,
     navController: NavController,
@@ -38,8 +47,9 @@ fun MapScreen(
     eventLocations: List<EventUiModel>,
     searchEventId: String?
 ) {
+    val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState()
-
+    val userLocation by locationViewModel.userLocation.collectAsState()
 
     var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) } //coge ubicacion al presionar dedo
@@ -57,6 +67,62 @@ fun MapScreen(
         TipoCategoria.FIESTA to 0f,        // ⚫ Negro
         TipoCategoria.CULTURAL to 120f     // 🟢 Verde
     )
+    // 1. Create a permission launcher
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions ->
+            val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+            val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+
+            if (fineLocationGranted || coarseLocationGranted) {
+                // Permission granted, fetch location
+                locationViewModel.fetchLocation()
+            } else {
+                // Permission denied, handle this case (e.g., show a message to the user)
+                Log.d("MapScreen", "Location permission denied.")
+            }
+        }
+    )
+
+    // 2. Request permission when the screen starts or when needed
+    LaunchedEffect(Unit) {
+        val hasFineLocationPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val hasCoarseLocationPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        when {
+            hasFineLocationPermission || hasCoarseLocationPermission -> {
+                // Permission already granted, fetch location
+                locationViewModel.fetchLocation()
+            }
+            else -> {
+                // Request permission
+                locationPermissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
+            }
+        }
+    }
+
+    // 3. Move the camera to the user's location once it's available
+    LaunchedEffect(userLocation) {
+        userLocation?.let { latLng ->
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(latLng, 15f)
+            )
+        }
+    }
+
+
     LaunchedEffect(searchEventId) {
         val evt = searchEventId
             ?.let { id -> eventLocations.find { it.id == id } }

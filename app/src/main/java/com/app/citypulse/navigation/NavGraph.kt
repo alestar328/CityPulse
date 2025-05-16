@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -21,12 +22,14 @@ import com.app.citypulse.presentation.register_screens.RegisterScreen
 import com.app.citypulse.presentation.register_screens.RegisterScreen2
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.FriendsViewModel
+import com.app.citypulse.presentation.viewmodel.LocationViewModel
 import com.app.citypulse.presentation.viewmodel.UserViewModel
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
     authViewModel: AuthViewModel = viewModel(),
+    locationViewModel: LocationViewModel,
     innerPadding: PaddingValues,
     eventLocations: List<EventUiModel>,
     selectedCategory: TipoCategoria
@@ -106,6 +109,7 @@ fun NavGraph(
                 viewModel = eventViewModel,
                 userViewModel = userViewModel,
                 authViewModel   = authViewModel,
+                locationViewModel = locationViewModel,
                 selectedCategory = selectedCategory,
                 eventLocations     = eventLocations,
                 onLocationSelected  = { latLng ->

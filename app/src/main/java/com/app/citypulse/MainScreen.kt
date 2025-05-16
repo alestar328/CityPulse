@@ -25,6 +25,7 @@ import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.navigation.BottomNavBar
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.app.citypulse.presentation.viewmodel.LocationViewModel
 import com.app.citypulse.utils.bottomNavigationItemsList
 
 @Composable
@@ -39,6 +40,7 @@ fun MainScreen(
     val authRoutes = listOf("login", "register", "register2")
     val showBottomBar = currentRoute !in authRoutes
     val showSearchTopBar = navController.currentBackStackEntryAsState().value?.destination?.route == "map_screen"
+    val locationViewModel: LocationViewModel = viewModel()
 
     val eventLocations by eventViewModel.eventUiList.collectAsState()
     var selectedCategory by remember { mutableStateOf(TipoCategoria.NONE) }
@@ -69,8 +71,10 @@ fun MainScreen(
             NavGraph(
                 navController = navController,
                 innerPadding = innerPadding,
+                authViewModel       = authViewModel,
                 eventLocations    = eventLocations,
-                selectedCategory  = selectedCategory
+                selectedCategory  = selectedCategory,
+                locationViewModel =locationViewModel
                 )
 
             if (showSearchTopBar) {
