@@ -84,7 +84,14 @@ fun MainScreen(
                     selectedCategory = selectedCategory,
                     onCategorySelected = { newCategory -> selectedCategory = newCategory },
                     onEventSelected = { event ->
-                        // Maneja esto con un ViewModel compartido o savedStateHandle
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("searchEventId", event.id)
+                        navController.navigate("map_screen") {
+                            launchSingleTop = true
+                            restoreState   = true
+
+                        }
                     }
                 )
             }

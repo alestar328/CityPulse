@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -21,6 +22,7 @@ import com.google.maps.android.compose.*
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.ui.theme.TurkBlue
 import com.app.citypulse.presentation.viewmodel.UserViewModel
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 @Composable
@@ -34,10 +36,10 @@ fun MapScreen(
     innerPadding: PaddingValues,
     selectedCategory: TipoCategoria,
     eventLocations: List<EventUiModel>,
+    searchEventId: String?
 ) {
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(41.57008436408339, 1.9954403499999671), 15f)
-    }
+    val cameraPositionState = rememberCameraPositionState()
+
 
     var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) } //coge ubicacion al presionar dedo
@@ -55,6 +57,24 @@ fun MapScreen(
         TipoCategoria.FIESTA to 0f,        // ⚫ Negro
         TipoCategoria.CULTURAL to 120f     // 🟢 Verde
     )
+    LaunchedEffect(searchEventId) {
+        val evt = searchEventId
+            ?.let { id -> eventLocations.find { it.id == id } }
+
+        if (evt != null) {
+            Log.d("MapScreen", "Buscando evento desde búsqueda: ${evt.nombre}")
+            selectedEvent = evt
+
+            // 3) Y luego animamos la cámara a su posición
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(evt.latitud, evt.longitud),
+                    15f
+                )
+            )
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()

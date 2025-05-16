@@ -97,7 +97,11 @@ fun NavGraph(
             LocationPickerScreen(navController, innerPadding = innerPadding)
         }
 
-        composable("map_screen") {
+        composable("map_screen") { backStackEntry ->
+            val searchEventId: String? =
+                backStackEntry.savedStateHandle
+                    .get<String>("searchEventId")
+                    .also { /* opcional: limpiar si no la quieres persistente */ }
             MapScreen(
                 viewModel = eventViewModel,
                 userViewModel = userViewModel,
@@ -117,7 +121,8 @@ fun NavGraph(
                     navController.navigate("event_details/${eventEntity.id}")
                 },
                 navController = navController,
-                innerPadding = innerPadding
+                innerPadding = innerPadding,
+                searchEventId     = searchEventId
             )
         }
 

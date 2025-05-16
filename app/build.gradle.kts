@@ -74,6 +74,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.storage)
+    implementation(libs.play.services.location)
 
 
     val room_version = "2.6.1"
