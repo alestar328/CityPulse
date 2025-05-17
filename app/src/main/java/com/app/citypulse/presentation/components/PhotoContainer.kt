@@ -6,12 +6,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,8 +31,10 @@ fun PhotoContainer(
     url: String?,          // Imagen guardada en Firestore (o nula)
     localUri: Uri?,        // Imagen local pendiente
     onClick: () -> Unit,
-    onDelete: () -> Unit
-){
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+
+    ){
     Box(
         modifier = Modifier
             .size(width = 115.dp, height = 170.dp)
@@ -40,36 +45,18 @@ fun PhotoContainer(
         when {
             localUri != null -> {
                 Image(
-                    painter = rememberAsyncImagePainter(localUri),
+                    painter = rememberAsyncImagePainter(model = localUri),
                     contentDescription = "Imagen local",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete photo",
-                    tint = Color.Red,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .size(30.dp)
-                        .clickable { onDelete() }
-                )
             }
             !url.isNullOrEmpty() -> {
                 Image(
-                    painter = rememberAsyncImagePainter(url),
+                    painter = rememberAsyncImagePainter(model = url),
                     contentDescription = "Imagen Firestore",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
-                )
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete photo",
-                    tint = Color.Red,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .size(30.dp)
-                        .clickable { onDelete() }
                 )
             }
             else -> {
@@ -81,6 +68,23 @@ fun PhotoContainer(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .size(40.dp)
+                )
+            }
+        }
+        // Botón de eliminar (solo si hay imagen)
+        if (localUri != null || !url.isNullOrEmpty()) {
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier
+                    .size(24.dp)
+                    .offset(x = (-4).dp, y = 4.dp)
+                    .background(Color.White, CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Eliminar",
+                    tint = Color.Red,
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }

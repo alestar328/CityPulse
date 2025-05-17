@@ -38,7 +38,9 @@ fun MainScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val authRoutes = listOf("login", "register", "register2")
-    val showBottomBar = currentRoute !in authRoutes
+    val hideBottomBarRoutes =
+        listOf("login", "register", "register2", "saved_events", "assisted_events")
+    val showBottomBar = currentRoute !in hideBottomBarRoutes
     val showSearchTopBar = navController.currentBackStackEntryAsState().value?.destination?.route == "map_screen"
     val locationViewModel: LocationViewModel = viewModel()
 

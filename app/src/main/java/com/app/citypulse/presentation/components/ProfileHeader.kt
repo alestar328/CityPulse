@@ -105,14 +105,14 @@ fun ProfileHeader(
             )
             Text(
                 text = user.email,
-                fontSize = 16.sp,
+                fontSize = 13.sp,
                 color = Color.LightGray
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = user.userType.name,
                 fontSize = 14.sp,
-                color = Color(0xFFBBDEFB)
+                color = Color(0xFF1FA2FF)
             )
         }
     }

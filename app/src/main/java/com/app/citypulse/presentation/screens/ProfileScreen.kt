@@ -32,13 +32,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.platform.LocalContext
-import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.presentation.components.ActionBox
 import com.app.citypulse.presentation.components.ButtonBar
 import com.app.citypulse.presentation.components.PersonalScoreBar
@@ -46,8 +47,6 @@ import com.app.citypulse.presentation.components.PhotoContainer
 import com.app.citypulse.presentation.components.ProfileHeader
 import com.app.citypulse.presentation.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 
 
 @Composable
@@ -60,41 +59,19 @@ fun ProfileScreen(
     val user by viewModel.currentUser.collectAsState()
     var isLoading by remember { mutableStateOf(true) }
     val context = LocalContext.current
+    val gallery by viewModel.galleryUrls.collectAsState()
 
     var pendingProfileUri by remember { mutableStateOf<Uri?>(null) }
-    var pendingGalleryUris by remember {
-        mutableStateOf(listOf<Uri?>(null, null, null))
-    }
+    val pendingGalleryUris = remember { mutableStateListOf<Uri?>(null, null, null) }
 
-    fun uploadImageToFirebase(
-        user: UserItem,
-        uri: Uri,
-        isProfilePicture: Boolean,
-        photoIndex: Int? = null, // Índice para diferenciar las fotos de PhotoContainer
-        onSuccess: (String) -> Unit
-    ) {
-        val storageRef = Firebase.storage.reference
-        val userId = user.uid ?: "anonymous"
-        val fileName = when {
-            isProfilePicture -> "profile.jpg"
-            photoIndex != null -> "photo_$photoIndex.jpg"
-            else -> "unknown.jpg"
+
+
+    LaunchedEffect(user) {
+        if (user != null) {
+            viewModel.loadGallery()
         }
-
-        // Carpeta del usuario en Firebase Storage
-        val imagePath = "profile_pictures/$userId/$fileName"
-        val imageRef = storageRef.child(imagePath)
-        imageRef.putFile(uri)
-            .addOnSuccessListener {
-                imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                    onSuccess(downloadUri.toString())
-                }
-            }
-            .addOnFailureListener {
-                println("⚠️ Error al subir la imagen: ${it.message}")
-            }
+        isLoading = false
     }
-
 
     val profileImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -105,40 +82,19 @@ fun ProfileScreen(
     }
 
 
-    // Launchers para cada una de las 3 fotos adicionales
-    val galleryLauncher1 = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        if (uri != null) {
-            // Copiamos la lista y cambiamos solo el primer elemento
-            pendingGalleryUris = pendingGalleryUris.toMutableList().also { it[0] = uri }
-        }
+    val launcher1 = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        pendingGalleryUris[0] = uri
     }
-    // Launchers para cada una de las 3 fotos adicionales
-    val galleryLauncher2 = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        if (uri != null) {
-            pendingGalleryUris = pendingGalleryUris.toMutableList().also { it[1] = uri }
-        }
+    val launcher2 = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        pendingGalleryUris[1] = uri
     }
-
-    // Launchers para cada una de las 3 fotos adicionales
-    val galleryLauncher3 = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        if (uri != null) {
-            pendingGalleryUris = pendingGalleryUris.toMutableList().also { it[2] = uri }
-        }
+    val launcher3 = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        pendingGalleryUris[2] = uri
     }
 
 
-    // Llamamos a loadUserData (asegúrate de tenerla implementada en tu AuthViewModel)
-    LaunchedEffect(Unit) {
-        viewModel.loadUserData()
-        // you could also observe some `isLoading` flow in the VM instead
-        isLoading = false
-    }
+
+
 
     if (isLoading) {
         Box(
@@ -166,7 +122,7 @@ fun ProfileScreen(
                 ) {
                     ProfileHeader(
                         user = currentUser,
-                        pendingProfileUri = pendingProfileUri,  // le pasamos la URI pendiente
+                        pendingProfileUri =  pendingProfileUri,
                         onClick = { profileImageLauncher.launch("image/*") }
                     )
                 }
@@ -223,77 +179,58 @@ fun ProfileScreen(
                         horizontalArrangement = Arrangement.SpaceAround,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        PhotoContainer(
-                            url = pendingGalleryUris[0]?.toString() ?: user?.galleryPictureUrls?.getOrNull(0),
-                            localUri = pendingGalleryUris[0],
-                            onClick = { galleryLauncher1.launch("image/*") },
-                            onDelete = { pendingGalleryUris = pendingGalleryUris.toMutableList().also { it[0] = null } }
-                        )
-                        PhotoContainer(
-                            url = pendingGalleryUris[1]?.toString() ?: user?.galleryPictureUrls?.getOrNull(1),
-                            localUri = pendingGalleryUris[1],
-                            onClick = { galleryLauncher2.launch("image/*") },
-                            onDelete = { pendingGalleryUris = pendingGalleryUris.toMutableList().also { it[1] = null } }
-                        )
-                        PhotoContainer(
-                            url = pendingGalleryUris[2]?.toString() ?: user?.galleryPictureUrls?.getOrNull(2),
-                            localUri = pendingGalleryUris[2],
-                            onClick = { galleryLauncher3.launch("image/*") },
-                            onDelete = { pendingGalleryUris = pendingGalleryUris.toMutableList().also { it[2] = null } }
-                        )
+                        repeat(3) { index ->
+                            PhotoContainer(
+                                url       = gallery.getOrNull(index),
+                                localUri  = pendingGalleryUris[index],
+                                modifier  = Modifier.padding(4.dp),
+                                onClick   = { when(index) {
+                                    0 -> launcher1.launch("image/*")
+                                    1 -> launcher2.launch("image/*")
+                                    2 -> launcher3.launch("image/*")
+                                }},
+                                onDelete  = { pendingGalleryUris[index] = null }
+                            )
+                        }
 
                     }
                     ButtonBar(
                         text = "Subir fotos",
                         backgroundColor = YellowLight,
                         onClick = {
-                            if (user != null) {
-                                val currentUser = user!!
-
-                                // 📸 Subir foto de perfil si hay una nueva
-                                if (pendingProfileUri != null) {
-                                    uploadImageToFirebase(
-                                        currentUser,
-                                        pendingProfileUri!!,
-                                        isProfilePicture = true
-                                    ) { url ->
-                                        viewModel.updateProfilePictureUrl(url) { success ->
-                                            if (success) {
-                                                Toast.makeText(context, "Foto de perfil subida", Toast.LENGTH_SHORT).show()
-                                            }
-                                        }
-                                        Toast.makeText(
-                                            context,
-                                            "Foto de perfil subida",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                    pendingProfileUri = null
+                            // 1) Preparamos lista de (uri, uploadFunction)
+                            val uploads = mutableListOf<Pair<Uri, (Uri, (Boolean,String?)->Unit) -> Unit>>().apply {
+                                pendingProfileUri?.let { uri ->
+                                    add(uri to viewModel::uploadProfileImage)
                                 }
+                                pendingGalleryUris.forEach { uri ->
+                                    uri?.let { add(it to viewModel::uploadGalleryImage) }
+                                }
+                            }
 
-                                // 🖼️ Subir las 3 fotos de la galería
-                                val updatedGallery = currentUser.galleryPictureUrls.toMutableList()
-                                pendingGalleryUris.forEachIndexed { index, uri ->
-                                    if (uri != null) {
-                                        uploadImageToFirebase(
-                                            currentUser,
-                                            uri,
-                                            isProfilePicture = false,
-                                            photoIndex = index + 1
-                                        ) { url ->
-                                            viewModel.addGalleryPictureUrl(url) { success ->
-                                                if (success) {
-                                                    updatedGallery.add(url)
-                                                    Toast.makeText(context, "Foto de perfil subida", Toast.LENGTH_SHORT).show()
+                            if (uploads.isEmpty()) return@ButtonBar
 
-                                                }
-                                            }
-                                        }
+                            // 2) Contadores
+                            var done = 0
+                            var allSuccess = true
+                            val total = uploads.size
+
+                            // 3) Disparar todas
+                            uploads.forEach { (uri, fn) ->
+                                fn(uri) { success, _ ->
+                                    if (!success) allSuccess = false
+                                    done++
+                                    if (done == total) {
+                                        // Aquí ya terminaron todas
+                                        val msg = if (allSuccess) "Imágenes subidas" else "Error al subir imágenes"
+                                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                                        Log.d("ProfileScreen", msg)
                                     }
                                 }
+                            }
 
-                                // Limpiar las URIs después de subir
-                                pendingGalleryUris = listOf(null, null, null)
+                            repeat(pendingGalleryUris.size) { idx ->
+                                pendingGalleryUris[idx] = null
                             }
                         }
                     )

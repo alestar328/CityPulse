@@ -1,6 +1,7 @@
 package com.app.citypulse.presentation.viewmodel
 
 import android.app.Activity
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +14,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -23,7 +29,8 @@ class AuthViewModel : ViewModel() {
     private val authRepository = AuthRepository()
     private var tempPhotoUrls: MutableList<String> = mutableListOf()
     private val auth = FirebaseAuth.getInstance()
-
+    val storage = Firebase.storage
+    var storageRef = storage.reference
     // Estado de autenticación
     private val _isAuthenticated = MutableStateFlow(auth.currentUser != null)
     val isAuthenticated: StateFlow<Boolean> get() = _isAuthenticated  // Exponemos el estado
@@ -37,12 +44,26 @@ class AuthViewModel : ViewModel() {
     private val _userType = MutableStateFlow<String?>(null)
     val userType: StateFlow<String?> = _userType
 
+    private val _galleryUrls = MutableStateFlow<List<String>>(emptyList())
+    val galleryUrls: StateFlow<List<String>> = _galleryUrls
+
+
     init{
         auth.addAuthStateListener { firebaseAuth ->
             _isAuthenticated.value = firebaseAuth.currentUser != null
             if(_isAuthenticated.value)loadUserData()
         }
     }
+    private suspend fun uploadToStorage(path: String, uri: Uri): String =
+        storage.reference
+            .child(path)
+            .putFile(uri)
+            .await()                            // de kotlinx-coroutines-play-services
+            .storage
+            .downloadUrl
+            .await()
+            .toString()
+
 
     fun loadUserData() {
         viewModelScope.launch {
@@ -57,9 +78,20 @@ class AuthViewModel : ViewModel() {
                 .get()
                 .await()
             _currentUser.value = if (doc.exists()) doc.toObject(UserItem::class.java) else null
+            loadGallery()
         }
     }
-
+    fun loadGallery() = viewModelScope.launch {
+        val uid = auth.currentUser?.uid ?: return@launch
+        val snaps = firestore
+            .collection("users")
+            .document(uid)
+            .collection("gallery")
+            .orderBy("createdAt")
+            .get()
+            .await()
+        _galleryUrls.value = snaps.mapNotNull { it.getString("url") }
+    }
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val result = authRepository.login(email, password)
@@ -91,46 +123,76 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun updateProfilePictureUrl(newUrl: String, onResult: (Boolean) -> Unit) {
-        val firebaseUser = auth.currentUser ?: run {
-            onResult(false)
-            return
-        }
-        val userRef = firestore.collection("users").document(firebaseUser.uid)
-        userRef.update("profilePictureUrl", newUrl)
-            .addOnSuccessListener {
-                // Update local StateFlow so the UI sees it
-                _currentUser.value = _currentUser.value?.copy(profilePictureUrl = newUrl)
-                onResult(true)
-            }
-            .addOnFailureListener {
-                onResult(false)
-            }
-    }
-    fun addGalleryPictureUrl(newUrl: String, onResult: (Boolean) -> Unit) {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            val userRef = firestore.collection("users").document(currentUser.uid)
+    fun uploadProfileImage(uri: Uri, onResult: (Boolean, String?)->Unit) {
+        val uid = auth.currentUser?.uid ?: return onResult(false, null)
+        viewModelScope.launch {
+            runCatching {
+                // 1) Sube al storage y obtiene URL de descarga
+                val path = "users/$uid/profile.jpg"
+                val downloadUrl = uploadToStorage(path, uri)
 
-            userRef.get().addOnSuccessListener { snapshot ->
-                val userItem = snapshot.toObject(UserItem::class.java)
-                if (userItem != null) {
-                    val updatedList = userItem.galleryPictureUrls.toMutableList().apply {
-                        add(newUrl)
-                    }
-                    userRef.update("galleryPictureUrls", updatedList)
-                        .addOnSuccessListener { onResult(true) }
-                        .addOnFailureListener { onResult(false) }
-                } else {
-                    onResult(false)
-                }
-            }.addOnFailureListener {
-                onResult(false)
+                // 2) Actualiza el campo profilePictureUrl en Firestore
+                firestore.collection("users")
+                    .document(uid)
+                    .update("profilePictureUrl", downloadUrl)
+                    .await()
+
+                // 3) Actualiza tu StateFlow para que Compose re-reemplace la imagen
+                _currentUser.value = _currentUser.value
+                    ?.copy(profilePictureUrl = downloadUrl)
+
+                onResult(true, downloadUrl)
+            }.onFailure { throwable ->
+                Log.e("AuthVM", "uploadProfileImage failed", throwable)
+                onResult(false, null)
             }
-        } else {
-            onResult(false)
         }
     }
+
+
+
+    fun uploadGalleryImage(uri: Uri, onResult: (Boolean, String?)->Unit) {
+        val uid = auth.currentUser?.uid ?: return onResult(false, null)
+        viewModelScope.launch {
+            runCatching {
+                // 1) Sube al storage y obtiene URL
+                val filename = "gallery/photo_${System.currentTimeMillis()}.jpg"
+                val downloadUrl = uploadToStorage("users/$uid/$filename", uri)
+
+                // 2) Crea un documento en la sub-colección `gallery`
+                val colRef = firestore
+                    .collection("users")
+                    .document(uid)
+                    .collection("gallery")
+
+                colRef.add(mapOf(
+                    "url" to downloadUrl,
+                    "createdAt" to FieldValue.serverTimestamp()
+                )).await()
+
+                // 3) ¡PRUNE! Borramos todo lo que exceda de 3
+                val allSnaps = colRef
+                    .orderBy("createdAt", Query.Direction.ASCENDING)
+                    .get()
+                    .await()
+
+                if (allSnaps.size() > 3) {
+                    val toDelete = allSnaps.documents.take(allSnaps.size() - 3)
+                    toDelete.forEach { doc ->
+                        colRef.document(doc.id).delete()
+                    }
+                }
+
+                // 4) Notifica el callback y recarga galería
+                onResult(true, downloadUrl)
+                loadGallery()
+            }.onFailure {
+                Log.e("AuthVM", "uploadGalleryImage", it)
+                onResult(false, null)
+            }
+        }
+    }
+
 
 
     // Variables temporales para almacenar datos antes del registro final
@@ -180,7 +242,7 @@ class AuthViewModel : ViewModel() {
 
             try {
                 // Guardamos el usuario en Firestore
-                userRef.set(userData).addOnSuccessListener {
+                userRef.set(userData, SetOptions.merge()).addOnSuccessListener {
                     onResult(true)  // Si se guardó correctamente
                 }.addOnFailureListener { exception ->
                     onResult(false)  // Si hubo un error al guardar
@@ -319,13 +381,8 @@ class AuthViewModel : ViewModel() {
 
 
     fun logout(onLogoutComplete: () -> Unit) {
-        // Lógica para cerrar la sesión (por ejemplo, usando Firebase Auth)
         Firebase.auth.signOut()
-
-        // Limpiar cualquier dato de usuario en el ViewModel
         clearUserData()
-
-        // Llamar al callback para notificar que el logout ha sido completado
         onLogoutComplete()
     }
 

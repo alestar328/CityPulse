@@ -30,6 +30,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
 
 @SuppressLint("MissingPermission")
@@ -155,6 +156,12 @@ fun MapScreen(
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     cameraPositionState = cameraPositionState,
+                    properties = MapProperties(
+                        isMyLocationEnabled = true        // activa el punto azul
+                    ),
+                    uiSettings = MapUiSettings(
+                        myLocationButtonEnabled = true    // habilita el botón de centrar en tu ubicación
+                    ),
                     onMapClick = { clickedLocation ->
                         selectedLocation = clickedLocation
                         selectedEvent = null
@@ -178,6 +185,16 @@ fun MapScreen(
                             )
                         }
 
+                    }
+                    userLocation?.let { myLoc  ->
+                        // círculo de 50m de radio
+                        Circle(
+                            center = myLoc ,
+                            radius = 50.0,                   // en metros
+                            strokeColor = Color.Blue.copy(alpha = 0.5f),
+                            fillColor   = Color.Blue.copy(alpha = 0.1f),
+                            strokeWidth = 2f
+                        )
                     }
                 }
 
