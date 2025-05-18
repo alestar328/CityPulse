@@ -48,10 +48,13 @@ class AuthViewModel : ViewModel() {
     val galleryUrls: StateFlow<List<String>> = _galleryUrls
 
 
-    init{
+    init {
         auth.addAuthStateListener { firebaseAuth ->
             _isAuthenticated.value = firebaseAuth.currentUser != null
-            if(_isAuthenticated.value)loadUserData()
+            if (_isAuthenticated.value) {
+                loadUserData()
+                loadUserType()        // <— aquí forzamos también la carga de userType
+            }
         }
     }
     private suspend fun uploadToStorage(path: String, uri: Uri): String =
@@ -67,18 +70,18 @@ class AuthViewModel : ViewModel() {
 
     fun loadUserData() {
         viewModelScope.launch {
-            val firebaseUser = auth.currentUser
-            if (firebaseUser == null) {
+            val firebaseUser = auth.currentUser ?: run {
                 _currentUser.value = null
                 return@launch
             }
-            // always use UID
             val doc = firestore.collection("users")
                 .document(firebaseUser.uid)
                 .get()
                 .await()
             _currentUser.value = if (doc.exists()) doc.toObject(UserItem::class.java) else null
             loadGallery()
+            // opcional: también sacar el userType del mismo documento
+            doc.getString("userType")?.let { _userType.value = it }
         }
     }
     fun loadGallery() = viewModelScope.launch {

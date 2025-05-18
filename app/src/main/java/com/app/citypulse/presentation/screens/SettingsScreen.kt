@@ -1,5 +1,6 @@
 package com.app.citypulse.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,15 +35,40 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.citypulse.presentation.components.SettingButton
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.app.citypulse.data.enums.AccountType
+import com.app.citypulse.presentation.components.DialogSubcats
+import com.app.citypulse.presentation.viewmodel.AuthViewModel
+import com.app.citypulse.presentation.viewmodel.SettingsViewModel
 
 
 @Composable
 fun SettingsScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    settingsViewModel: SettingsViewModel = viewModel(),
+    authViewModel: AuthViewModel = viewModel()
 ) {
+    val showDialog by settingsViewModel.showSubcatDialog.collectAsState()
+    val userTypeStr by authViewModel.userType.collectAsState()
+    val context = LocalContext.current
+    val errorMsg  by settingsViewModel.errorMessage.collectAsState()
+    val successMsg      by settingsViewModel.successMessage.collectAsState()
+
+    val accountType = remember(userTypeStr) {
+        try {
+            AccountType.valueOf(userTypeStr?.uppercase() ?: "")
+        } catch (_: Exception) {
+            AccountType.PERSON
+        }
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -77,7 +103,18 @@ fun SettingsScreen(
         Text(text = "Ayuda", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
         SettingSection {
             SettingButton(icon = Icons.Default.Info, text = "Información")
-            SettingButton(icon = Icons.Default.Email, text = "Contactar")
+            SettingButton(
+                icon = Icons.Default.Add,
+                text = "Añadir Subcategoría",
+                onClick = {
+                    // Solo COMPANY u ONG pueden abrir
+                    if (accountType == AccountType.COMPANY || accountType == AccountType.ONG) {
+                        settingsViewModel.openSubcatDialog()
+                    } else {
+                        Toast.makeText(context, "Acción prohibida", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -88,6 +125,13 @@ fun SettingsScreen(
             SettingButton(icon = Icons.Default.Delete, text = "Eliminar cuenta")
         }
     }
+    DialogSubcats(
+        show = showDialog,
+        errorMessage= errorMsg,
+        successMessage = successMsg,
+        onDismiss   = { settingsViewModel.closeSubcatDialog() },
+        onAdd       = { name, cat -> settingsViewModel.addSubcategory(name, cat) }
+    )
 }
 
 @Composable
@@ -123,12 +167,3 @@ fun SettingButton(icon: ImageVector, text: String, onClick: () -> Unit = {}) {
     }
 }
 
-/*
-@Preview
-@Composable
-fun SettingsScreenPreview() {
-    SettingsScreen(
-
-    )
-}
-*/
