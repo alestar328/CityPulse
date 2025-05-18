@@ -23,6 +23,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.app.citypulse.navigation.NavGraph
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.navigation.BottomNavBar
+import com.app.citypulse.presentation.components.FilterDialog
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.viewmodel.LocationViewModel
@@ -33,7 +34,7 @@ fun MainScreen(
     eventViewModel: EventViewModel = viewModel(),
     authViewModel: AuthViewModel = viewModel()
 ) {
-
+    var showFilterDialog by remember { mutableStateOf(false) }
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -98,9 +99,30 @@ fun MainScreen(
                             restoreState   = true
 
                         }
+                    },
+                    onSettingsClick = {
+                        showFilterDialog = true
+                    },
+                    onClearClick = {
+                        // limpia cualquier searchId pendiente
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.remove<Long>("searchEventId")
                     }
                 )
             }
+            FilterDialog(
+                show = showFilterDialog,
+                onDismiss = { showFilterDialog = false },
+                onOptionSelected = { option ->
+                    // aquí manejas la opción (p. ej. filtrar tu lista)
+                    showFilterDialog = false
+                }
+            )
+
+
+
+
         }
     }
 }

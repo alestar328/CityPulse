@@ -22,8 +22,10 @@ fun SearchTopbar(
     events: List<EventUiModel>, // 🔹 Pasamos eventos desde ViewModel
     selectedCategory: TipoCategoria,
     onCategorySelected: (TipoCategoria) -> Unit,
-    onEventSelected: (EventUiModel) -> Unit // 🔹 Maneja la selección del evento
-){
+    onEventSelected: (EventUiModel) -> Unit, // 🔹 Maneja la selección del evento
+    onSettingsClick: () -> Unit,
+    onClearClick: () -> Unit
+    ){
 
     Column(
         modifier = modifier
@@ -34,8 +36,11 @@ fun SearchTopbar(
 
     ) {
         SearcherBar(
-            events = events,
-            onEventSelected = onEventSelected
+            modifier         = Modifier.fillMaxWidth(),
+            events           = events,
+            onSettingsClick  = onSettingsClick,
+            onClearClick     = onClearClick,
+            onEventSelected  = onEventSelected
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row(

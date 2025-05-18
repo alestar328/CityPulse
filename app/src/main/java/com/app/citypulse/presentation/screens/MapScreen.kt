@@ -30,8 +30,10 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission")
 @Composable
@@ -51,6 +53,7 @@ fun MapScreen(
     val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState()
     val userLocation by locationViewModel.userLocation.collectAsState()
+    val mapUiScope = rememberCoroutineScope()
 
     var selectedEvent by remember { mutableStateOf<EventUiModel?>(null) }
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) } //coge ubicacion al presionar dedo
@@ -73,7 +76,8 @@ fun MapScreen(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { permissions ->
             val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
-            val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+            val coarseLocationGranted =
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
 
             if (fineLocationGranted || coarseLocationGranted) {
                 // Permission granted, fetch location
@@ -102,6 +106,7 @@ fun MapScreen(
                 // Permission already granted, fetch location
                 locationViewModel.fetchLocation()
             }
+
             else -> {
                 // Request permission
                 locationPermissionLauncher.launch(
@@ -113,34 +118,36 @@ fun MapScreen(
             }
         }
     }
-
-    // 3. Move the camera to the user's location once it's available
-    LaunchedEffect(userLocation) {
-        userLocation?.let { latLng ->
-            cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(latLng, 15f)
-            )
-        }
-    }
-
-
     LaunchedEffect(searchEventId) {
-        val evt = searchEventId
+        searchEventId
             ?.let { id -> eventLocations.find { it.id == id } }
+            ?.let { evt ->
+                mapUiScope.launch {
+                    cameraPositionState.animate(
+                        CameraUpdateFactory.newLatLngZoom(
+                            LatLng(evt.latitud, evt.longitud),
+                            15f
+                        )
+                    )
+                }
+                selectedEvent = evt
 
-        if (evt != null) {
-            Log.d("MapScreen", "Buscando evento desde búsqueda: ${evt.nombre}")
-            selectedEvent = evt
-
-            // 3) Y luego animamos la cámara a su posición
-            cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(evt.latitud, evt.longitud),
-                    15f
+            }
+    }
+    // 3. Move the camera to the user's location once it's available
+    LaunchedEffect(userLocation, searchEventId) {
+        // solo si no había búsqueda activa
+        if (searchEventId.isNullOrEmpty()) {
+            userLocation?.let { latLng ->
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newLatLngZoom(latLng, 15f)
                 )
-            )
+            }
         }
     }
+
+
+
 
     Box(
         modifier = Modifier
@@ -160,7 +167,8 @@ fun MapScreen(
                         isMyLocationEnabled = true        // activa el punto azul
                     ),
                     uiSettings = MapUiSettings(
-                        myLocationButtonEnabled = true    // habilita el botón de centrar en tu ubicación
+                        myLocationButtonEnabled = true, //Ubi propia
+                        zoomControlsEnabled = false
                     ),
                     onMapClick = { clickedLocation ->
                         selectedLocation = clickedLocation
@@ -186,45 +194,40 @@ fun MapScreen(
                         }
 
                     }
-                    userLocation?.let { myLoc  ->
+                    userLocation?.let { myLoc ->
                         // círculo de 50m de radio
                         Circle(
-                            center = myLoc ,
+                            center = myLoc,
                             radius = 50.0,                   // en metros
                             strokeColor = Color.Blue.copy(alpha = 0.5f),
-                            fillColor   = Color.Blue.copy(alpha = 0.1f),
+                            fillColor = Color.Blue.copy(alpha = 0.1f),
                             strokeWidth = 2f
                         )
                     }
                 }
-
-                if (userType == "COMPANY" || userType == "ONG") {
-                    FloatingActionButton(
-                        onClick = {
-                            if (selectedEvent == null) {
-                                val location =
-                                    selectedLocation ?: cameraPositionState.position.target
-                                onLocationSelected(location)
-                                navController.navigate("create_event")
-                            } else {
-                                onMarkerClicked(selectedEvent!!)
-                                navController.navigate("create_event")
-
+                FloatingActionButton(
+                    onClick = {
+                        userLocation?.let { loc ->
+                            // no llamar a animate() directamente: envuélvelo en un launch
+                            mapUiScope.launch {
+                                cameraPositionState.animate(
+                                    CameraUpdateFactory.newLatLngZoom(loc, 15f)
+                                )
                             }
-                        },
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(16.dp, bottom = 80.dp),
-                        containerColor = TurkBlue
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Crear Evento",
-                            tint = Color.White,
-                        )
-                    }
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 16.dp, bottom = 80.dp),
+                    containerColor = Color.White,            // o el color que prefieras
+                    elevation = FloatingActionButtonDefaults.elevation(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MyLocation,
+                        contentDescription = "Mi ubicación",
+                        tint = TurkBlue
+                    )
                 }
-
                 // --- Tarjeta con la información del evento seleccionado ---
                 selectedEvent?.let { event ->
                     Box(
@@ -254,6 +257,34 @@ fun MapScreen(
                             },
                             images = event.galleryPictureUrls
                                 ?: emptyList() // 🔹 Ahora pasamos las imágenes correctas
+                        )
+                    }
+                }
+
+                //Boton crear evento
+                if (userType == "COMPANY" || userType == "ONG") {
+                    FloatingActionButton(
+                        onClick = {
+                            if (selectedEvent == null) {
+                                val location =
+                                    selectedLocation ?: cameraPositionState.position.target
+                                onLocationSelected(location)
+                                navController.navigate("create_event")
+                            } else {
+                                onMarkerClicked(selectedEvent!!)
+                                navController.navigate("create_event")
+
+                            }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(16.dp, bottom = 80.dp),
+                        containerColor = TurkBlue
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Crear Evento",
+                            tint = Color.White,
                         )
                     }
                 }
