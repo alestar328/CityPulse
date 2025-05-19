@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.app.citypulse.R
 import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.presentation.components.CardValueStars
 import com.app.citypulse.presentation.ui.theme.TurkBlue
 import java.util.Locale
 
@@ -36,6 +37,9 @@ fun EventDetailsScreen(
     event: EventUiModel,
     navController: NavController
 ) {
+    var rating by remember { mutableStateOf(event.valoracion) }
+    val avatarUrl = event.galleryPictureUrls.firstOrNull() ?: ""
+
     Column(modifier = Modifier.fillMaxSize()) {
 
         TopAppBar(
@@ -225,6 +229,13 @@ fun EventDetailsScreen(
                 ) {
                     Text(text = event.descripcion, fontSize = 20.sp)
                 }
+            }
+            item {
+                CardValueStars(
+                    avatarUrl         = avatarUrl,
+                    rating            = rating,
+                    onRatingChanged   = { newRating -> rating = newRating }
+                )
             }
         }
     }
