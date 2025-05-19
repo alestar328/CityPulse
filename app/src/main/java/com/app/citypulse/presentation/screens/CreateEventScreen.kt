@@ -9,13 +9,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -23,17 +27,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.app.citypulse.R
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.presentation.components.CustomTextField
 import com.app.citypulse.presentation.components.DescriptionTextField
+import com.app.citypulse.presentation.components.DropdownSubcat
 import com.app.citypulse.presentation.components.NumericTextField
 import com.app.citypulse.presentation.components.PhotoContainer
 import com.app.citypulse.presentation.ui.theme.TurkBlue
 import com.app.citypulse.presentation.ui.theme.YellowLight
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.app.citypulse.presentation.viewmodel.SettingsViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.*
@@ -43,7 +50,9 @@ fun CreateEventScreen(
     viewModel: EventViewModel,
     authViewModel: AuthViewModel,
     navController: NavController,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    settingsViewModel: SettingsViewModel// 1) Inyectamos aquí
+
 ) {
     var nombre by rememberSaveable { mutableStateOf("") }
     var categoriaSeleccionada by rememberSaveable { mutableStateOf(TipoCategoria.CULTURAL) }
@@ -60,6 +69,7 @@ fun CreateEventScreen(
     var subcategoria by rememberSaveable { mutableStateOf("") }
     val currentUser by authViewModel.currentUser.collectAsState()
 
+    val gallery by viewModel.galleryUrls.collectAsState()
 
     val context = LocalContext.current
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
@@ -89,6 +99,11 @@ fun CreateEventScreen(
 
         savedState?.get<List<Uri>>("event_photos")?.let {
             if (it.isNotEmpty()) eventPhotos = it
+        }
+    }
+    LaunchedEffect(eventPhotos) {
+        eventPhotos.take(3).forEachIndexed { i, uri ->
+            selectedPhotos[i] = uri
         }
     }
     val photoLaunchers = List(3) { index ->
@@ -136,10 +151,10 @@ fun CreateEventScreen(
                 CategoriaDropdown(selectedCategoria = categoriaSeleccionada) {
                     categoriaSeleccionada = it
                 }
-                CustomTextField(
-                    value = subcategoria,
-                    label = stringResource(id = R.string.subcategoria),
-                    onValueChange = { subcategoria = it }
+                DropdownSubcat(
+                    subcategoria = subcategoria,
+                    onValueChange = { subcategoria = it },
+                    settingsViewModel = settingsViewModel
                 )
 
                 DescriptionTextField(
@@ -232,12 +247,34 @@ fun CreateEventScreen(
                                 } // Borrar imagen seleccionada
                             )
                         }
+
                     }
                     Spacer(modifier = Modifier.width(5.dp))
 
                 }
             }
-
+            item {
+                if (gallery.isNotEmpty()) {
+                    Text("Fotos guardadas:", color = Color.White, modifier = Modifier.padding(vertical = 8.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    ) {
+                        items(gallery) { url ->
+                            AsyncImage(
+                                model = url,
+                                contentDescription = "Foto del evento",
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(MaterialTheme.shapes.small),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
+            }
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),

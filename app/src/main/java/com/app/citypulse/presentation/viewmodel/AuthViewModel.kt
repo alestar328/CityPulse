@@ -30,7 +30,6 @@ class AuthViewModel : ViewModel() {
     private var tempPhotoUrls: MutableList<String> = mutableListOf()
     private val auth = FirebaseAuth.getInstance()
     val storage = Firebase.storage
-    var storageRef = storage.reference
     // Estado de autenticación
     private val _isAuthenticated = MutableStateFlow(auth.currentUser != null)
     val isAuthenticated: StateFlow<Boolean> get() = _isAuthenticated  // Exponemos el estado

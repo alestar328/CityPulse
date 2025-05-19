@@ -23,6 +23,7 @@ import com.app.citypulse.presentation.register_screens.RegisterScreen2
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.FriendsViewModel
 import com.app.citypulse.presentation.viewmodel.LocationViewModel
+import com.app.citypulse.presentation.viewmodel.SettingsViewModel
 import com.app.citypulse.presentation.viewmodel.UserViewModel
 
 @Composable
@@ -35,6 +36,7 @@ fun NavGraph(
     selectedCategory: TipoCategoria
 ) {
     val eventViewModel: EventViewModel = viewModel()
+    val settingsViewModel: SettingsViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
     val friendsViewModel: FriendsViewModel = viewModel(factory = FriendsViewModel.FriendsViewModelFactory(authViewModel))
 
@@ -93,7 +95,7 @@ fun NavGraph(
 
         // Eventos
         composable("create_event") {
-            CreateEventScreen(eventViewModel, authViewModel,navController, innerPadding)
+            CreateEventScreen(eventViewModel, authViewModel,navController, innerPadding, settingsViewModel)
         }
 
         composable("location_picker_screen") {

@@ -8,6 +8,7 @@ import com.app.citypulse.data.model.EventEntity
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +36,9 @@ class EventViewModel : ViewModel() {
     // Estado para la LISTA de eventos (para una pantalla de lista, si existe)
     private val _eventUiList = MutableStateFlow<List<EventUiModel>>(emptyList())
     val eventUiList: StateFlow<List<EventUiModel>> = _eventUiList.asStateFlow()
+
+    private val _galleryUrls = MutableStateFlow<List<String>>(emptyList())
+    val galleryUrls: StateFlow<List<String>> = _galleryUrls.asStateFlow()
 
     // Estado para los DETALLES de un SOLO evento
     private val _eventDetailsUiState = MutableStateFlow<EventDetailsUiState>(EventDetailsUiState.Loading)
@@ -68,31 +72,31 @@ class EventViewModel : ViewModel() {
         )
     }
 
-    fun createEvent(event: EventEntity, images: List<Uri>, onComplete: (String) -> Unit) {
+    fun createEvent(
+        event: EventEntity,
+        images: List<Uri>,
+        onComplete: (String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val eventId = repository.addEvent(event)
                 println("📌 Evento creado con ID: $eventId")
 
-                val imageUrls = if (images.isNotEmpty()) {
+                // Subimos imágenes y actualizamos galleryUrls
+                val urls = if (images.isNotEmpty()) {
                     repository.uploadEventImages(eventId, images)
-                } else {
-                    emptyList()
-                }
+                } else emptyList()
+                _galleryUrls.value = urls
 
-                if (imageUrls.isNotEmpty()) {
-                    val updatedEvent = event.copy(galleryPictureUrls = imageUrls.toMutableList())
-                    repository.updateEvent(updatedEvent)
-                }
+                // Si quieres refrescar desde la sub-colección:
+                // loadEventGallery(eventId)
 
                 onComplete(eventId)
             } catch (e: Exception) {
                 println("⚠️ Error creando evento: ${e.message}")
-                // Considerar emitir un estado de error o usar un canal de eventos para errores
             }
         }
     }
-
 
     fun deleteEvent(eventId: String, navController: NavController) {
         viewModelScope.launch {
@@ -128,27 +132,32 @@ class EventViewModel : ViewModel() {
 
     fun getEventById(eventId: String) {
         viewModelScope.launch {
-            _eventDetailsUiState.value = EventDetailsUiState.Loading // Indica carga al inicio
+            _eventDetailsUiState.value = EventDetailsUiState.Loading
             try {
                 val event = repository.getEventById(eventId)
                 if (event != null) {
-                    // Aquí se determina si es el creador y se crea el estado Success
-                    val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
-                    val isCreator = currentUser != null && currentUser == event.idRealizador
+                    // Estado detalles
+                    val ui = mapToUiModel(event)
+                    val isCreator =
+                        FirebaseAuth.getInstance().currentUser?.uid == event.idRealizador
+                    _eventDetailsUiState.value = EventDetailsUiState.Success(ui, isCreator)
 
-                    // Mapeamos EventEntity a EventUiModel Y creamos el estado Success
-                    val eventUiModel = mapToUiModel(event) // Usamos el mapeo original para obtener el UiModel
-                    _eventDetailsUiState.value = EventDetailsUiState.Success(eventUiModel, isCreator)
-
-                    println("🔹 Evento encontrado: ${event.nombre} con imágenes: ${event.galleryPictureUrls}")
+                    // **Aquí recargamos la galería** desde la sub-colección:
+                    loadEventGallery(eventId)
                 } else {
-                    _eventDetailsUiState.value = EventDetailsUiState.NotFound // Indica que no se encontró
-                    println("⚠️ No se encontró el evento con ID: $eventId")
+                    _eventDetailsUiState.value = EventDetailsUiState.NotFound
                 }
             } catch (e: Exception) {
-                _eventDetailsUiState.value = EventDetailsUiState.Error // Indica error
+                _eventDetailsUiState.value = EventDetailsUiState.Error
                 println("⚠️ Error al obtener evento: ${e.message}")
             }
+        }
+    }
+
+
+    fun loadEventGallery(eventId: String) {
+        viewModelScope.launch {
+            _galleryUrls.value = repository.getEventGallery(eventId)
         }
     }
 
