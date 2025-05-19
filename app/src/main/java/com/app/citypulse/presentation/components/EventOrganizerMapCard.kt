@@ -10,32 +10,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.app.citypulse.R
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun EventOrganizerMapCard(
     nombre: String,
-    nomOrg : String,
+    nomOrg: String,
     categoria: String,
     subcategoria: String?,
     lugar: String,
@@ -46,8 +43,12 @@ fun EventOrganizerMapCard(
     eventId: String,
     navController: NavController,
     images: List<String>,
-    onSubscribe: () -> Unit
+    onSaved: () -> Unit,
+    onAssisted:() -> Unit
 ) {
+    var isGoing by remember { mutableStateOf(false) }
+    var isInterested by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -133,27 +134,38 @@ fun EventOrganizerMapCard(
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
+
             ActionButton(
-                text = "Inscribirse",
-                onClick = onSubscribe,
+                text = "Asistiré",
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Asistiré"
+                    )
+                },
+                onClick = { isGoing = !isGoing
+                          onAssisted()
+                          },
+                modifier = Modifier.weight(1f),
+                backgroundColor = if (isGoing) Color(0xFF4CAF50) else Color(0xFFE0E0E0),
+                contentColor = if (isGoing) Color.White else Color.Black
+
+            )
+            ActionButton(
+                text = "Guardar",
+                onClick = {
+                    isInterested = !isInterested
+                    onSaved()
+                },
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = "Asistencia"
                     )
                 },
-                modifier = Modifier.weight(1f)
-            )
-            ActionButton(
-                text = "Compartir",
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = "Compartir"
-                    )
-                },
-                onClick = {},
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                backgroundColor = if (isInterested) Color(0xFFE91E63) else Color(0xFFE0E0E0),
+                contentColor = if (isInterested) Color.White else Color.Black
             )
             // 🔹 Nuevo botón de "Información"
             ActionButton(

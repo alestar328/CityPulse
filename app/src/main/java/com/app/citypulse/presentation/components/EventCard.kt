@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,6 +38,7 @@ fun EventCard(
     val parts = event.fechaInicio.split(" ")
     val day = parts.getOrNull(0) ?: ""
     val mon = parts.getOrNull(1)?.uppercase() ?: ""
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -89,22 +94,59 @@ fun EventCard(
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
                 Text(
-
                     //Creador evento
                     text = event.nomOrg,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White
                 )
-                Text(
-                    //Categoria evento
-                    text = event.categoria.displayName ?: event.categoria.name,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Gray
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Row {
+                        // 5 estrellas, rellenas u outline según la valoración
+                        for (i in 1..5) {
+                            val icon = if (i <= event.valoracion) {
+                                Icons.Filled.Star
+                            } else {
+                                Icons.Outlined.Star
+                            }
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .padding(end = 2.dp),
+                                tint = Color(0xFFFFD700) // dorado
+                            )
+                        }
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Text(
+                        //Categoria evento
+                        text = event.categoria.displayName ?: event.categoria.name,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White
 
-                )
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        //Categoria evento
+                        text = event.subcategoria,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Gray
+
+                    )
+                }
             }
 
         }

@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,10 +19,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.app.citypulse.R
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.ui.theme.TurkBlue
@@ -61,27 +65,43 @@ fun EventDetailsScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // 1️⃣ Imagen de portada
             item {
-                Box(
-                    modifier = Modifier
-                        .height(500.dp)
-                        .fillMaxWidth()
-                        .background(Color(0xFFA1887F))
-                        .padding(horizontal = 45.dp),
-                    contentAlignment = Alignment.Center // Para centrar la imagen
-
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.eventimagecard),
-                        contentDescription = "Event Image",
+                if (event.galleryPictureUrls.isNotEmpty()) {
+                    LazyRow(
                         modifier = Modifier
-                            .fillMaxSize(),
-                        contentScale = ContentScale.Crop // Recorta la imagen si sobrepasa el contenedor
-                    )
+                            .padding(top = 5.dp)
+                            .height(400.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(horizontal = 20.dp)
+                    ) {
+                        items(event.galleryPictureUrls.size) { idx ->
+                            val url = event.galleryPictureUrls[idx]
+                            AsyncImage(
+                                model = url,
+                                contentDescription = "Imagen del evento $idx",
+                                modifier = Modifier
+                                    .height(400.dp)
+                                    .fillParentMaxWidth(0.8f)    // ocupa el 80% del ancho del padre
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .height(200.dp)
+                            .fillMaxWidth()
+                            .background(Color.LightGray),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No hay imágenes", color = Color.DarkGray)
+                    }
                 }
             }
             item {
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()

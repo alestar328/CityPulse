@@ -21,12 +21,60 @@ class UserViewModel(
     private val _savedEvents = MutableStateFlow<List<EventUiModel>>(emptyList())
     val savedEvents: StateFlow<List<EventUiModel>> = _savedEvents.asStateFlow()
 
+    private val _assistedEvents = MutableStateFlow<List<EventUiModel>>(emptyList())
+    val assistedEvents: StateFlow<List<EventUiModel>> = _assistedEvents.asStateFlow()
+
+
+
+
+    init {
+        loadSavedEvents()
+        loadAssistedEvents()
+    }
+
     fun saveEventForUser(eventId: String) = viewModelScope.launch {
         userRepo.saveEventForUser(eventId)
         loadSavedEvents() // recarga tras guardar
     }
-    init {
-        loadSavedEvents()
+
+    fun assistedEventForUser(eventId: String) = viewModelScope.launch {
+        userRepo.assistedEventForUser(eventId)
+        loadAssistedEvents() // recarga tras guardar
+    }
+    private fun loadAssistedEvents() = viewModelScope.launch {
+        // 1) IDs de eventos a los que ha asistido el usuario
+        val ids = userRepo.getAssistedEventIdsForUser()
+
+
+        // 2) Por cada ID, recuperar entidad y mapear a EventUiModel
+        val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+        val models = ids.mapNotNull { id ->
+            eventRepo.getEventById(id)?.let { entity ->
+                EventUiModel(
+                    id               = entity.id,
+                    nombre           = entity.nombre,
+                    nomOrg           = entity.nombreOrg,
+                    categoria        = entity.categoria,
+                    subcategoria     = entity.subcategoria,
+                    descripcion      = entity.descripcion,
+                    lugar            = entity.lugar,
+                    latitud          = entity.latitud,
+                    longitud         = entity.longitud,
+                    fechaInicio      = entity.fechaInicio
+                        ?.let { dateFormat.format(it) }
+                        ?: "Sin fecha",
+                    fechaFin         = entity.fechaFin
+                        ?.let { dateFormat.format(it) }
+                        ?: "Sin fecha",
+                    aforo            = entity.aforo,
+                    precio           = entity.precio,
+                    valoracion       = entity.valoracion,
+                    idRealizador     = entity.idRealizador,
+                    galleryPictureUrls = entity.galleryPictureUrls ?: emptyList()
+                )
+            }
+        }
+        _assistedEvents.value = models
     }
     private fun loadSavedEvents() = viewModelScope.launch {
         // 1) IDs guardados

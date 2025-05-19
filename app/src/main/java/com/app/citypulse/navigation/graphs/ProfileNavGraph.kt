@@ -21,7 +21,7 @@ fun NavGraphBuilder.profileRouteScreen(rootNavController: NavHostController) {
         }
         composable(route = ProfileRouteScreen.SavedEvents.route) {
         }
-        composable(route = ProfileRouteScreen.AssitedEvents.route) {
+        composable(route = ProfileRouteScreen.AssistedEvents.route) {
         }
     }
 }

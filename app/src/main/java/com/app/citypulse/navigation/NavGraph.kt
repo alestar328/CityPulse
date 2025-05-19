@@ -159,7 +159,7 @@ fun NavGraph(
         }
 
         composable("assisted_events") {
-            AssitedEventsScreen(navController = navController)
+            AssistedEventsScreen(navController = navController,userViewModel = userViewModel)
         }
     }
 }

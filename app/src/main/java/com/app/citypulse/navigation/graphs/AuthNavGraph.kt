@@ -6,7 +6,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.app.citypulse.navigation.AuthRouteScreen
 import com.app.citypulse.navigation.Graph
-import com.app.citypulse.navigation.ProfileRouteScreen
 
 fun NavGraphBuilder.authNavGraph(rootNavController: NavHostController) {
     navigation(

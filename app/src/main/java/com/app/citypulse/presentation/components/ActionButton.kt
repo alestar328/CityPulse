@@ -26,7 +26,9 @@ fun ActionButton(
     modifier: Modifier = Modifier,
     text: String,
     icon: @Composable (() -> Unit)? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    backgroundColor: Color = Color(0xFFE0E0E0),
+    contentColor:    Color = Color.Black
 ){
     ElevatedButton(
         onClick = onClick,
@@ -35,8 +37,8 @@ fun ActionButton(
             .widthIn(min = 70.dp, max = 170.dp), // 🔹 Tamaño mínimo y máximo controlado
         shape = RoundedCornerShape(24.dp),
         colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = Color.White,
-            contentColor = Color.Black
+            containerColor = backgroundColor,
+            contentColor   = contentColor
         )
     ) {
         Row(
@@ -49,7 +51,9 @@ fun ActionButton(
                 text = text,
                 fontSize = 10.sp, // 🔹 Tamaño de texto más pequeño
                 maxLines = 1, //  Evita que el texto salte a otra linea
-                softWrap = false
+                softWrap = false,
+                color = contentColor
+
             )
         }
     }

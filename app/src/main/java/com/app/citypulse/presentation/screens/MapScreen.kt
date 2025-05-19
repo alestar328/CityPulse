@@ -31,7 +31,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.launch
 
@@ -251,9 +250,11 @@ fun MapScreen(
                             aforo = event.aforo,
                             eventId = event.id,
                             navController = navController,
-                            onSubscribe = {
+                            onSaved = {
                                 userViewModel.saveEventForUser(event.id)
-                                navController.navigate("saved_events")
+                            },
+                            onAssisted = {
+                                userViewModel.assistedEventForUser(event.id)
                             },
                             images = event.galleryPictureUrls
                                 ?: emptyList() // 🔹 Ahora pasamos las imágenes correctas

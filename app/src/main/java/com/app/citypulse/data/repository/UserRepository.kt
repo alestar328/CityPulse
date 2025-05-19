@@ -2,6 +2,7 @@ package com.app.citypulse.data.repository
 
 import com.app.citypulse.data.dataUsers.UserItem
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -20,6 +21,16 @@ class UserRepository {
             .await()
         return snaps.documents.mapNotNull { it.id }
     }
+    suspend fun getAssistedEventIdsForUser(): List<String> {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return emptyList()
+        val snaps = db
+            .collection("users")
+            .document(uid)
+            .collection("assistedEvents")
+            .get()
+            .await()
+        return snaps.documents.mapNotNull { it.getString("eventId") }
+    }
     suspend fun saveEventForUser(eventId: String) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val userDoc = db.collection("users").document(uid)
@@ -27,6 +38,18 @@ class UserRepository {
             .collection("savedEvents")
             .document(eventId)
             .set(mapOf("eventId" to eventId))
+            .await()
+
+    }
+
+    suspend fun assistedEventForUser(eventId: String) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        db
+            .collection("users")
+            .document(uid)
+            .collection("assistedEvents")
+            .document(eventId)
+            .set(mapOf("eventId" to eventId, "timestamp" to FieldValue.serverTimestamp()))
             .await()
     }
 

@@ -163,13 +163,13 @@ fun ProfileScreen(
                     ) {
                         ActionBox(
                             icon = Icons.Default.Check,
-                            title = "Eventos asistidos",
+                            title = "Próximos eventos",
                             modifier = Modifier,
                             onClick = { navController.navigate("assisted_events") }
                         )
                         ActionBox(
                             icon = Icons.Default.Favorite,
-                            title = "Eventos guardados",
+                            title = "Eventos de interés",
                             modifier = Modifier,
                             onClick = { navController.navigate("saved_events") }
                         )
@@ -237,7 +237,12 @@ fun ProfileScreen(
                     ButtonBar(
                         "Cerrar Sesión",
                         backgroundColor = Color.Red,
-                        onClick = { viewModel.logout { navController.navigate("login") } }
+                        onClick = {
+                            navController.navigate("login") {
+                                popUpTo("profile") { inclusive = true }
+                            }
+                            viewModel.logout {
+                                navController.navigate("login") } }
                     )
                 }
             }

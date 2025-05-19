@@ -37,7 +37,7 @@ sealed class ProfileRouteScreen(val route:String){
 
     object AddFriend : ProfileRouteScreen("addfriend")
     object SavedEvents : ProfileRouteScreen("saved_events")
-    object AssitedEvents : ProfileRouteScreen("assisted_events")
+    object AssistedEvents : ProfileRouteScreen("assisted_events")
 
 
 

@@ -48,7 +48,6 @@ fun EventDetailsContent(
         }
 
         is EventDetailsUiState.Error -> {
-            // TODO: reemplaza con tu UI de error (texto, retry...)
             Box(
                 Modifier
                     .fillMaxSize()
