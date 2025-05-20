@@ -23,7 +23,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.app.citypulse.navigation.NavGraph
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.navigation.BottomNavBar
-import com.app.citypulse.presentation.components.FilterDialog
+import com.app.citypulse.presentation.components.DialogFiltersEvents
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.viewmodel.LocationViewModel
@@ -111,7 +111,7 @@ fun MainScreen(
                     }
                 )
             }
-            FilterDialog(
+            DialogFiltersEvents(
                 show = showFilterDialog,
                 onDismiss = { showFilterDialog = false },
                 onOptionSelected = { option ->

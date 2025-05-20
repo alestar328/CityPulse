@@ -1,4 +1,6 @@
 package com.app.citypulse.presentation.components
+
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -8,7 +10,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.presentation.viewmodel.SettingsViewModel
 
 enum class FilterOption(val label: String) {
     CATEGORY("Categoria"),
@@ -17,12 +23,31 @@ enum class FilterOption(val label: String) {
 }
 
 @Composable
-fun FilterDialog(
+fun DialogFiltersEvents(
     show: Boolean,
     onDismiss: () -> Unit,
-    onOptionSelected: (FilterOption) -> Unit
+    onOptionSelected: (FilterOption) -> Unit,
+    settingsViewModel: SettingsViewModel = viewModel()
 ) {
+    var selectedCats by remember { mutableStateOf(setOf<TipoCategoria>()) }
     if (!show) return
+    var selected by remember { mutableStateOf(FilterOption.CATEGORY) }
+    val storedSubcats by settingsViewModel.subcats.collectAsState()
+    val allSubcats by settingsViewModel.subcats.collectAsState()
+    var selectedStars by remember { mutableStateOf<Float?>(null) }
+
+    val displayedSubcats = remember(allSubcats, selectedCats) {
+        if (selectedCats.isEmpty()) {
+            allSubcats.map { it.name }
+        } else {
+            allSubcats
+                .filter { it.category in selectedCats }
+                .map { it.name }
+        }
+    }
+
+
+
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -52,38 +77,84 @@ fun FilterDialog(
                         fontSize = 20.sp
                     )
                 }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    listOf(
+                        TipoCategoria.GASTRONOMICO,
+                        TipoCategoria.CULTURAL,
+                        TipoCategoria.FIESTA
+                    ).forEach { cat ->
+                        val checked = selectedCats.contains(cat)
+                        FilterChip(
+                            selected = checked,
+                            onClick = {
+                                selectedCats = if (checked)
+                                    selectedCats - cat
+                                else
+                                    selectedCats + cat
+                            },
+                            label = { Text(cat.displayName ?: cat.name) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Filtrar por:",
-                    style = MaterialTheme.typography.bodyMedium
+                FilterStarsBar(
+                    modifier = Modifier.fillMaxWidth(),
+                    options = listOf(3.5f, 4.0f, 4.5f),
+                    onSelectionChange = { rating ->
+                        selectedStars = rating
+                    }
                 )
-
                 Spacer(modifier = Modifier.height(12.dp))
+                FilterSubcat(
+                    title = "Subcategorías",
+                    subcats = displayedSubcats,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Divider(color = Color(0xFFBDBDBD), thickness = 1.dp)
+                Spacer(modifier = Modifier.height(8.dp))
 
-                var selected by remember { mutableStateOf(FilterOption.CATEGORY) }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Botón "Borrar"
+                    OutlinedButton(
+                        onClick = { /* TODO: limpiar filtros */ },
+                        modifier = Modifier.weight(1f),
+                        border = BorderStroke(1.dp, Color(0xFF1976D2)),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color.White,
+                            contentColor = Color(0xFF1976D2)
+                        )
+                    ) {
+                        Text("Borrar")
+                    }
 
-                Column {
-                    FilterOption.values().forEach { option ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                        ) {
-                            RadioButton(
-                                selected = (option == selected),
-                                onClick = {
-                                    selected = option
-                                    onOptionSelected(option)
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = option.label)
-                        }
+                    // Botón "Aplicar"
+                    Button(
+                        onClick = { /* TODO: aplicar filtros */ },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF1976D2),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Aplicar")
                     }
                 }
             }
+
         }
     }
 }
