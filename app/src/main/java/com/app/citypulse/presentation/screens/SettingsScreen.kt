@@ -130,7 +130,7 @@ fun SettingsScreen(
         errorMessage= errorMsg,
         successMessage = successMsg,
         onDismiss   = { settingsViewModel.closeSubcatDialog() },
-        onAdd       = { name, cat -> settingsViewModel.addSubcategory(name, cat) }
+        onAdd       = { name, cat, imageUri,description  -> settingsViewModel.addSubcategory(name, cat, imageUri, description) }
     )
 }
 

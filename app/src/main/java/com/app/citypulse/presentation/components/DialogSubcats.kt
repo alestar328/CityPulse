@@ -1,9 +1,9 @@
 package com.app.citypulse.presentation.components
 
-import androidx.compose.foundation.background
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,7 +24,7 @@ fun DialogSubcats(
     onDismiss: () -> Unit,
     successMessage: String?,
     errorMessage: String?,
-    onAdd: (name: String, category: TipoCategoria) -> Unit,
+    onAdd: (name: String, category: TipoCategoria, imageUri: Uri?, description: String) -> Unit,
     settingsViewModel: SettingsViewModel = viewModel()
 
 ) {
@@ -32,10 +32,19 @@ fun DialogSubcats(
 
     var name by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
+    var description by remember { mutableStateOf("") }
     var selectedCat by remember { mutableStateOf(TipoCategoria.GASTRONOMICO) }
     var action by remember { mutableStateOf(SubcatAction.ADD) }
     var selectedSubcat by remember { mutableStateOf<SubcatItem?>(null) }
     var selectionError by remember { mutableStateOf<String?>(null) }
+
+    var localImageUri by remember { mutableStateOf<Uri?>(null) }
+    var remoteImageUrl by remember { mutableStateOf<String?>(null) }
+// Launcher para abrir galería
+
+    val imagePicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? -> localImageUri = uri }
+
 
     //Busqueda predictiva
     val subcats by settingsViewModel.subcats.collectAsState()
@@ -52,7 +61,6 @@ fun DialogSubcats(
             }
         }
     }
-
     val expandedSuggestions by remember(suggestions) {
         derivedStateOf { suggestions.isNotEmpty() }
     }
@@ -92,6 +100,24 @@ fun DialogSubcats(
                                     action = act
                                     selectedSubcat = null
                                     name = ""
+                                    when (act) {
+                                        SubcatAction.ADD -> {
+                                            // en ADD borramos toda imagen
+                                            localImageUri = null
+                                            remoteImageUrl = null
+                                            description    = ""
+                                        }
+                                        SubcatAction.UPDATE,
+                                        SubcatAction.DELETE -> {
+                                            // en UPDATE/DELETE, si hay una subcategoría previamente seleccionada,
+                                            // recargamos su image:
+                                            selectedSubcat?.image?.let { img ->
+                                                remoteImageUrl = img
+                                                localImageUri = null
+                                                description    = description ?: ""
+                                            }
+                                        }
+                                    }
                                 }
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -139,6 +165,9 @@ fun DialogSubcats(
                                     name = subcat.name
                                     selectedCat = subcat.category
                                     selectedSubcat = subcat
+                                    remoteImageUrl = subcat.image
+                                    localImageUri = null
+                                    description     = subcat.description ?: ""
                                 }
                             )
                         }
@@ -181,6 +210,45 @@ fun DialogSubcats(
                             }
                     }
                 }
+                Text("Descripción corta (máx 20 palabras)", style = MaterialTheme.typography.bodyMedium)
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { new ->
+                        // solo permitimos hasta 20 palabras
+                        if (new.trim().split("\\s+".toRegex()).size <= 20) {
+                            description = new
+                        }
+                    },
+                    placeholder = { Text("Escribe hasta 20 palabras…") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp),
+                    maxLines = 4
+                )
+                Text(
+                    text = "${description.trim().split("\\s+".toRegex()).size}/20 palabras",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.align(Alignment.End)
+                )
+
+                Text(text = "Imagen asociada", style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                PhotoContainer(
+                    url = remoteImageUrl,
+                    localUri = localImageUri,
+                    onClick = {
+                        imagePicker.launch("image/*")
+                    },
+                    onDelete = {
+                        localImageUri = null
+                        remoteImageUrl = null
+                    },
+                    modifier = Modifier
+                        .height(170.dp)
+                        .fillMaxWidth()
+                )
+
+
 
                 Spacer(modifier = Modifier.height(16.dp))
                 val selErr = selectionError
@@ -190,6 +258,7 @@ fun DialogSubcats(
                     selErr != null -> Text(selErr, color = Color.Red)
                     successMessage != null -> Text(successMessage, color = Color(0xFF4CAF50))
                 }
+                Spacer(modifier = Modifier.height(16.dp))
                 // Botones
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -207,29 +276,33 @@ fun DialogSubcats(
                     Button(
                         onClick = {
                             when (action) {
-                                SubcatAction.ADD ->
-                                    settingsViewModel.addSubcategory(name, selectedCat)
-
-                                SubcatAction.DELETE ->
-                                    settingsViewModel.deleteSubcategory(name, selectedCat)
-
+                                SubcatAction.ADD -> {
+                                    onAdd(name, selectedCat, localImageUri, description.trim())
+                                }
                                 SubcatAction.UPDATE -> {
-                                    val item = selectedSubcat
-                                    if (item != null)
+                                    selectedSubcat?.let { subcat ->
                                         settingsViewModel.updateSubcategory(
-                                            item.id,
-                                            name,
-                                            selectedCat
+                                            id        = subcat.id,
+                                            newName   = name.trim(),
+                                            newCategory = selectedCat,
+                                            newDescription= description.trim()
                                         )
-                                    else
-                                        selectionError =
-                                            "Selecciona una subcategoría para modificar"
+                                    }
+                                }
+                                SubcatAction.DELETE -> {
+                                    // aquí borras la subcategoría completa
+                                    settingsViewModel.deleteSubcategory(
+                                        name     = name.trim(),
+                                        category = selectedCat
+                                    )
                                 }
                             }
                         },
-                        enabled = name.isNotBlank()
-                                && (action != SubcatAction.UPDATE || selectedSubcat != null),
-
+                        enabled = when (action) {
+                            SubcatAction.ADD    -> name.isNotBlank()
+                            SubcatAction.UPDATE -> selectedSubcat != null && name.isNotBlank()
+                            SubcatAction.DELETE -> selectedSubcat != null
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF4CAF50),
                             contentColor = Color.White

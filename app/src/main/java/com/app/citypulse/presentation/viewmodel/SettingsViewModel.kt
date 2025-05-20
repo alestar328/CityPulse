@@ -1,11 +1,14 @@
 package com.app.citypulse.presentation.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.citypulse.data.dataUsers.SubcatItem
 import com.app.citypulse.data.enums.TipoCategoria
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -43,23 +46,24 @@ class SettingsViewModel : ViewModel() {
                     .orderBy("createdAt")
                     .get()
                     .await()
+
                 _subcats.value = snaps.documents.map { doc ->
-                    val catName = doc.getString("category") ?: ""
                     SubcatItem(
-                        id = doc.id,
-                        name = doc.getString("name").orEmpty(),
-                        category = TipoCategoria.values()
-                            .find { it.name == catName }
+                        id        = doc.id,
+                        name      = doc.getString("name").orEmpty(),
+                        category  = TipoCategoria.values()
+                            .find { it.name == doc.getString("category") }
                             ?: TipoCategoria.NONE,
-                        createdAt = doc.getTimestamp("createdAt")
+                        createdAt = doc.getTimestamp("createdAt"),
+                        image     = doc.getString("image")   // ← leemos el campo image
                     )
                 }
-            } catch (_: Exception) { /* opcional: _errorMessage */
+            } catch (_: Exception) {
+                // manejar error…
             }
-
         }
     }
-    fun updateSubcategory(id: String, newName: String, newCategory: TipoCategoria) {
+    fun updateSubcategory(id: String, newName: String, newCategory: TipoCategoria, newDescription: String) {
         val trimmed = newName.trim()
         when {
             trimmed.length > 30 -> {
@@ -90,7 +94,8 @@ class SettingsViewModel : ViewModel() {
                     .update(
                         mapOf(
                             "name"     to trimmed,
-                            "category" to newCategory.name
+                            "category" to newCategory.name,
+                            "description" to newDescription
                         )
                     )
                     .await()
@@ -153,7 +158,12 @@ class SettingsViewModel : ViewModel() {
         _showSubcatDialog.value = false
     }
 
-    fun addSubcategory(name: String, category: TipoCategoria) {
+    fun addSubcategory(
+        name: String,
+        category: TipoCategoria,
+        imageUri: Uri?,
+        description: String
+    ) {
         val trimmed = name.trim()
 
         when {
@@ -200,18 +210,37 @@ class SettingsViewModel : ViewModel() {
                     .document() // sin parámetros, Firestore asigna un ID único
 
                 val id = subcatRef.id
+                val now = com.google.firebase.Timestamp.now()
                 val data = mapOf(
                     "id" to id,
-                    "name" to name.trim(),
+                    "name" to trimmed,
                     "category" to category.name,
-                    "createdAt" to com.google.firebase.Timestamp.now()
+                    "description" to description.trim(),
+                    "createdAt" to now
                 )
 
                 // Guardamos bajo ese ID
                 subcatRef.set(data).await()
 
-                // 3) Informamos de éxito (no cerramos el diálogo aún)
-                _successMessage.value = "Subcategoría “${name.trim()}” guardada."
+                // 2) Si el usuario seleccionó una foto, la subimos
+                imageUri?.let { uri ->
+                    // ruta: users/{uid}/subcategories/{id}/{timestamp}.jpg
+                    val filename = "photo_${System.currentTimeMillis()}.jpg"
+                    val storageRef = Firebase.storage
+                        .reference
+                        .child("users/$uid/subcategories/$id/$filename")
+
+                    // subimos y obtenemos URL
+                    val uploadTask = storageRef.putFile(uri).await()
+                    val downloadUrl = storageRef.downloadUrl.await().toString()
+
+                    // guardamos el campo "image" en Firestore
+                    subcatRef.update("image", downloadUrl).await()
+                }
+
+                // 3) Refrescamos la lista y mostramos éxito
+                loadSubcategories()
+                _successMessage.value = "Subcategoría “$trimmed” guardada."
                 _errorMessage.value = null
 
             } catch (e: Exception) {

@@ -96,16 +96,33 @@ class AuthViewModel : ViewModel() {
     }
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
-            val result = authRepository.login(email, password)
-            val isSuccessful = result != null
-            onResult(isSuccessful)
-
-            // Si el login es exitoso, actualizamos el estado
-            _isAuthenticated.value = isSuccessful
-
-            if (isSuccessful) {
-                loadUserType()  // Cargar el tipo de usuario
+            val authResult = authRepository.login(email, password)
+            if (authResult == null) {
+                onResult(false)
+                return@launch
             }
+
+            val uid = authResult.user?.uid
+            if (uid == null) {
+                auth.signOut()
+                onResult(false)
+                return@launch
+            }
+            val userDoc = firestore.collection("users")
+                .document(uid)
+                .get()
+                .await()
+
+            if (!userDoc.exists()) {
+                auth.signOut()
+                onResult(false)
+                return@launch
+            }
+
+            _isAuthenticated.value = true
+            loadUserData()    // esto hará también _currentUser.value = UserItem(...)
+            loadUserType()
+            onResult(true)
         }
     }
 
