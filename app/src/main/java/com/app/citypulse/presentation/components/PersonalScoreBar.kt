@@ -32,9 +32,9 @@ fun PersonalScoreBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         ScoreItem(number = "0", label = "Asistidos")
-        Divider()
+        DividerBar()
         ScoreItem(number = "0", label = "Seguidores")
-        Divider()
+        DividerBar()
         ScoreItem(number = "0", label = "Creados")
     }
 }
@@ -52,3 +52,12 @@ fun ScoreItem(
     }
 }
 
+@Composable
+fun DividerBar() {
+    Box(
+        modifier = Modifier
+            .height(32.dp)
+            .width(1.dp)
+            .background(Color.Gray)
+    )
+}

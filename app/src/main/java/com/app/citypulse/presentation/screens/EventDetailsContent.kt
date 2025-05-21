@@ -15,18 +15,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.app.citypulse.data.dataUsers.SubcatItem
 import com.app.citypulse.presentation.viewmodel.EventDetailsUiState
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.app.citypulse.presentation.viewmodel.SettingsViewModel
+import com.app.citypulse.presentation.viewmodel.UserViewModel
 
 @Composable
 fun EventDetailsContent(
     eventId: String,
     viewModel: EventViewModel = hiltViewModel(),
+    userViewModel : UserViewModel,
+    settingsViewModel: SettingsViewModel,
     navController: NavController,
     innerPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     // 1️⃣ Estado del ViewModel
     val uiState by viewModel.eventDetailsUiState.collectAsState()
+    val subcats by settingsViewModel.subcats.collectAsState()
 
     // 2️⃣ Disparar la carga al entrar en pantalla
     LaunchedEffect(eventId) {
@@ -74,10 +80,13 @@ fun EventDetailsContent(
             // Extraemos los datos limpios del estado
             val success = uiState as EventDetailsUiState.Success
             val event = success.event
+            val matchedSubcat = subcats.find { it.name == event.subcategoria }
+
             val isCreator = success.isCreator
 
-            // Llamada al componente UI “tonto”, sólo datos + callbacks
-            EventDetailsScreen(event = event, navController = navController)
+
+                EventDetailsScreen(event = event, eventViewModel = viewModel, isCreator = isCreator, subCategory =  matchedSubcat ,navController = navController, userViewModel = userViewModel)
+
 
         }
     }

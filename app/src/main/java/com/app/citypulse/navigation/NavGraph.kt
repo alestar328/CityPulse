@@ -135,12 +135,12 @@ fun NavGraph(
         // Detalles del evento
         composable("event_details/{eventId}") { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
-            EventDetailsContent(eventId = eventId, viewModel = eventViewModel, navController = navController, innerPadding = innerPadding)
+            EventDetailsContent(eventId = eventId ,viewModel = eventViewModel, settingsViewModel = settingsViewModel,userViewModel = userViewModel ,navController = navController, innerPadding = innerPadding)
         }
 
         composable("edit_event/{eventId}") { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
-            EditEventScreen(eventId = eventId, viewModel = eventViewModel, navController = navController)
+            EditEventScreen(eventId = eventId, viewModel = eventViewModel, settingsViewModel= settingsViewModel,navController = navController)
         }
 
         // Otras pantallas

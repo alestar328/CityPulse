@@ -6,6 +6,7 @@ import com.google.firebase.Timestamp
 data class SubcatItem(
     val id: String = "",
     val name: String = "",
+    val creatorId: String? = null,
     val category: TipoCategoria = TipoCategoria.NONE,
     val createdAt: Timestamp? = null,
     val image: String? = null,

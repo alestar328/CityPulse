@@ -27,11 +27,74 @@ class EventRepository{
             throw e
         }
     }
+    suspend fun deleteImageFromGallery(eventId: String, imageUrl: String): Boolean {
+        return try {
+            val storageRef = Firebase.storage.getReferenceFromUrl(imageUrl)
+            storageRef.delete().await()
 
+            // Eliminar documento de la subcolección eventGallery
+            val eventGalleryRef = db.collection("Eventos")
+                .document(eventId)
+                .collection("eventGallery")
+
+            // Obtener el documento con esa URL
+            val snapshots = eventGalleryRef
+                .whereEqualTo("url", imageUrl)
+                .get()
+                .await()
+
+            for (doc in snapshots.documents) {
+                doc.reference.delete().await()
+            }
+
+            // También eliminar del array galleryPictureUrls en el documento principal
+            val eventDocRef = db.collection("Eventos").document(eventId)
+            val currentUrls = eventDocRef.get().await().get("galleryPictureUrls") as? List<String> ?: emptyList()
+            val updatedUrls = currentUrls.filterNot { it == imageUrl }
+
+            eventDocRef.update("galleryPictureUrls", updatedUrls).await()
+
+            true
+        } catch (e: Exception) {
+            println("⚠️ Error en deleteImageFromGallery: ${e.message}")
+            false
+        }
+    }
     suspend fun deleteEvent(eventId: String) {
         try {
-            db.collection("Eventos").document(eventId).delete().await()
+            val eventDocRef = db.collection("Eventos").document(eventId)
+
+            // 1. Obtener URLs de las imágenes del array galleryPictureUrls
+            val eventSnapshot = eventDocRef.get().await()
+            val galleryUrls = eventSnapshot.get("galleryPictureUrls") as? List<String> ?: emptyList()
+
+            // 2. Eliminar las imágenes de Firebase Storage
+            withContext(Dispatchers.IO) {
+                galleryUrls.map { url ->
+                    async {
+                        try {
+                            val ref = Firebase.storage.getReferenceFromUrl(url)
+                            ref.delete().await()
+                        } catch (e: Exception) {
+                            println("⚠️ Error eliminando imagen de Storage: ${e.message}")
+                        }
+                    }
+                }.awaitAll()
+            }
+
+            // 3. Eliminar los documentos de la subcolección `eventGallery`
+            val gallerySnapshots = eventDocRef.collection("eventGallery").get().await()
+            for (doc in gallerySnapshots.documents) {
+                doc.reference.delete().await()
+            }
+
+            // 4. Eliminar el documento del evento principal
+            eventDocRef.delete().await()
+
+            println("✅ Evento y sus imágenes eliminados correctamente.")
+
         } catch (e: Exception) {
+            println("⚠️ Error eliminando evento completo: ${e.message}")
             throw e
         }
     }

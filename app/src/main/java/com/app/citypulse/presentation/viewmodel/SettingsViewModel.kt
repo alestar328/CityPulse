@@ -38,30 +38,32 @@ class SettingsViewModel : ViewModel() {
 
     fun loadSubcategories() {
         val uid = auth.currentUser?.uid ?: return
-        viewModelScope.launch {
-            try {
-                val snaps = firestore.collection("users")
-                    .document(uid)
-                    .collection("subcategories")
-                    .orderBy("createdAt")
-                    .get()
-                    .await()
+        firestore.collection("users")
+            .document(uid)
+            .collection("subcategories")
+            .orderBy("createdAt")
+            .addSnapshotListener { snapshots, e ->
+                if (e != null || snapshots == null) {
+                    // Manejo básico de error
+                    _errorMessage.value = "Error al cargar subcategorías."
+                    return@addSnapshotListener
+                }
 
-                _subcats.value = snaps.documents.map { doc ->
+                val subcats = snapshots.documents.map { doc ->
                     SubcatItem(
-                        id        = doc.id,
-                        name      = doc.getString("name").orEmpty(),
-                        category  = TipoCategoria.values()
-                            .find { it.name == doc.getString("category") }
-                            ?: TipoCategoria.NONE,
+                        id = doc.id,
+                        creatorId = doc.getString("creatorId") ?: uid,
+                        name = doc.getString("name").orEmpty(),
+                        category = TipoCategoria.values()
+                            .find { it.name == doc.getString("category") } ?: TipoCategoria.NONE,
                         createdAt = doc.getTimestamp("createdAt"),
-                        image     = doc.getString("image")   // ← leemos el campo image
+                        image = doc.getString("image"),
+                        description = doc.getString("description")
                     )
                 }
-            } catch (_: Exception) {
-                // manejar error…
+
+                _subcats.value = subcats
             }
-        }
     }
     fun updateSubcategory(id: String, newName: String, newCategory: TipoCategoria, newDescription: String) {
         val trimmed = newName.trim()

@@ -6,10 +6,12 @@ import com.app.citypulse.data.dataUsers.UserItem
 import com.app.citypulse.data.model.EventUiModel
 import com.app.citypulse.data.repository.EventRepository
 import com.app.citypulse.data.repository.UserRepository
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -24,6 +26,7 @@ class UserViewModel(
     private val _assistedEvents = MutableStateFlow<List<EventUiModel>>(emptyList())
     val assistedEvents: StateFlow<List<EventUiModel>> = _assistedEvents.asStateFlow()
 
+    private val firestore = FirebaseFirestore.getInstance()
 
 
 
@@ -106,6 +109,26 @@ class UserViewModel(
         }
         _savedEvents.value = models
     }
+
+    fun fetchUserProfilePicture(uid: String, onResult: (String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val doc = firestore.collection("users")
+                    .document(uid)
+                    .get()
+                    .await()
+                val profileUrl = doc.getString("profilePictureUrl")
+                onResult(profileUrl)
+            } catch (e: Exception) {
+                onResult(null)
+            }
+        }
+    }
+
+
+
+
+
     // 🔹 Agregar una persona a Firestore
     fun addPerson(user: UserItem) {
         viewModelScope.launch {

@@ -20,21 +20,31 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Brush
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.components.CustomTextField
 import com.app.citypulse.presentation.components.DescriptionTextField
+import com.app.citypulse.presentation.components.DropdownSubcat
 import com.app.citypulse.presentation.components.NumericTextField
 import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.app.citypulse.presentation.viewmodel.SettingsViewModel
 import java.text.SimpleDateFormat
 
 @Composable
-fun EditEventScreen(eventId: String, viewModel: EventViewModel, navController: NavController) {
+fun EditEventScreen(
+    eventId: String,
+    viewModel: EventViewModel,
+    navController: NavController,
+    settingsViewModel: SettingsViewModel
+) {
     val context = LocalContext.current
-
     val eventState by viewModel.eventFlow.collectAsState()
+    val gallery by viewModel.galleryUrls.collectAsState()
+    val subcats by settingsViewModel.subcats.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getEventById(eventId)
+        settingsViewModel.loadSubcategories()
     }
 
     if (eventState == null) {
@@ -93,7 +103,11 @@ fun EditEventScreen(eventId: String, viewModel: EventViewModel, navController: N
 
             CustomTextField(value = nombre, label = "Nombre del evento", onValueChange = { nombre = it })
             CategoriaDropdown(selectedCategoria = categoriaSeleccionada) { categoriaSeleccionada = it }
-            CustomTextField(value = subcategoria, label = "Subcategoría", onValueChange = { subcategoria = it })
+            DropdownSubcat(
+                subcategoria = subcategoria,
+                onValueChange = { subcategoria = it },
+                settingsViewModel = settingsViewModel
+            )
             DescriptionTextField(value = descripcion, label = "Descripción", onValueChange = { descripcion = it })
             NumericTextField(value = precio, label = "Precio", onValueChange = { precio = it }, isDecimal = true)
             NumericTextField(value = aforo, label = "Aforo", onValueChange = { aforo = it })
@@ -131,8 +145,8 @@ fun EditEventScreen(eventId: String, viewModel: EventViewModel, navController: N
                         return@Button
                     }
 
-                    if (descripcion.length !in 20..50) {
-                        Toast.makeText(context, "La descripción debe tener entre 20 y 50 caracteres", Toast.LENGTH_SHORT).show()
+                    if (descripcion.length !in 10..15) {
+                        Toast.makeText(context, "La descripción debe tener entre 10 y 15 caracteres", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
 

@@ -71,7 +71,21 @@ class EventViewModel : ViewModel() {
             galleryPictureUrls = event.galleryPictureUrls ?: emptyList()
         )
     }
-
+    fun deleteImageFromGallery(eventId: String, imageUrl: String) {
+        viewModelScope.launch {
+            try {
+                val result = repository.deleteImageFromGallery(eventId, imageUrl)
+                if (result) {
+                    loadEventGallery(eventId)
+                    println("✅ Imagen eliminada de la galería y storage.")
+                } else {
+                    println("⚠️ No se pudo eliminar la imagen.")
+                }
+            } catch (e: Exception) {
+                println("⚠️ Error al eliminar la imagen: ${e.message}")
+            }
+        }
+    }
     fun createEvent(
         event: EventEntity,
         images: List<Uri>,
@@ -141,7 +155,7 @@ class EventViewModel : ViewModel() {
                     val isCreator =
                         FirebaseAuth.getInstance().currentUser?.uid == event.idRealizador
                     _eventDetailsUiState.value = EventDetailsUiState.Success(ui, isCreator)
-
+                    _eventFlow.value = event
                     // **Aquí recargamos la galería** desde la sub-colección:
                     loadEventGallery(eventId)
                 } else {

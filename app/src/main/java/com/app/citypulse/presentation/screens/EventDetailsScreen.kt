@@ -1,5 +1,7 @@
 package com.app.citypulse.presentation.screens
 
+import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,19 +28,39 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.app.citypulse.R
+import com.app.citypulse.data.dataUsers.SubcatItem
 import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.presentation.components.CardValueStars
 import com.app.citypulse.presentation.ui.theme.TurkBlue
+import com.app.citypulse.presentation.viewmodel.AuthViewModel
+import com.app.citypulse.presentation.viewmodel.EventViewModel
+import com.app.citypulse.presentation.viewmodel.UserViewModel
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetailsScreen(
     event: EventUiModel,
-    navController: NavController
+    subCategory: SubcatItem?,
+    navController: NavController,
+    userViewModel: UserViewModel,
+    isCreator: Boolean,
+    eventViewModel: EventViewModel
 ) {
-    var rating by remember { mutableStateOf(event.valoracion) }
-    val avatarUrl = event.galleryPictureUrls.firstOrNull() ?: ""
+    var rating by remember { mutableIntStateOf(event.valoracion) }
+    var profilePicUrl by remember { mutableStateOf<String?>(null) }
+
+    var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(event.idRealizador) {
+        userViewModel.fetchUserProfilePicture(event.idRealizador) { url ->
+            profilePicUrl = url
+        }
+    }
+    val avatarUrl = profilePicUrl ?: ""
+
+    Log.d("EventDetailsScreen", "Subcategory: $subCategory")
+
 
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -184,17 +206,9 @@ fun EventDetailsScreen(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "La Fira Villarroel",
+                        text = event.lugar,
                         fontSize = 20.sp
                     )
-                }
-            }
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(text = event.lugar, fontSize = 18.sp)
                 }
             }
             item {
@@ -231,40 +245,81 @@ fun EventDetailsScreen(
                 }
             }
             item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(text = subCategory?.description ?: "Sin descripción", fontSize = 20.sp)
+                }
+            }
+            item {
                 CardValueStars(
-                    avatarUrl         = avatarUrl,
-                    rating            = rating,
-                    onRatingChanged   = { newRating -> rating = newRating }
+                    avatarUrl = avatarUrl,
+                    rating = rating,
+                    onRatingChanged = { newRating -> rating = newRating }
                 )
             }
+            if (isCreator) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Botón "Borrar"
+                        OutlinedButton(
+                            onClick = { showDeleteConfirmationDialog = true },
+                            modifier = Modifier.weight(1f),
+                            border = BorderStroke(1.dp, Color(0xFF1976D2)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color.Red,
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Borrar")
+                        }
+
+                        // Botón "Aplicar"
+                        Button(
+                            onClick = {
+                                navController.navigate("edit_event/${event.id}")
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF1976D2),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Editar")
+                        }
+                    }
+                }
+            }
+        }
+        if (showDeleteConfirmationDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteConfirmationDialog = false },
+                title = { Text("Confirmar eliminación") },
+                text = { Text("¿Estás seguro de que quieres eliminar este evento? Esta acción no se puede deshacer.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        eventViewModel.deleteEvent(event.id, navController)
+                        showDeleteConfirmationDialog = false
+                    }) {
+                        Text("Sí, borrar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        showDeleteConfirmationDialog = false
+                    }) {
+                        Text("Cancelar")
+                    }
+                }
+            )
         }
     }
 
 }
 
-@Preview
-@Composable
-fun EventDetailsScreenPreview() {
-    val sampleEvent = EventUiModel(
-        id = "1",
-        nombre = "Carnaval Catalán",
-        nomOrg = "Razzmatazz",
-        categoria = TipoCategoria.FIESTA,
-        subcategoria = "Disfraces",
-        descripcion = "Un concierto de prueba para el instituto jajajajja",
-        lugar = "C. Monaco 196 , 08204 Barcelona, Spain",
-        latitud = 0.0,
-        longitud = 0.0,
-        fechaInicio = "Sab, 22 feb 2025 19:00",
-        fechaFin = "Sab, 22 feb 2025 23:30",
-        aforo = 500,
-        precio = 20.0,
-        valoracion = 4
-    )
-
-    val navController = rememberNavController()
-    EventDetailsScreen(
-        event = sampleEvent,
-        navController = navController
-    )
-}

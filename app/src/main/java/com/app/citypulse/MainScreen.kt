@@ -37,11 +37,11 @@ fun MainScreen(
     var showFilterDialog by remember { mutableStateOf(false) }
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val currentRoute = navBackStackEntry?.destination?.route ?: ""
     val authRoutes = listOf("login", "register", "register2")
     val hideBottomBarRoutes =
-        listOf("login", "register", "register2", "saved_events", "assisted_events")
-    val showBottomBar = currentRoute !in hideBottomBarRoutes
+        listOf("login", "register", "register2", "saved_events", "assisted_events","event_details")
+    val showBottomBar = hideBottomBarRoutes.none { currentRoute.startsWith(it) }
     val showSearchTopBar = navController.currentBackStackEntryAsState().value?.destination?.route == "map_screen"
     val locationViewModel: LocationViewModel = viewModel()
 
