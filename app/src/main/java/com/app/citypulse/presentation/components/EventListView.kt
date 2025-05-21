@@ -10,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.app.citypulse.data.enums.TipoCategoria
 import com.app.citypulse.data.model.EventFilters
 import com.app.citypulse.data.model.EventUiModel
 
@@ -20,15 +19,20 @@ fun EventListView(
     filters: EventFilters,  // tu data class con categorías, subcats y rating
     navController: NavController,
     onSaved: (EventUiModel) -> Unit,
+    modifier: Modifier = Modifier,
     onAssisted: (EventUiModel) -> Unit
 ) {
     // 1) Aplica aquí tu lógica de filtrado:
     val filtered = remember(events, filters) {
         events
-            .filter { filters.category == TipoCategoria.NONE || it.categoria == filters.category }
-            .filter { filters.subcategories.isEmpty() || filters.subcategories.contains(it.subcategoria) }
-            .filter { filters.rating == null || it.valoracion >= filters.rating }
+            // Filtrado por categoría (puede ser múltiples)
+            .filter { filters.categories.isEmpty() || it.categoria in filters.categories }
+            // Filtrado por subcategoría (puede ser múltiples)
+            .filter { filters.subcategories.isEmpty() || it.subcategoria in filters.subcategories }
+            // Filtrado por valoración mínima
+            .filter { filters.rating == null || it.valoracion >= filters.rating!! }
     }
+
 
     // 2) Renderiza la LazyColumn:
     LazyColumn(

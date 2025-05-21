@@ -2,6 +2,7 @@ package com.app.citypulse
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,8 +23,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.app.citypulse.navigation.NavGraph
 import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.data.model.EventFilters
 import com.app.citypulse.navigation.BottomNavBar
 import com.app.citypulse.presentation.components.DialogFiltersEvents
+import com.app.citypulse.presentation.components.EventListView
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.viewmodel.LocationViewModel
@@ -34,23 +37,27 @@ fun MainScreen(
     eventViewModel: EventViewModel = viewModel(),
     authViewModel: AuthViewModel = viewModel()
 ) {
-    var showFilterDialog by remember { mutableStateOf(false) }
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: ""
     val authRoutes = listOf("login", "register", "register2")
     val hideBottomBarRoutes =
-        listOf("login", "register", "register2", "saved_events", "assisted_events","event_details")
+        listOf("login", "register", "register2", "saved_events", "assisted_events", "event_details")
     val showBottomBar = hideBottomBarRoutes.none { currentRoute.startsWith(it) }
-    val showSearchTopBar = navController.currentBackStackEntryAsState().value?.destination?.route == "map_screen"
+    val showSearchTopBar =
+        navController.currentBackStackEntryAsState().value?.destination?.route == "map_screen"
     val locationViewModel: LocationViewModel = viewModel()
 
     val eventLocations by eventViewModel.eventUiList.collectAsState()
     var selectedCategory by remember { mutableStateOf(TipoCategoria.NONE) }
 
+    var showFilterDialog by remember { mutableStateOf(false) }
+    var showResults by remember { mutableStateOf(false) }
+    var filters by remember { mutableStateOf(EventFilters()) }
+    val events by eventViewModel.eventUiList.collectAsState()
+
     Scaffold(
         containerColor = Color.Transparent,
-
         bottomBar = {
             if (showBottomBar) {
                 BottomNavBar(
@@ -70,17 +77,31 @@ fun MainScreen(
     ) { innerPadding ->
         // Usamos un Box para superponer la barra encima del contenido
         Box(modifier = Modifier.fillMaxSize()) {
-            // 1) Contenido principal (NavGraph) donde se muestra el mapa
-            NavGraph(
-                navController = navController,
-                innerPadding = innerPadding,
-                authViewModel       = authViewModel,
-                eventLocations    = eventLocations,
-                selectedCategory  = selectedCategory,
-                locationViewModel =locationViewModel
+            if (showResults) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.7f)
+                ) {
+                    EventListView(
+                        events = events,
+                        filters = filters,
+                        navController = navController,
+                        onSaved = { /*…*/ },
+                        onAssisted = { /*…*/ }
+                    )
+                }
+            } else {
+                NavGraph(
+                    navController = navController,
+                    innerPadding = innerPadding,
+                    authViewModel = authViewModel,
+                    eventLocations = eventLocations,
+                    selectedCategory = selectedCategory,
+                    locationViewModel = locationViewModel
                 )
-
-            if (showSearchTopBar) {
+            }
+            if (!showResults && showSearchTopBar) {
                 SearchTopbar(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
@@ -96,7 +117,7 @@ fun MainScreen(
                             ?.set("searchEventId", event.id)
                         navController.navigate("map_screen") {
                             launchSingleTop = true
-                            restoreState   = true
+                            restoreState = true
 
                         }
                     },
@@ -110,17 +131,16 @@ fun MainScreen(
                             ?.remove<Long>("searchEventId")
                     }
                 )
+                DialogFiltersEvents(
+                    show    = showFilterDialog,
+                    onDismiss = { showFilterDialog = false },
+                    onApply   = { newFilters ->
+                        filters         = newFilters
+                        showFilterDialog= false
+                        showResults     = true
+                    }
+                )
             }
-            DialogFiltersEvents(
-                show = showFilterDialog,
-                onDismiss = { showFilterDialog = false },
-                onOptionSelected = { option ->
-                    // aquí manejas la opción (p. ej. filtrar tu lista)
-                    showFilterDialog = false
-                }
-            )
-
-
 
 
         }

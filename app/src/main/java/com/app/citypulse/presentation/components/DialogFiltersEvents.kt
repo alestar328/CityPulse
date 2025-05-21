@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.data.model.EventFilters
 import com.app.citypulse.presentation.viewmodel.SettingsViewModel
 
 enum class FilterOption(val label: String) {
@@ -26,7 +27,7 @@ enum class FilterOption(val label: String) {
 fun DialogFiltersEvents(
     show: Boolean,
     onDismiss: () -> Unit,
-    onOptionSelected: (FilterOption) -> Unit,
+    onApply: (EventFilters) -> Unit,
     settingsViewModel: SettingsViewModel = viewModel()
 ) {
     var selectedCats by remember { mutableStateOf(setOf<TipoCategoria>()) }
@@ -128,7 +129,10 @@ fun DialogFiltersEvents(
                 ) {
                     // Botón "Borrar"
                     OutlinedButton(
-                        onClick = { /* TODO: limpiar filtros */ },
+                        onClick = {
+                            selectedCats = emptySet()
+                            selectedStars = null
+                        },
                         modifier = Modifier.weight(1f),
                         border = BorderStroke(1.dp, Color(0xFF1976D2)),
                         colors = ButtonDefaults.outlinedButtonColors(
@@ -141,7 +145,18 @@ fun DialogFiltersEvents(
 
                     // Botón "Aplicar"
                     Button(
-                        onClick = { /* TODO: aplicar filtros */ },
+                        onClick = {
+                            // 1) Creamos el objeto EventFilters
+                            val filters = EventFilters(
+                                categories     = selectedCats,
+                                subcategories  = displayedSubcats.map { it.name }.toSet(),
+                                rating         = selectedStars
+                            )
+                            // 2) Llamamos al callback
+                            onApply(filters)
+                            // 3) Cerramos el diálogo
+                            onDismiss()
+                        },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF1976D2),

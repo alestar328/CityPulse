@@ -6,8 +6,10 @@ import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.app.citypulse.data.model.EventUiModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.SphericalUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -39,6 +41,15 @@ class LocationViewModel(
                 }
             }
         }
+    }
+
+    fun List<EventUiModel>.filterByProximity(
+        userLoc: LatLng,
+        radius: Double
+    ): List<EventUiModel> = filter { event ->
+        val eventLoc = LatLng(event.latitud, event.longitud)
+        val distance = SphericalUtil.computeDistanceBetween(userLoc, eventLoc)
+        distance <= radius
     }
 
 }
