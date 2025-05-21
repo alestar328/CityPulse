@@ -109,8 +109,7 @@ fun CardReviewEvent(
         Spacer(modifier = Modifier.height(12.dp))
         // Botones condicionales
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            when {
-                isCurrentUser -> {
+            if (isCurrentUser) {
                     Text(
                         text = "Editar",
                         modifier = Modifier.clickable(onClick = onEdit),
@@ -125,16 +124,16 @@ fun CardReviewEvent(
                     )
                 }
 
-                isEventOwner -> {
+            else if (isEventOwner) {
                     Text(
-                        text = "Revisar",
+                        text = "Reportar",
                         modifier = Modifier.clickable(onClick = onReview),
                         color = Color.Blue,
                         fontSize = 14.sp
                     )
-                }
 
-                else -> {} // No se muestran botones
+
+
             }
         }
 

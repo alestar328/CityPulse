@@ -38,11 +38,9 @@ fun DialogFiltersEvents(
 
     val displayedSubcats = remember(allSubcats, selectedCats) {
         if (selectedCats.isEmpty()) {
-            allSubcats.map { it.name }
-        } else {
             allSubcats
-                .filter { it.category in selectedCats }
-                .map { it.name }
+        } else {
+            allSubcats.filter { it.category in selectedCats }
         }
     }
 

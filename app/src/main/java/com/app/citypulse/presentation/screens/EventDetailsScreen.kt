@@ -330,8 +330,8 @@ fun EventDetailsScreen(
                         userName = comment.userName,
                         userType = "", // Puedes reemplazar con datos reales si los tienes
                         commentText = comment.message.orEmpty(),
-                        isCurrentUser = comment.userId == currentUser?.uid,
-                        isEventOwner = currentUser?.uid == event.idRealizador,
+                        isCurrentUser =  comment.userId == currentUser?.uid,
+                        isEventOwner = isCreator,
                         onRatingChanged = {},
                         onEdit = {
                             commentToEdit = comment
@@ -345,6 +345,7 @@ fun EventDetailsScreen(
                         },
                         onReview = { /* Agrega lógica de revisión para el creador */ }
                     )
+                    Spacer(Modifier.height(24.dp))
 
                 }
 
