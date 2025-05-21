@@ -67,6 +67,8 @@ android {
 }
 
 dependencies {
+    implementation( "com.google.maps.android:android-maps-utils:3.5.0")
+
     //Imagenes desde el movil:
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
