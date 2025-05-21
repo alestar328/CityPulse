@@ -28,11 +28,13 @@ fun ReviewEventSection(
     avatarUrl: String?,
     userName: String,
     initialRating: Int,
+    initialText: String = "",
     onBack: () -> Unit,
     onPublish: (rating: Int, reviewText: String) -> Unit
 ) {
     var rating by remember { mutableStateOf(initialRating) }
-    var reviewText by remember { mutableStateOf("") }
+    var reviewText by remember { mutableStateOf(initialText) }
+
 
     Scaffold(
         topBar = {

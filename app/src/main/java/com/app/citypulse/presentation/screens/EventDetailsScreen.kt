@@ -1,8 +1,8 @@
 package com.app.citypulse.presentation.screens
 
+import androidx.compose.foundation.lazy.items
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.citypulse.data.model.EventUiModel
@@ -23,17 +22,17 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.app.citypulse.R
 import com.app.citypulse.data.dataUsers.SubcatItem
-import com.app.citypulse.data.enums.TipoCategoria
+import com.app.citypulse.data.model.Comment
+import com.app.citypulse.presentation.components.CardReviewEvent
 import com.app.citypulse.presentation.components.CardValueStars
 import com.app.citypulse.presentation.components.ReviewEventSection
 import com.app.citypulse.presentation.ui.theme.TurkBlue
 import com.app.citypulse.presentation.viewmodel.AuthViewModel
+import com.app.citypulse.presentation.viewmodel.CommentsViewModel
 import com.app.citypulse.presentation.viewmodel.EventViewModel
 import com.app.citypulse.presentation.viewmodel.UserViewModel
 import java.util.Locale
@@ -50,15 +49,28 @@ fun EventDetailsScreen(
 ) {
     var rating by remember { mutableIntStateOf(event.valoracion) }
     var profilePicUrl by remember { mutableStateOf<String?>(null) }
-
+    val authViewModel: AuthViewModel = viewModel()
+    val currentUser by authViewModel.currentUser.collectAsState()
     var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
     var showReviewSection by remember { mutableStateOf(false) }
     var selectedRating by remember { mutableIntStateOf(0) }
+    val loggedInAvatarUrl = currentUser?.profilePictureUrl.orEmpty()
+    val userAvatar = currentUser?.profilePictureUrl.orEmpty()
+    val userNameStr = "${currentUser?.name.orEmpty()} ${currentUser?.surname.orEmpty()}"
+    val commentsViewModel: CommentsViewModel = viewModel()
+    var commentToEdit by remember { mutableStateOf<Comment?>(null) }
+    var selectedText   by remember { mutableStateOf("") }
+    var commentToDeleteId by remember { mutableStateOf<String?>(null) }
+    var showDeleteCommentDialog by remember { mutableStateOf(false) }
+    val comments by commentsViewModel.comments.collectAsState(initial = emptyList())
 
     LaunchedEffect(event.idRealizador) {
         userViewModel.fetchUserProfilePicture(event.idRealizador) { url ->
             profilePicUrl = url
         }
+    }
+    LaunchedEffect(event.id) {
+        commentsViewModel.fetchComments(event.id)
     }
     LaunchedEffect(selectedRating) {
         if (selectedRating > 0) {
@@ -73,35 +85,61 @@ fun EventDetailsScreen(
     if (showReviewSection) {
         ReviewEventSection(
             placeName = event.nombre,
-            avatarUrl = avatarUrl,
+            avatarUrl = userAvatar,
+            initialText = selectedText,  // texto previo en edición
             initialRating = selectedRating,
-            userName = "Tu nombre aquí", // o recógelo desde el userViewModel
-            onBack = { showReviewSection = false },
-            onPublish = { rating, reviewText ->
+            userName = userNameStr, // o recógelo desde el userViewModel
+            onBack = {
                 showReviewSection = false
-                println("⭐ Publicado: $rating estrellas, texto: $reviewText")
+                commentToEdit = null
+            },
+            onPublish = { rating, reviewText ->
+                if (commentToEdit != null) {
+                    // — EDICIÓN —
+                    commentsViewModel.updateComment(
+                        eventId   = event.id,
+                        commentId = commentToEdit!!.id,
+                        newRating = rating,
+                        newMessage = reviewText
+                    ) { success ->
+                        showReviewSection = false
+                        commentToEdit     = null
+                        if (success) commentsViewModel.fetchComments(event.id)
+                    }
+                } else {
+                    // — CREACIÓN —
+                    commentsViewModel.addComment(
+                        eventId     = event.id,
+                        organizerId = event.idRealizador,
+                        rating      = rating,
+                        message     = reviewText
+                    ) { success ->
+                        showReviewSection = false
+                        if (success) commentsViewModel.fetchComments(event.id)
+                    }
+                }
             }
         )
-    }  else {
-    Column(modifier = Modifier.fillMaxSize()) {
+    } else {
+        Column(modifier = Modifier.fillMaxSize()) {
 
-        TopAppBar(
-            title = { Text("Detalles del evento") },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Volver",
-                        tint = Color.White
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = TurkBlue,
-                navigationIconContentColor = Color.White,
-                titleContentColor = Color.White
+            TopAppBar(
+                title = { Text("Detalles del evento") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color.White
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = TurkBlue,
+                    navigationIconContentColor = Color.White,
+                    titleContentColor = Color.White
+                )
             )
-        )
 
             LazyColumn(
                 modifier = Modifier
@@ -276,7 +314,7 @@ fun EventDetailsScreen(
                 }
                 item {
                     CardValueStars(
-                        avatarUrl = avatarUrl,
+                        avatarUrl = loggedInAvatarUrl,
                         rating = rating,
                         onRatingChanged = { newRating ->
                             rating = newRating
@@ -285,6 +323,31 @@ fun EventDetailsScreen(
                         }
                     )
                 }
+                items(comments) { comment ->
+                    CardReviewEvent(
+                        avatarUrl = comment.userProfileUrl.orEmpty(),
+                        rating = comment.rating ?: 0,
+                        userName = comment.userName,
+                        userType = "", // Puedes reemplazar con datos reales si los tienes
+                        commentText = comment.message.orEmpty(),
+                        isCurrentUser = comment.userId == currentUser?.uid,
+                        isEventOwner = currentUser?.uid == event.idRealizador,
+                        onRatingChanged = {},
+                        onEdit = {
+                            commentToEdit = comment
+                            selectedRating  = comment.rating ?: 0
+                            selectedText   = comment.message.orEmpty()
+                            showReviewSection  = true
+                        },
+                        onDelete = {
+                            commentToDeleteId = comment.id
+                            showDeleteCommentDialog = true
+                        },
+                        onReview = { /* Agrega lógica de revisión para el creador */ }
+                    )
+
+                }
+
                 if (isCreator) {
                     item {
                         Row(
@@ -303,7 +366,7 @@ fun EventDetailsScreen(
                                     contentColor = Color.White
                                 )
                             ) {
-                                Text("Borrar")
+                                Text("Borrar Evento")
                             }
 
                             // Botón "Aplicar"
@@ -317,11 +380,37 @@ fun EventDetailsScreen(
                                     contentColor = Color.White
                                 )
                             ) {
-                                Text("Editar")
+                                Text("Editar Evento")
                             }
                         }
                     }
                 }
+            }
+
+
+            if (showDeleteCommentDialog && commentToDeleteId != null) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteCommentDialog = false },
+                    title = { Text("Borrar comentario") },
+                    text = { Text("¿Seguro que quieres eliminar este comentario?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            commentsViewModel.deleteComment(
+                                event.id,
+                                commentToDeleteId!!
+                            ) { success ->
+                                showDeleteCommentDialog = false
+                            }
+                        }) {
+                            Text("Borrar", color = Color.Red)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDeleteCommentDialog = false }) {
+                            Text("Cancelar")
+                        }
+                    }
+                )
             }
         }
         if (showDeleteConfirmationDialog) {
