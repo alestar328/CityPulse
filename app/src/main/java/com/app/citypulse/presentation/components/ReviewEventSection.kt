@@ -27,10 +27,11 @@ fun ReviewEventSection(
     placeName: String,
     avatarUrl: String?,
     userName: String,
+    initialRating: Int,
     onBack: () -> Unit,
     onPublish: (rating: Int, reviewText: String) -> Unit
 ) {
-    var rating by remember { mutableStateOf(0) }
+    var rating by remember { mutableStateOf(initialRating) }
     var reviewText by remember { mutableStateOf("") }
 
     Scaffold(
@@ -157,6 +158,7 @@ fun ReviewScreenPreview() {
     ReviewEventSection(
         placeName = "Braseria Sokystwo",
         avatarUrl = null,
+        initialRating = 3,
         userName = "alejandro ormeño",
         onBack = {},
         onPublish = { rating, text -> /* ... */ }
